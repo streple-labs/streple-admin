@@ -1,25 +1,50 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import { anton } from "@/app/fonts";
+import api from "@/utils/axios";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { toast } from "sonner";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
 
-export default function SignupForm({
-  loading,
-  formData,
-  handleChange,
-  handleSubmit,
-}: {
-  formData: {
-    name: string;
-    email: string;
-    password: string;
-  };
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (e: React.FormEvent) => void;
-  loading: boolean;
-}) {
+export default function Login() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const { mutate: handleLogin, isPending: loading } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: async (data: typeof formData) =>
+      await api.post("/auth/login", data),
+    onSuccess: (res) => {
+      console.log("response", res);
+      toast.success("login successful.");
+    },
+    onError: (error: any) => {
+      console.error("Signup failed:", error);
+      toast.error(
+        error?.userMessage ||
+          error?.message ||
+          error?.response?.data?.message ||
+          "Signup failed. Please try again later."
+      );
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    handleLogin(formData);
+  };
 
   return (
     <form
@@ -30,7 +55,7 @@ export default function SignupForm({
         <h4
           className={`tracking-[2px] leading-[150%] font-normal text-2xl md:text-3xl lg:text-4xl ${anton.className} w-full text-center`}
         >
-          Sign up to get started
+          Welcome back
         </h4>
         <div className="w-full flex flex-col gap-4 md:gap-6">
           <div className="h-[55px] md:h-[82px] cursor-pointer w-full text-base px-6 py-5 rounded-[10px] md:rounded-[20px] gap-4 bg-[#242324] flex items-center justify-center">
@@ -46,25 +71,6 @@ export default function SignupForm({
             <span className="h-[1px] bg-[#FFFFFF33] rounded-full w-full" />
           </span>
 
-          <label className="space-y-1.5 md:space-y-3">
-            <p className="font-normal text-sm md:text-base leading-6 tracking-[1px]">
-              Full name
-            </p>
-            <input
-              value={formData.name}
-              name="name"
-              onChange={handleChange}
-              required
-              title="Please enter your full name"
-              type="text"
-              placeholder="e.g John Doe"
-              className={`h-[60px] md:h-[82px] w-full py-5 px-3 md:px-6 rounded-[10px] md:rounded-[20px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 text-base outline-0 ring-0 caret-[#B39FF0] ${
-                formData.name
-                  ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
-                  : "bg-[#242324] text-white"
-              }`}
-            />
-          </label>
           <label className="space-y-1.5 md:space-y-3">
             <p className="font-normal text-sm md:text-base leading-6 tracking-[1px]">
               Email address

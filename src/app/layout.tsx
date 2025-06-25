@@ -1,3 +1,4 @@
+import Providers from "@/providers/providers";
 import type { Metadata, Viewport } from "next";
 import { openSans } from "./fonts";
 import "./globals.css";
@@ -58,7 +59,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${openSans.className} antialiased`}>{children}</body>
+      <Providers>
+        <body className={`${openSans.className} antialiased`}>{children}</body>
+      </Providers>
     </html>
   );
 }

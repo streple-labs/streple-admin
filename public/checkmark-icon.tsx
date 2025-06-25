@@ -54,8 +54,8 @@ export default function CheckmarkIcon() {
           y2="64.0854"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#9274F2" stop-opacity="0.8" />
-          <stop offset="1" stop-color="#9274F2" stop-opacity="0.1" />
+          <stop stopColor="#9274F2" stopOpacity="0.8" />
+          <stop offset="1" stopColor="#9274F2" stopOpacity="0.1" />
         </linearGradient>
         <image
           id="image0_376_1021"
