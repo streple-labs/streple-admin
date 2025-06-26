@@ -1,4 +1,5 @@
 import { anton } from "@/app/fonts";
+import { passwordValidation } from "@/utils/utils";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import GoogleIcon from "../../../public/google-icon";
@@ -11,7 +12,7 @@ export default function SignupForm({
   handleSubmit,
 }: {
   formData: {
-    name: string;
+    fullName: string;
     email: string;
     password: string;
   };
@@ -23,7 +24,7 @@ export default function SignupForm({
 
   return (
     <form
-      className="size-full space-y-[40px] md:space-y-[60px] md:mb-[120px]"
+      className="size-full space-y-[40px] md:space-y-[60px] md:h-screen"
       onSubmit={handleSubmit}
     >
       <div className="space-y-8 w-full">
@@ -51,15 +52,15 @@ export default function SignupForm({
               Full name
             </p>
             <input
-              value={formData.name}
-              name="name"
+              value={formData.fullName}
+              name="fullName"
               onChange={handleChange}
               required
               title="Please enter your full name"
               type="text"
               placeholder="e.g John Doe"
               className={`h-[60px] md:h-[82px] w-full py-5 px-3 md:px-6 rounded-[10px] md:rounded-[20px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 text-base outline-0 ring-0 caret-[#B39FF0] ${
-                formData.name
+                formData.fullName
                   ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
                   : "bg-[#242324] text-white"
               }`}
@@ -89,33 +90,54 @@ export default function SignupForm({
             <p className="font-normal text-sm md:text-base leading-6 tracking-[1px]">
               Password
             </p>
-            <span className="relative">
-              <input
-                pattern=".{8,}"
-                title="Password must be at least 8 characters long"
-                value={formData.password}
-                name="password"
-                onChange={handleChange}
-                type={showPassword ? "text" : "password"}
-                required
-                placeholder="Minimum of 8 characters"
-                className={`h-[60px] md:h-[82px] w-full text-base py-5 px-3 md:px-6 rounded-[10px] md:rounded-[20px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] ${
-                  formData.password
-                    ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
-                    : "bg-[#242324] text-white"
-                }`}
-              />
-              <span
-                className="absolute right-4 top-1/2 -translate-y-1/2"
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? (
-                  <IoEyeOffOutline size={16} color="#FFFFFFB2" />
-                ) : (
-                  <IoEyeOutline size={16} color="#FFFFFFB2" />
-                )}
+            <div className="relative space-y-2">
+              <span className="relative">
+                <input
+                  pattern=".{8,}"
+                  title="Password must be at least 8 characters long"
+                  value={formData.password}
+                  name="password"
+                  onChange={handleChange}
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="Minimum of 8 characters"
+                  className={`h-[60px] md:h-[82px] w-full text-base py-5 px-3 md:px-6 rounded-[10px] md:rounded-[20px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] ${
+                    formData.password
+                      ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
+                      : "bg-[#242324] text-white"
+                  }`}
+                />
+                <span
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? (
+                    <IoEyeOffOutline size={16} color="#FFFFFFB2" />
+                  ) : (
+                    <IoEyeOutline size={16} color="#FFFFFFB2" />
+                  )}
+                </span>
               </span>
-            </span>
+              {formData.password && (
+                <>
+                  <div className="flex gap-1 mt-2">
+                    {Array.from({
+                      length: passwordValidation(formData.password)
+                        .passedChecks,
+                    }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="h-0.5 w-[70px] rounded-full bg-[#B39FF0]"
+                      />
+                    ))}
+                  </div>
+
+                  <p className="text-white/40 leading-4 text-sm tracking-[1px]">
+                    {passwordValidation(formData.password).message}
+                  </p>
+                </>
+              )}
+            </div>
           </label>
         </div>
       </div>

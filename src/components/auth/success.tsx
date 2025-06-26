@@ -1,5 +1,6 @@
 import { anton } from "@/app/fonts";
 import CheckmarkIcon from "../../../public/checkmark-icon";
+import Link from "next/link";
 
 export default function Success() {
   return (
@@ -23,13 +24,15 @@ export default function Success() {
               </p>
             </div>
 
-            <button
-              className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
-              title="success"
-              // type="submit"
-            >
-              Continue
-            </button>
+            <Link href={"/login"}>
+              <button
+                className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
+                title="success"
+                // type="submit"
+              >
+                Continue
+              </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -10,10 +10,10 @@ import SignupForm from "./signup-form";
 import Success from "./success";
 
 export default function Signup() {
-  const [stage, setStage] = useState<"form" | "otp" | "success">("otp");
+  const [stage, setStage] = useState<"form" | "otp" | "success">("form");
 
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     password: "",
   });
@@ -32,11 +32,10 @@ export default function Signup() {
       setStage("otp");
     },
     onError: (error: any) => {
-      console.error("Signup failed:", error);
       toast.error(
-        error?.userMessage ||
+        error?.response?.data?.message ||
+          error?.userMessage ||
           error?.message ||
-          error?.response?.data?.message ||
           "Signup failed. Please try again later."
       );
     },

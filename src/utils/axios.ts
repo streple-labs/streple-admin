@@ -14,7 +14,7 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 const api = axios.create({
   baseURL: base_url,
-  timeout: 10000,
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },

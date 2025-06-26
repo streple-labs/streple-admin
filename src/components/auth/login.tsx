@@ -31,11 +31,10 @@ export default function Login() {
       toast.success("login successful.");
     },
     onError: (error: any) => {
-      console.error("Signup failed:", error);
       toast.error(
-        error?.userMessage ||
+        error?.response?.data?.message ||
+          error?.userMessage ||
           error?.message ||
-          error?.response?.data?.message ||
           "Signup failed. Please try again later."
       );
     },
@@ -48,7 +47,7 @@ export default function Login() {
 
   return (
     <form
-      className="size-full space-y-[40px] md:space-y-[60px] md:mb-[120px]"
+      className="size-full space-y-[40px] md:space-y-[60px]"
       onSubmit={handleSubmit}
     >
       <div className="space-y-8 w-full">

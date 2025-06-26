@@ -1,5 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { anton } from "@/app/fonts";
+import api from "@/utils/axios";
+import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import Loader from "../loader";
 
 const focusToNextInput = (target: HTMLElement) => {
   const nextElementSibling = target.nextElementSibling as HTMLInputElement;
@@ -52,19 +57,41 @@ export default function OtpForm({
       if (!isDigit) return;
 
       focusToNextInput(e.target);
-    } else if (val.length === 4) {
+    } else if (val.length === 6) {
       setValue(val);
 
       e.target.blur();
     }
   };
 
+  const {
+    mutate: handleVerifyToken,
+    isPending: loading,
+    isError,
+    error,
+  } = useMutation({
+    mutationKey: ["otp-verification"],
+    mutationFn: async (data: string) =>
+      await api.post("/auth/verify-otp", data),
+    onSuccess: (res) => {
+      console.log("response", res);
+      toast.success("OTP verification successful.");
+      setStage("success");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.userMessage ||
+          error?.message ||
+          "Signup failed. Please try again later."
+      );
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Handle OTP submission logic here
-    console.log(value);
-    setStage("success");
+    handleVerifyToken(value.trim());
   };
 
   return (
@@ -95,7 +122,6 @@ export default function OtpForm({
                 pattern="\d{1}"
                 required
                 maxLength={1}
-                type="text"
                 onKeyDown={(e) => {
                   const target = e.target as HTMLInputElement;
                   const val = target.value;
@@ -120,8 +146,8 @@ export default function OtpForm({
                 onFocus={(e) =>
                   e.target.setSelectionRange(0, e.target.value.length)
                 }
-                className={`h-[65px] md:h-[82px] lg:h-[65px] xl:h-[82px] w-[54px] md:w-[78px] lg:w-[54px] xl:w-[78px] caret-[#B39FF0] text-center flex items-center justify-center text-base px-6 py-5 rounded-[10px] leading-6 tracking-[1px] placeholder:text-white/50 placeholder:text-xs sm:placeholder:text-base outline-0 ring-0 ${
-                  true
+                className={`h-[65px] md:h-[82px] lg:h-[65px] xl:h-[82px] w-[54px] md:w-[78px] lg:w-[54px] xl:w-[78px] caret-[#B39FF0] text-center flex items-center justify-center text-base rounded-[10px] leading-6 tracking-[1px] placeholder:text-white/50 placeholder:text-xs sm:placeholder:text-base outline-0 ring-0 ${
+                  isError
                     ? "text-white border-[#FB736EB2] border bg-[#FB736E1A] focus:bg-[#242324] focus:text-white focus:border-0"
                     : digit
                     ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
@@ -130,24 +156,30 @@ export default function OtpForm({
               />
             ))}
           </div>
-          {true && (
+          {isError && (
             <p className="text-xs md:text-sm text-[#FB736E] leading-5 tracking-[1px]">
-              This code is not correct. Double-check it and try again
+              {error?.response?.data?.message ||
+                error?.userMessage ||
+                error?.message ||
+                "Signup failed. Please try again later."}
             </p>
           )}
         </div>
-        <button
-          className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
-          title="Verify OTP"
-          type="submit"
-        >
-          Continue
-        </button>
+        <div className="space-y-2">
+          <button
+            disabled={loading}
+            className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
+            title="Verify OTP"
+            type="submit"
+          >
+            {loading ? <Loader /> : "Continue"}
+          </button>
+          <p className="text-base md:text-xl leading-[150%] tracking-[2px] font-semibold">
+            Didn&apos;t get the code?{" "}
+            <span className="text-[#B39FF0]"> Resend in 00:45</span>
+          </p>
+        </div>
       </form>
-      <p className="text-base md:text-xl leading-[150%] tracking-[2px] font-semibold">
-        Didn&apos;t get the code?{" "}
-        <span className="text-[#B39FF0]"> Resend in 00:45</span>
-      </p>
     </div>
   );
 }
