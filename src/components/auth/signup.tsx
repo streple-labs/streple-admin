@@ -9,9 +9,10 @@ import OtpForm from "./otp-form";
 import SignupForm from "./signup-form";
 import Success from "./success";
 import { focusToNextInput } from "@/utils/utils";
+import { RE_DIGIT } from "@/utils/constants";
 
 export default function Signup() {
-  const [stage, setStage] = useState<"form" | "otp" | "success">("otp");
+  const [stage, setStage] = useState<"form" | "otp" | "success">("form");
 
   const [otp, setOtp] = useState("");
 
@@ -19,25 +20,34 @@ export default function Signup() {
     e: React.ChangeEvent<HTMLInputElement>,
     idx: number
   ) => {
-    let val = e.target.value.trim();
-    const isDigit = /^\d$/.test(val);
+    const target = e.target;
+    let targetValue = target.value.trim();
+    const isTargetValueDigit = RE_DIGIT.test(targetValue);
 
-    if (!isDigit && val !== "") return;
+    if (!isTargetValueDigit && targetValue !== "") return;
 
-    val = isDigit ? val : " ";
+    const nextInputEl = target.nextElementSibling as HTMLInputElement | null;
 
-    if (val.length === 1) {
-      const newValue = otp.substring(0, idx) + val + otp.substring(idx + 1);
+    // only delete digit if next input element has no value
+    if (!isTargetValueDigit && nextInputEl && nextInputEl.value !== "") return;
+
+    targetValue = isTargetValueDigit ? targetValue : " ";
+
+    const targetValueLength = targetValue.length;
+
+    if (targetValueLength === 1) {
+      const newValue =
+        otp.substring(0, idx) + targetValue + otp.substring(idx + 1);
 
       setOtp(newValue);
 
-      if (!isDigit) return;
+      if (!isTargetValueDigit) return;
 
-      focusToNextInput(e.target);
-    } else if (val.length === 6) {
-      setOtp(val);
+      focusToNextInput(target);
+    } else if (targetValueLength === 6) {
+      setOtp(targetValue);
 
-      e.target.blur();
+      target.blur();
     }
   };
 
@@ -48,9 +58,9 @@ export default function Signup() {
     error: otpError,
   } = useMutation({
     mutationKey: ["otp-verification"],
-    mutationFn: async () => await api.post("/auth/verify-otp", { otp }),
+    mutationFn: async () =>
+      await api.post("/auth/verify-otp", { otp, email: formData.email }),
     onSuccess: (res) => {
-      console.log("response", res);
       toast.success(res.data.message || "OTP verification successful.");
       setStage("success");
     },
@@ -59,7 +69,26 @@ export default function Signup() {
         error?.response?.data?.message ||
           error?.userMessage ||
           error?.message ||
-          "Signup failed. Please try again later."
+          "otp request failed. Please try again later."
+      );
+    },
+  });
+
+  const { mutate: handleResendOtp, isPending: isResendLoading } = useMutation({
+    mutationKey: ["resend-otp"],
+    mutationFn: async () =>
+      await api.post("/auth/resend-otp", { email: formData.email }),
+    onSuccess: (res) => {
+      toast.success(
+        res.data.message || "OTP sent successfully. Please check your email."
+      );
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.userMessage ||
+          error?.message ||
+          "otp request failed. Please try again later."
       );
     },
   });
@@ -118,6 +147,8 @@ export default function Signup() {
         }}
         handleChange={handleOTPChange}
         value={otp}
+        handleResend={handleResendOtp}
+        isResendLoading={isResendLoading}
       />
     );
 
