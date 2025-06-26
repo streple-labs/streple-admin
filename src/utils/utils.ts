@@ -23,3 +23,15 @@ export const passwordValidation = (password: string) => {
     passedChecks,
   };
 };
+
+export const focusToNextInput = (target: HTMLElement) => {
+  const nextElementSibling = target.nextElementSibling as HTMLInputElement;
+
+  if (nextElementSibling) nextElementSibling.focus();
+};
+export const focusToPrevInput = (target: HTMLElement) => {
+  const previousElementSibling =
+    target.previousElementSibling as HTMLInputElement;
+
+  if (previousElementSibling) previousElementSibling.focus();
+};

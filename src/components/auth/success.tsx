@@ -30,7 +30,7 @@ export default function Success() {
                 title="success"
                 // type="submit"
               >
-                Continue
+                Login
               </button>
             </Link>
           </div>

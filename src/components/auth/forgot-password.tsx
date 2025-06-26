@@ -1,0 +1,163 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import api from "@/utils/axios";
+import { focusToNextInput } from "@/utils/utils";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import ForgotPasswordForm from "./forgot-password-form";
+import OtpForm from "./otp-form";
+import ResetPasswordForm from "./reset-password-form";
+import Success from "./success";
+
+export default function ForgotPassword() {
+  const [stage, setStage] = useState<
+    "form" | "otp" | "reset-password" | "success"
+  >("reset-password");
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirm_password: "",
+  });
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const { mutate: handleForgotPassword, isPending: forgotPasswordLoading } =
+    useMutation({
+      mutationKey: ["email-verification"],
+      mutationFn: async () =>
+        await api.post("/auth/forgot-password", { email: formData.email }),
+      onSuccess: (res) => {
+        console.log("response", res);
+        toast.success(
+          res.data.message || "OTP sent to your email. Please check your inbox."
+        );
+        setStage("otp");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            error?.userMessage ||
+            error?.message ||
+            "Signup failed. Please try again later."
+        );
+      },
+    });
+
+  const [otp, setOtp] = useState("");
+
+  const handleOTPChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    idx: number
+  ) => {
+    let val = e.target.value.trim();
+    const isDigit = /^\d$/.test(val);
+
+    if (!isDigit && val !== "") return;
+
+    val = isDigit ? val : " ";
+
+    if (val.length === 1) {
+      const newValue = otp.substring(0, idx) + val + otp.substring(idx + 1);
+
+      setOtp(newValue);
+
+      if (!isDigit) return;
+
+      focusToNextInput(e.target);
+    } else if (val.length === 6) {
+      setOtp(val);
+
+      e.target.blur();
+    }
+  };
+
+  const {
+    mutate: handleVerifyToken,
+    isPending: otpLoading,
+    isError: isOtpError,
+    error: otpError,
+  } = useMutation({
+    mutationKey: ["otp-verification"],
+    mutationFn: async () => await api.post("/auth/verify-otp", { otp }),
+    onSuccess: (res) => {
+      console.log("response", res);
+      toast.success(res.data.message || "OTP verification successful.");
+      setStage("reset-password");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.userMessage ||
+          error?.message ||
+          "Signup failed. Please try again later."
+      );
+    },
+  });
+
+  const {
+    mutate: handleResetPassword,
+    isPending: resetPasswordLoading,
+    // isError: isResetPasswordError,
+    // error: resetPasswordError,
+  } = useMutation({
+    mutationKey: ["reset-password"],
+    mutationFn: async () =>
+      await api.post("/auth/reset-password", { password: formData.password }),
+    onSuccess: (res) => {
+      console.log("response", res);
+      toast.success(res.data.message || "password reset successful.");
+      setStage("success");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.userMessage ||
+          error?.message ||
+          "password reset failed. Please try again later."
+      );
+    },
+  });
+
+  if (stage === "form")
+    return (
+      <ForgotPasswordForm
+        loading={forgotPasswordLoading}
+        email={formData.email}
+        handleChange={handleEmailChange}
+        handleForgotPassword={handleForgotPassword}
+      />
+    );
+
+  if (stage === "otp")
+    return (
+      <OtpForm
+        title="Forgot password"
+        description={`Enter the code sent to ${formData.email} to reset your password`}
+        action={{
+          handleVerifyToken,
+          loading: otpLoading,
+          isError: isOtpError,
+          error: otpError,
+        }}
+        handleChange={handleOTPChange}
+        value={otp}
+      />
+    );
+
+  if (stage === "reset-password")
+    return (
+      <ResetPasswordForm
+        loading={resetPasswordLoading}
+        formData={formData}
+        handleChange={handleEmailChange}
+        handleResetPassword={handleResetPassword}
+      />
+    );
+
+  return <Success />;
+}

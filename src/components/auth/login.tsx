@@ -4,6 +4,7 @@
 import { anton } from "@/app/fonts";
 import api from "@/utils/axios";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
@@ -24,11 +25,10 @@ export default function Login() {
 
   const { mutate: handleLogin, isPending: loading } = useMutation({
     mutationKey: ["login"],
-    mutationFn: async (data: typeof formData) =>
-      await api.post("/auth/login", data),
+    mutationFn: async () => await api.post("/auth/login", formData),
     onSuccess: (res) => {
       console.log("response", res);
-      toast.success("login successful.");
+      toast.success(res.data.message || "login successful.");
     },
     onError: (error: any) => {
       toast.error(
@@ -42,12 +42,12 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleLogin(formData);
+    handleLogin();
   };
 
   return (
     <form
-      className="size-full space-y-[40px] md:space-y-[60px]"
+      className="size-full flex items-center justify-center flex-col gap-[40px] md:gap-[60px]"
       onSubmit={handleSubmit}
     >
       <div className="space-y-8 w-full">
@@ -94,40 +94,48 @@ export default function Login() {
             <p className="font-normal text-sm md:text-base leading-6 tracking-[1px]">
               Password
             </p>
-            <span className="relative">
-              <input
-                pattern=".{8,}"
-                title="Password must be at least 8 characters long"
-                value={formData.password}
-                name="password"
-                onChange={handleChange}
-                type={showPassword ? "text" : "password"}
-                required
-                placeholder="Minimum of 8 characters"
-                className={`h-[60px] md:h-[82px] w-full text-base py-5 px-3 md:px-6 rounded-[10px] md:rounded-[20px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] ${
-                  formData.password
-                    ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
-                    : "bg-[#242324] text-white"
-                }`}
-              />
-              <span
-                className="absolute right-4 top-1/2 -translate-y-1/2"
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? (
-                  <IoEyeOffOutline size={16} color="#FFFFFFB2" />
-                ) : (
-                  <IoEyeOutline size={16} color="#FFFFFFB2" />
-                )}
+            <div className="flex flex-col gap-2 w-full">
+              <span className="relative">
+                <input
+                  pattern=".{8,}"
+                  title="Password must be at least 8 characters long"
+                  value={formData.password}
+                  name="password"
+                  onChange={handleChange}
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="Minimum of 8 characters"
+                  className={`h-[60px] md:h-[82px] w-full text-base py-5 px-3 md:px-6 rounded-[10px] md:rounded-[20px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] ${
+                    formData.password
+                      ? "text-[#FFFFFF99] bg-[#F4E90E1A] border border-[#F4E90EB2] focus:bg-[#242324] focus:text-white focus:border-0"
+                      : "bg-[#242324] text-white"
+                  }`}
+                />
+                <span
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? (
+                    <IoEyeOffOutline size={16} color="#FFFFFFB2" />
+                  ) : (
+                    <IoEyeOutline size={16} color="#FFFFFFB2" />
+                  )}
+                </span>
               </span>
-            </span>
+              <Link
+                href={"/forgot-password"}
+                className="w-full text-end text-sm leading-6 tracking-[1px] font-black"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </label>
         </div>
       </div>
       <button
         disabled={loading}
         className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
-        title="sign up"
+        title="login"
         type="submit"
       >
         {loading ? <Loader /> : "Continue"}
