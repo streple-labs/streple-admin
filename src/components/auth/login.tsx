@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
 import { setCookie } from "cookies-next";
+import { base_url } from "@/utils/constants";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -58,7 +59,10 @@ export default function Login() {
           Welcome back
         </h4>
         <div className="w-full flex flex-col gap-4 md:gap-6">
-          <div className="h-[55px] md:h-[82px] cursor-pointer w-full text-base px-6 py-5 rounded-[10px] md:rounded-[20px] gap-4 bg-[#242324] flex items-center justify-center">
+          <div
+            onClick={() => (window.location.href = `${base_url}/auth/google`)}
+            className="h-[55px] md:h-[82px] cursor-pointer w-full text-base px-6 py-5 rounded-[10px] md:rounded-[20px] gap-4 bg-[#242324] flex items-center justify-center"
+          >
             <GoogleIcon className="size-5 md:size-6" />
             <p className="text-base md:text-[21px] leading-6 md:leading-8 tracking-[1px] font-normal">
               Continue with Google

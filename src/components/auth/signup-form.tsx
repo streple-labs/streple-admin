@@ -4,13 +4,16 @@ import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
+import { base_url } from "@/utils/constants";
 
 export default function SignupForm({
   loading,
   formData,
   handleChange,
   handleSignup,
-}: {
+}: // handleGoogleLogin,
+// isGoogleLoginLoading,
+{
   formData: {
     fullName: string;
     email: string;
@@ -19,6 +22,8 @@ export default function SignupForm({
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSignup: () => void;
   loading: boolean;
+  // handleGoogleLogin: () => void;
+  // isGoogleLoginLoading: boolean;
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -37,7 +42,10 @@ export default function SignupForm({
           Sign up to get started
         </h4>
         <div className="w-full flex flex-col gap-4 md:gap-6">
-          <div className="h-[55px] md:h-[82px] cursor-pointer w-full text-base px-6 py-5 rounded-[10px] md:rounded-[20px] gap-4 bg-[#242324] flex items-center justify-center">
+          <div
+            className="h-[55px] md:h-[82px] cursor-pointer w-full text-base px-6 py-5 rounded-[10px] md:rounded-[20px] gap-4 bg-[#242324] flex items-center justify-center"
+            onClick={() => (window.location.href = `${base_url}/auth/google`)}
+          >
             <GoogleIcon className="size-5 md:size-6" />
             <p className="text-base md:text-[21px] leading-6 md:leading-8 tracking-[1px] font-normal">
               Continue with Google
@@ -55,6 +63,7 @@ export default function SignupForm({
               Full name
             </p>
             <input
+              readOnly={loading}
               value={formData.fullName}
               name="fullName"
               onChange={handleChange}
@@ -74,6 +83,7 @@ export default function SignupForm({
               Email address
             </p>
             <input
+              readOnly={loading}
               value={formData.email}
               name="email"
               onChange={handleChange}
@@ -96,6 +106,7 @@ export default function SignupForm({
             <div className="relative space-y-2">
               <span className="relative">
                 <input
+                  readOnly={loading}
                   pattern=".{8,}"
                   title="Password must be at least 8 characters long"
                   value={formData.password}
