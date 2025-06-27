@@ -24,7 +24,7 @@ export default function SignupForm({
 
   return (
     <form
-      className="size-full flex items-center justify-center flex-col gap-[40px] md:gap-[60px]"
+      className="size-full flex items-center justify-center flex-col gap-[40px] md:gap-[60px] md:min-h-screen"
       onSubmit={(e) => {
         e.preventDefault();
         handleSignup();

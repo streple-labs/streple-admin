@@ -10,6 +10,7 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
+import { setCookie } from "cookies-next";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ export default function Login() {
     mutationKey: ["login"],
     mutationFn: async () => await api.post("/auth/login", formData),
     onSuccess: (res) => {
-      console.log("response", res);
+      setCookie("streple_auth_token", res.data.access_token);
       toast.success(res.data.message || "login successful.");
     },
     onError: (error: any) => {

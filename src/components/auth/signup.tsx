@@ -57,9 +57,12 @@ export default function Signup() {
     isError: isOtpError,
     error: otpError,
   } = useMutation({
-    mutationKey: ["otp-verification"],
+    mutationKey: ["verify-otp"],
     mutationFn: async () =>
-      await api.post("/auth/verify-otp", { otp, email: formData.email }),
+      await api.post("/auth/verify-otp", {
+        otpCode: otp,
+        email: formData.email,
+      }),
     onSuccess: (res) => {
       toast.success(res.data.message || "OTP verification successful.");
       setStage("success");

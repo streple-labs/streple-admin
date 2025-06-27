@@ -41,7 +41,7 @@ export default function AuthPageWrappper({
             alt="streple logo"
             width={112}
             height={34}
-            className="md:hidden"
+            className="lg:hidden"
           />
         </div>
         {children}
