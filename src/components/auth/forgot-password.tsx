@@ -123,6 +123,25 @@ export default function ForgotPassword() {
     },
   });
 
+  const { mutate: handleResendOtp, isPending: isResendLoading } = useMutation({
+    mutationKey: ["resend-otp"],
+    mutationFn: async () =>
+      await api.post("/auth/resend-otp", { email: formData.email }),
+    onSuccess: (res) => {
+      toast.success(
+        res.data.message || "OTP sent successfully. Please check your email."
+      );
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.userMessage ||
+          error?.message ||
+          "otp request failed. Please try again later."
+      );
+    },
+  });
+
   if (stage === "form")
     return (
       <ForgotPasswordForm
@@ -146,6 +165,8 @@ export default function ForgotPassword() {
         }}
         handleChange={handleOTPChange}
         value={otp}
+        handleResend={handleResendOtp}
+        isResendLoading={isResendLoading}
       />
     );
 
