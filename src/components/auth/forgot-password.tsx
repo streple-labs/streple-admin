@@ -180,5 +180,10 @@ export default function ForgotPassword() {
       />
     );
 
-  return <Success />;
+  return (
+    <Success
+      title="Successful"
+      description="Your password has been reset successfully"
+    />
+  );
 }

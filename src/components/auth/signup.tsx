@@ -176,5 +176,10 @@ export default function Signup() {
       />
     );
 
-  return <Success />;
+  return (
+    <Success
+      title="Successfully verified"
+      description="Your email has been verified successfully"
+    />
+  );
 }

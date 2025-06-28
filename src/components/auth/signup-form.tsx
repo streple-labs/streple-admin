@@ -1,10 +1,11 @@
 import { anton } from "@/app/fonts";
+import { base_url } from "@/utils/constants";
 import { passwordValidation } from "@/utils/utils";
+import Link from "next/link";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
-import { base_url } from "@/utils/constants";
 
 export default function SignupForm({
   loading,
@@ -155,14 +156,25 @@ export default function SignupForm({
           </label>
         </div>
       </div>
-      <button
-        disabled={loading}
-        className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
-        title="sign up"
-        type="submit"
-      >
-        {loading ? <Loader /> : "Continue"}
-      </button>
+      <div className="flex items-center justify-center flex-col gap-6 w-full">
+        <button
+          disabled={loading}
+          className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
+          title="sign up"
+          type="submit"
+        >
+          {loading ? <Loader /> : "Continue"}
+        </button>
+        <p className="text-sm leading-[25px] tracking-[1px]">
+          Already have an account?{" "}
+          <Link
+            href={"/login"}
+            className="text-[#B39FF0] cursor-pointer font-bold"
+          >
+            Login
+          </Link>
+        </p>
+      </div>
     </form>
   );
 }

@@ -3,15 +3,15 @@
 
 import { anton } from "@/app/fonts";
 import api from "@/utils/axios";
+import { base_url } from "@/utils/constants";
 import { useMutation } from "@tanstack/react-query";
+import { setCookie } from "cookies-next";
 import Link from "next/link";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
-import { setCookie } from "cookies-next";
-import { base_url } from "@/utils/constants";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -137,14 +137,25 @@ export default function Login() {
           </label>
         </div>
       </div>
-      <button
-        disabled={loading}
-        className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
-        title="login"
-        type="submit"
-      >
-        {loading ? <Loader /> : "Continue"}
-      </button>
+      <div className="flex items-center justify-center flex-col gap-6 w-full">
+        <button
+          disabled={loading}
+          className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
+          title="login"
+          type="submit"
+        >
+          {loading ? <Loader /> : "Continue"}
+        </button>
+        <p className="text-sm leading-[25px] tracking-[1px]">
+          Don&apos;t have an account?{" "}
+          <Link
+            href={"/signup"}
+            className="text-[#B39FF0] cursor-pointer font-bold"
+          >
+            Create account
+          </Link>
+        </p>
+      </div>
     </form>
   );
 }

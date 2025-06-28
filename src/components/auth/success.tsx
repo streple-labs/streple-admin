@@ -2,9 +2,15 @@ import { anton } from "@/app/fonts";
 import CheckmarkIcon from "../../../public/checkmark-icon";
 import Link from "next/link";
 
-export default function Success() {
+export default function Success({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
-    <div className="fixed inset-0 hero-section-bg">
+    <div className="fixed inset-0 bg-[url('../../public/success-bg.png')] bg-center bg-cover bg-no-repeat">
       <div className="bg-[url('../../public/bg-eclipse.png')] absolute bottom-0 right-0 bg-center bg-cover bg-no-repeat size-[796px] rotate-180" />
 
       <div className="size-full flex items-center justify-center relative p-[5%]">
@@ -16,11 +22,11 @@ export default function Success() {
               <h5
                 className={`${anton.className} text-xl md:text-[27px] leading-[150%] tracking-[2px] text-center w-full`}
               >
-                Successfully verified
+                {title}
               </h5>
 
               <p className="text-sm md:text-base leading-6 w-full text-center tracking-[1px] font-normal">
-                Your email has been verified successfully
+                {description}
               </p>
             </div>
 
