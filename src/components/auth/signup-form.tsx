@@ -30,7 +30,7 @@ export default function SignupForm({
 
   return (
     <form
-      className="size-full flex items-center justify-center flex-col gap-[40px] md:gap-[60px] md:min-h-screen"
+      className="size-full flex items-center justify-center flex-col gap-[40px] md:gap-[60px]"
       onSubmit={(e) => {
         e.preventDefault();
         handleSignup();
@@ -108,8 +108,8 @@ export default function SignupForm({
               <span className="relative">
                 <input
                   readOnly={loading}
-                  pattern=".{8,}"
-                  title="Password must be at least 8 characters long"
+                  pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!.%*#?&])[A-Za-z\d@$!.%*#?&]{8,}$"
+                  title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
                   value={formData.password}
                   name="password"
                   onChange={handleChange}

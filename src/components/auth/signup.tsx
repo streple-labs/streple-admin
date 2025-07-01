@@ -127,25 +127,6 @@ export default function Signup() {
     },
   });
 
-  // const { mutate: handleGoogleLogin, isPending: googleLoginLoading } =
-  //   useMutation({
-  //     mutationKey: ["google-login"],
-  //     mutationFn: async () => await api.get("/auth/google"),
-  //     onSuccess: (res) => {
-  //       console.log("response", res);
-  //       toast.success(res.data.message || "Google login successful.");
-  //       // Handle successful Google login, e.g., redirect or update state
-  //     },
-  //     onError: (error: any) => {
-  //       toast.error(
-  //         error?.response?.data?.message ||
-  //           error?.userMessage ||
-  //           error?.message ||
-  //           "Google login failed. Please try again later."
-  //       );
-  //     },
-  //   });
-
   if (stage === "form")
     return (
       <SignupForm
@@ -153,8 +134,6 @@ export default function Signup() {
         formData={formData}
         handleChange={handleChange}
         handleSignup={handleSignUp}
-        // handleGoogleLogin={handleGoogleLogin}
-        // isGoogleLoginLoading={googleLoginLoading}
       />
     );
 

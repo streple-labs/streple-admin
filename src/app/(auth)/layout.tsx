@@ -2,7 +2,7 @@ import { anton } from "@/app/fonts";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function AuthPageWrappper({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -34,14 +34,13 @@ export default function AuthPageWrappper({
           </div>
         </div>
       </div>
-      <div className="w-full lg:w-1/2 min-h-screen lg:h-screen flex items-center justify-center flex-col gap-16 px-[5%] md:px-[5.76%] py-8 lg:overflow-y-auto bg-[#1B191C] relative">
-        <div className="w-full flex items-start">
+      <div className="w-full lg:w-1/2 h-screen flex items-center justify-center flex-col gap-10 px-[5%] md:px-[5.76%] py-8 bg-[#1B191C] relative">
+        <div className="w-full flex items-start lg:hidden">
           <Image
             src="/streple-logo.png"
             alt="streple logo"
             width={112}
             height={34}
-            className="lg:hidden"
           />
         </div>
         {children}

@@ -108,7 +108,7 @@ export default function OtpForm({
 
                 e.target.setSelectionRange(0, e.target.value.length);
               }}
-              className={`size-8 xs:size-12 sm:h-[65px] md:h-[82px] lg:h-[65px] xl:h-[82px] sm:w-[54px] md:w-[78px] lg:w-[54px] xl:w-[78px] caret-[#B39FF0] text-center flex items-center justify-center text-base rounded-[10px] leading-6 tracking-[1px] outline-0 ring-0 ${
+              className={`size-8 min-[375px]:size-12 sm:h-[65px] md:h-[82px] lg:h-[65px] xl:h-[82px] sm:w-[54px] md:w-[78px] lg:w-[54px] xl:w-[78px] caret-[#B39FF0] text-center flex items-center justify-center text-base rounded-[10px] leading-6 tracking-[1px] outline-0 ring-0 ${
                 isError
                   ? "text-white border-[#FB736EB2] border bg-[#FB736E1A] focus:bg-[#242324] focus:text-white focus:border-0"
                   : digit

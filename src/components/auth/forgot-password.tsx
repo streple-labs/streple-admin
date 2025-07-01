@@ -14,7 +14,7 @@ import Success from "./success";
 export default function ForgotPassword() {
   const [stage, setStage] = useState<
     "form" | "otp" | "reset-password" | "success"
-  >("reset-password");
+  >("form");
 
   const [formData, setFormData] = useState({
     email: "",
@@ -82,11 +82,8 @@ export default function ForgotPassword() {
     isError: isOtpError,
     error: otpError,
   } = useMutation({
-    mutationKey: ["otp-verification"],
-    mutationFn: async () => await api.post("/auth/verify-otp", { otp }),
-    onSuccess: (res) => {
-      console.log("response", res);
-      toast.success(res.data.message || "OTP verification successful.");
+    mutationKey: ["verify-otp"],
+    mutationFn: async () => {
       setStage("reset-password");
     },
     onError: (error: any) => {
@@ -99,29 +96,29 @@ export default function ForgotPassword() {
     },
   });
 
-  const {
-    mutate: handleResetPassword,
-    isPending: resetPasswordLoading,
-    // isError: isResetPasswordError,
-    // error: resetPasswordError,
-  } = useMutation({
-    mutationKey: ["reset-password"],
-    mutationFn: async () =>
-      await api.post("/auth/reset-password", { password: formData.password }),
-    onSuccess: (res) => {
-      console.log("response", res);
-      toast.success(res.data.message || "password reset successful.");
-      setStage("success");
-    },
-    onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message ||
-          error?.userMessage ||
-          error?.message ||
-          "password reset failed. Please try again later."
-      );
-    },
-  });
+  const { mutate: handleResetPassword, isPending: resetPasswordLoading } =
+    useMutation({
+      mutationKey: ["reset-password"],
+      mutationFn: async () =>
+        await api.post("/auth/reset-password", {
+          newPassword: formData.password,
+          otp,
+          email: formData.email,
+        }),
+      onSuccess: (res) => {
+        console.log("response", res);
+        toast.success(res.data.message || "password reset successful.");
+        setStage("success");
+      },
+      onError: (error: any) => {
+        toast.error(
+          error?.response?.data?.message ||
+            error?.userMessage ||
+            error?.message ||
+            "password reset failed. Please try again later."
+        );
+      },
+    });
 
   const { mutate: handleResendOtp, isPending: isResendLoading } = useMutation({
     mutationKey: ["resend-otp"],

@@ -48,8 +48,8 @@ export default function ResetPasswordForm({
             <div className="relative space-y-2">
               <span className="relative">
                 <input
-                  pattern=".{8,}"
-                  title="Password must be at least 8 characters long"
+                  pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!.%*#?&])[A-Za-z\d@$!.%*#?&]{8,}$"
+                  title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
                   value={formData.password}
                   name="password"
                   onChange={handleChange}
@@ -101,8 +101,8 @@ export default function ResetPasswordForm({
             <div className="relative space-y-2">
               <span className="relative">
                 <input
-                  pattern=".{8,}"
-                  title="Password must be at least 8 characters long"
+                  pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!.%*#?&])[A-Za-z\d@$!.%*#?&]{8,}$"
+                  title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
                   value={formData.confirm_password}
                   name="confirm_password"
                   onChange={handleChange}
@@ -150,7 +150,12 @@ export default function ResetPasswordForm({
         </div>
       </div>
       <button
-        disabled={loading}
+        disabled={
+          loading ||
+          !formData.password ||
+          !formData.confirm_password ||
+          formData.password !== formData.confirm_password
+        }
         className="w-full py-3 px-4 rounded-[10px] md:rounded-[20px] h-[61px] md:h-[84px] bg-[#B39FF0] hover:bg-[#B39FF0]/90 text-[#2C2C26] text-base md:text-xl font-bold leading-[150%] tracking-[2px] flex items-center justify-center"
         title="reset password"
         type="submit"
