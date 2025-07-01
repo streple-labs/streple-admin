@@ -108,7 +108,7 @@ export default function SignupForm({
               <span className="relative">
                 <input
                   readOnly={loading}
-                  pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!.%*#?&])[A-Za-z\d@$!.%*#?&]{8,}$"
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!.%*?&])[A-Za-z\d@$!.%*?&]{8,}$"
                   title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
                   value={formData.password}
                   name="password"

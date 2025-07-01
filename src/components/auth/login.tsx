@@ -102,7 +102,7 @@ export default function Login() {
             <div className="flex flex-col gap-2 w-full">
               <span className="relative">
                 <input
-                  pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!.%*#?&])[A-Za-z\d@$!.%*#?&]{8,}$"
+                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!.%*?&])[A-Za-z\d@$!.%*?&]{8,}$"
                   title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
                   value={formData.password}
                   name="password"
