@@ -12,8 +12,11 @@ import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
 import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -30,6 +33,7 @@ export default function Login() {
     mutationFn: async () => await api.post("/auth/login", formData),
     onSuccess: (res) => {
       setCookie("streple_auth_token", res.data.streple_auth_token);
+      router.push("/admin");
       toast.success(res.data.message || "login successful.");
     },
     onError: (error: any) => {
@@ -42,15 +46,13 @@ export default function Login() {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    handleLogin();
-  };
-
   return (
     <form
       className="size-full flex items-center justify-center flex-col gap-[40px] md:gap-[60px]"
-      onSubmit={handleSubmit}
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleLogin();
+      }}
     >
       <div className="space-y-8 w-full">
         <h4

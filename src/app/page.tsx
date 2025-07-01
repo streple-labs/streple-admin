@@ -1,3 +1,5 @@
+import DashboardWrapper from "@/components/dashboard/wrapper";
+
 export default function Home() {
-  return <div>Dashboard</div>;
+  return <DashboardWrapper>Dashboard</DashboardWrapper>;
 }

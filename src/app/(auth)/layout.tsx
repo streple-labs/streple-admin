@@ -17,7 +17,7 @@ export default function AuthLayout({
               src="/streple-logo.png"
               alt="streple logo"
               width={112}
-              height={34}
+              height={33}
             />
           </Link>
 
@@ -40,7 +40,7 @@ export default function AuthLayout({
             src="/streple-logo.png"
             alt="streple logo"
             width={112}
-            height={34}
+            height={33}
           />
         </div>
         {children}
