@@ -30,7 +30,7 @@ export default function Login() {
 
   const { mutate: handleLogin, isPending: loading } = useMutation({
     mutationKey: ["login"],
-    mutationFn: async () => await api.post("/auth/login", formData),
+    mutationFn: async () => await api.post("/auth/login/user", formData),
     onSuccess: (res) => {
       setCookie("streple_auth_token", res.data.streple_auth_token);
       router.push("/admin");

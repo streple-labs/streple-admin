@@ -59,8 +59,8 @@ export default function Signup() {
   } = useMutation({
     mutationKey: ["verify-otp"],
     mutationFn: async () =>
-      await api.post("/auth/verify-otp", {
-        otpCode: otp,
+      await api.post("/auth/verify-email", {
+        otp,
         email: formData.email,
       }),
     onSuccess: (res) => {

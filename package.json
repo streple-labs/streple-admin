@@ -11,8 +11,11 @@
   "dependencies": {
     "@tanstack/react-query": "^5.81.5",
     "axios": "^1.10.0",
+    "classnames": "^2.5.1",
     "cookies-next": "^6.0.0",
     "dayjs": "^1.11.13",
+    "draft-convert": "^2.1.13",
+    "draft-js": "^0.11.7",
     "jwt-decode": "^4.0.0",
     "next": "15.3.4",
     "react": "^19.0.0",
@@ -23,6 +26,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/draft-convert": "^2.1.8",
+    "@types/draft-js": "^0.11.18",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

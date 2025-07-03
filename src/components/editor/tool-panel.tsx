@@ -1,0 +1,135 @@
+import cn from "classnames";
+import { useState } from "react";
+import { FaChevronDown } from "react-icons/fa6";
+import { GoLink } from "react-icons/go";
+import { IoImageOutline } from "react-icons/io5";
+import {
+  BLOCK_LABELS,
+  BlockType,
+  HEADING_BLOCK_LABELS,
+  InlineStyle,
+  InlineStyle_LABELS,
+} from "./config";
+import { useEditorApi } from "./context";
+
+const ToolPanel: React.FC = () => {
+  const {
+    toHtml,
+    addLink,
+    toggleBlockType,
+    currentBlockType,
+    toggleInlineStyle,
+    hasInlineStyle,
+    openLinkForm,
+    setOpenLinkForm,
+  } = useEditorApi();
+
+  const [showHeadingOptions, setShowHeadingOptions] = useState(false);
+
+  const [url, setUrl] = useState("");
+
+  return (
+    <div className="flex flex-wrap items-center justify-between">
+      <div className="shrink-0 flex items-center gap-3">
+        <span className="shrink-0 px-3 py-2 rounded-[4px] bg-[#CBB0FD0D] cursor-pointer">
+          <IoImageOutline color="#D28BF6CC" width={12} />
+        </span>
+        <span className="shrink-0 px-3 py-2 rounded-[4px] bg-[#F4E90E0D] cursor-pointer relative">
+          <span
+            onClick={() => {
+              setOpenLinkForm(true);
+            }}
+          >
+            <GoLink color="#F4E90ECC" width={12} />
+          </span>
+          {openLinkForm && (
+            <div className="absolute top-8 left-0 w-[300px] rounded-[15px] p-3 flex flex-col gap-3 bg-[#252326]">
+              <input
+                type="text"
+                placeholder="Add link"
+                className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-[45px] px-4 py-3 text-xs text-white/50"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <button
+                className="w-full text-xs font-bold leading-4 tracking-[1px] text-end text-[#A082F9CC]"
+                onClick={() => {
+                  if (url) {
+                    addLink(url);
+                    setUrl("");
+                  }
+                  setOpenLinkForm(false);
+                }}
+              >
+                Apply
+              </button>
+            </div>
+          )}
+        </span>
+      </div>
+
+      <div className="shrink-0 flex items-center gap-6">
+        <div
+          className="flex items-center gap-3 cursor-pointer relative"
+          onClick={() => setShowHeadingOptions(!showHeadingOptions)}
+        >
+          <p className="text-xs leading-4 text-white/70">
+            {BLOCK_LABELS[currentBlockType]}
+          </p>
+          <FaChevronDown className="w-3 stroke-white/50" />
+
+          {showHeadingOptions && (
+            <div className="absolute top-6 left-0 bg-white/10 backdrop-blur-md rounded-lg p-2 flex flex-col gap-1 w-40">
+              {Object.entries(HEADING_BLOCK_LABELS).map(([type, label]) => {
+                const blockType = type as BlockType;
+                return (
+                  <button
+                    key={blockType}
+                    className={cn(
+                      "w-full text-left p-2 rounded text-xs",
+                      currentBlockType === blockType && "text-[#A082F9]"
+                    )}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      toggleBlockType(blockType);
+                      setShowHeadingOptions(false);
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {Object.values(InlineStyle).map((v) => (
+          <button
+            key={v}
+            className={cn(
+              "shrink-0 my-2.5 mr-1.5",
+              hasInlineStyle(v) ? "text-[#A082F9]" : "text-[#FFFFFF99]"
+            )}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              toggleInlineStyle(v);
+            }}
+          >
+            {InlineStyle_LABELS[v]}
+          </button>
+        ))}
+
+        <button
+          className="shrink-0 my-2.5 mr-1.5"
+          onClick={() => {
+            console.log(toHtml());
+          }}
+        >
+          Print
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ToolPanel;

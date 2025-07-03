@@ -83,7 +83,10 @@ export default function ForgotPassword() {
     error: otpError,
   } = useMutation({
     mutationKey: ["verify-otp"],
-    mutationFn: async () => {
+    mutationFn: async () =>
+      await api.post("/auth/verify-otp", { email: formData.email, otp }),
+    onSuccess: (res) => {
+      toast.success(res.data.message || "OTP verification successful.");
       setStage("reset-password");
     },
     onError: (error: any) => {
@@ -102,11 +105,9 @@ export default function ForgotPassword() {
       mutationFn: async () =>
         await api.post("/auth/reset-password", {
           newPassword: formData.password,
-          otp,
           email: formData.email,
         }),
       onSuccess: (res) => {
-        console.log("response", res);
         toast.success(res.data.message || "password reset successful.");
         setStage("success");
       },
