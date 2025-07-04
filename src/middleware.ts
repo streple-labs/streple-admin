@@ -43,14 +43,23 @@ export function middleware(request: NextRequest) {
   }
 
   const hasRoute = (routes: Array<string>, currentPath: string) => {
-    let isValid = false;
+    return routes.some((route) => {
+      if (route === "/" && currentPath === "/") return true;
 
-    routes.forEach((route) => {
-      const routeRegex = new RegExp(`^${route}(.*)$`);
-      isValid = isValid || routeRegex.test(currentPath);
+      if (route !== "/" && currentPath.startsWith(route))
+        return currentPath === route || currentPath.startsWith(route + "/");
+
+      return false;
     });
 
-    return isValid;
+    // let isValid = false;
+
+    // routes.forEach((route) => {
+    //   const routeRegex = new RegExp(`^${route}(.*)$`);
+    //   isValid = isValid || routeRegex.test(currentPath);
+    // });
+
+    // return isValid;
   };
 
   const buildUrl = (route: string) =>
@@ -63,11 +72,10 @@ export function middleware(request: NextRequest) {
   )
     return NextResponse.redirect(buildUrl("/login"));
 
-  if (isAuthenticated && hasRoute(loginUrls, CURRENT_URL_PATHNAME)) {
+  if (isAuthenticated && hasRoute(loginUrls, CURRENT_URL_PATHNAME))
     return NextResponse.redirect(
       userType === "ADMIN" ? buildUrl("/admin") : buildUrl("/")
     );
-  }
 
   return response;
 }

@@ -101,8 +101,8 @@ export default function ResetPasswordForm({
             <div className="relative space-y-2">
               <span className="relative">
                 <input
-                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!.%*?&])[A-Za-z\d@$!.%*?&]{8,}$"
-                  title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+                  title="Password must equal the new password"
+                  pattern={formData.password}
                   value={formData.confirm_password}
                   name="confirm_password"
                   onChange={handleChange}
@@ -127,23 +127,17 @@ export default function ResetPasswordForm({
                 </span>
               </span>
               {formData.confirm_password && (
-                <>
-                  <div className="flex gap-1 mt-2">
-                    {Array.from({
-                      length: passwordValidation(formData.confirm_password)
-                        .passedChecks,
-                    }).map((_, i) => (
-                      <span
-                        key={i}
-                        className="h-0.5 w-[70px] rounded-full bg-[#B39FF0]"
-                      />
-                    ))}
-                  </div>
-
-                  <p className="text-white/40 leading-4 text-sm tracking-[1px]">
-                    {passwordValidation(formData.confirm_password).message}
-                  </p>
-                </>
+                <p
+                  className={`${
+                    formData.password === formData.confirm_password
+                      ? "text-white/40"
+                      : "text-red-500"
+                  } leading-4 text-sm tracking-[1px] mt-2`}
+                >
+                  {formData.password === formData.confirm_password
+                    ? "All requirements met"
+                    : "password must match the new password"}
+                </p>
               )}
             </div>
           </label>
