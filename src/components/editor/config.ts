@@ -52,10 +52,10 @@ export const BLOCK_LABELS = {
 };
 
 export const HEADING_BLOCK_LABELS = {
-  [BlockType.default]: "Body",
   [BlockType.h1]: "Heading 1",
   [BlockType.h2]: "Heading 2",
   [BlockType.h3]: "Heading 3",
+  [BlockType.default]: "Body",
 };
 
 export type KeyCommand = DraftEditorCommand | "accent";

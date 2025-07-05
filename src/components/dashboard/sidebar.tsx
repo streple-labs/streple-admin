@@ -18,47 +18,47 @@ const nav_items = [
   {
     name: "Overview",
     icon: OverviewIcon,
-    href: "/admin",
+    href: "/",
   },
   {
     name: "Users",
     icon: UsersIcon,
-    href: "/admin/users",
+    href: "/users",
   },
   {
     name: "Learning hub",
     icon: LearningHubIcon,
-    href: "/admin/learning-hub",
+    href: "/learning-hub",
   },
   {
     name: "Blog manager",
     icon: BlogManagerIcon,
-    href: "/admin/blog-manager",
+    href: "/blog-manager",
   },
   {
     name: "Protraders",
     icon: ProtradersIcon,
-    href: "/admin/protraders",
+    href: "/protraders",
   },
   {
     name: "Trading simulator",
     icon: TradingSimulatorIcon,
-    href: "/admin/trading-simulator",
+    href: "/trading-simulator",
   },
   {
     name: "Email Center",
     icon: EmailIcon,
-    href: "/admin/email-center",
+    href: "/email-center",
   },
   {
     name: "Feedback page",
     icon: FeedbackIcon,
-    href: "/admin/feedback-page",
+    href: "/feedback-page",
   },
   {
     name: "Analytics",
     icon: AnalyticsIcon,
-    href: "/admin/analytics",
+    href: "/analytics",
   },
 ];
 
@@ -67,7 +67,7 @@ export default function Sidebar() {
   const router = useRouter();
 
   return (
-    <aside className="flex py-8 px-6 w-full max-w-[249px] rounded-[20px] bg-[#5A555C1A]">
+    <aside className="flex py-8 px-6 w-full max-w-[249px] max-h-screen rounded-[20px] bg-[#5A555C1A]">
       <nav className="flex flex-col gap-4 w-full">
         {nav_items.map((item) => (
           <Link

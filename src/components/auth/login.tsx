@@ -33,7 +33,7 @@ export default function Login() {
     mutationFn: async () => await api.post("/auth/login/user", formData),
     onSuccess: (res) => {
       setCookie("streple_auth_token", res.data.streple_auth_token);
-      router.push("/admin");
+      router.push("/");
       toast.success(res.data.message || "login successful.");
     },
     onError: (error: any) => {

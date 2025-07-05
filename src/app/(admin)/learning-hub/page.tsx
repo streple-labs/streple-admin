@@ -219,8 +219,8 @@ export default function Page() {
                         <span
                           className={`px-2 py-1 h-6 w-fit flex items-center justify-center cursor-pointer rounded-[14px] group ${
                             course.status === "Published"
-                              ? "bg-[#7A5FCA33]"
-                              : "bg-[#66646C33]"
+                              ? "bg-[#F4E90ECC] text-[#313127CC]"
+                              : "bg-[#807C8B] text-[#141315]"
                           }`}
                         >
                           {course.status}

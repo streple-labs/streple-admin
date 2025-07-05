@@ -3,26 +3,31 @@ import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 import { NextRequest, NextResponse } from "next/server";
 
-export type UserEnumType = null | "USER" | "ADMIN";
-
 export type Tokens = string;
 
 export type UserType = {
   _id: string;
   exp: number;
   iat: number;
-  role: "USER" | "ADMIN";
 };
 
 const loginUrls = ["/login", "/signup", "/forgot-password"];
-const protectedRoutes = ["/", "/admin"];
+const protectedRoutes = [
+  "/",
+  "/users",
+  "/learning-hub",
+  "/blog-manager",
+  "/protraders",
+  "/trading-simulator",
+  "/email-center",
+  "/analytics",
+];
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   let isAuthenticated = false;
   const BASE_FRONTEND_URL = request.nextUrl.origin;
   const CURRENT_URL_PATHNAME = request.nextUrl.pathname;
-  let userType: UserEnumType = null;
 
   const strepleAuthToken = request.cookies.get("streple_auth_token");
   if (strepleAuthToken) {
@@ -32,7 +37,6 @@ export function middleware(request: NextRequest) {
       const isExpired = dayjs.unix(data.exp).diff(dayjs()) < 1;
 
       if (!isExpired) {
-        userType = (data?.role as UserEnumType) || "USER";
         isAuthenticated = true;
       } else {
         deleteCookie("streple_auth_token", { req: request, res: response });
@@ -73,9 +77,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(buildUrl("/login"));
 
   if (isAuthenticated && hasRoute(loginUrls, CURRENT_URL_PATHNAME))
-    return NextResponse.redirect(
-      userType === "ADMIN" ? buildUrl("/admin") : buildUrl("/")
-    );
+    return NextResponse.redirect(buildUrl("/"));
 
   return response;
 }
