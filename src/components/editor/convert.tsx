@@ -58,9 +58,19 @@ export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
     }
   },
   entityToHTML: (entity, originalText) => {
-    if (entity.type === EntityType.link) {
+    if (entity.type === EntityType.link)
       return <a href={entity.data.url}>{originalText}</a>;
-    }
+
+    if (entity.type === EntityType.img)
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={entity.data.img}
+          alt="image"
+          style={{ maxWidth: "100%", height: "auto" }}
+        />
+      );
+
     return originalText;
   },
 });
@@ -99,9 +109,7 @@ export const HTMLtoState = convertFromHTML<DOMStringMap, BlockType>({
       case "h4":
         return BlockType.h4;
       case "li":
-        if (last === "ol") {
-          return BlockType.orderList;
-        }
+        if (last === "ol") return BlockType.orderList;
         return BlockType.list;
       case "blockquote":
         return BlockType.blockquote;
@@ -115,9 +123,10 @@ export const HTMLtoState = convertFromHTML<DOMStringMap, BlockType>({
     }
   },
   htmlToEntity: (nodeName, node, createEntity) => {
-    if (nodeName === "a" && node.href) {
+    if (nodeName === "a" && node.href)
       return createEntity(EntityType.link, "MUTABLE", { url: node.href });
-    }
+    if (nodeName === "img" && node.src)
+      return createEntity(EntityType.img, "MUTABLE", { img: node.src });
 
     return undefined;
   },

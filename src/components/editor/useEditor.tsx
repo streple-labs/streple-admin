@@ -1,4 +1,5 @@
 import {
+  AtomicBlockUtils,
   CompositeDecorator,
   DraftEntityMutability,
   DraftHandleValue,
@@ -10,6 +11,7 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import { BlockType, EntityType, InlineStyle, KeyCommand } from "./config";
 import { HTMLtoState, stateToHTML } from "./convert";
+import { ImageDecorator } from "./image-block";
 import LinkDecorator from "./link";
 
 export type EditorApi = {
@@ -21,6 +23,8 @@ export type EditorApi = {
   toggleInlineStyle: (inlineStyle: InlineStyle) => void;
   hasInlineStyle: (inlineStyle: InlineStyle) => boolean;
   addLink: (url: string) => void;
+  addImg: (img: string) => void;
+  addImgInline: (img: string) => void;
   setEntityData: (entityKey: string, data: Record<string, string>) => void;
   handleKeyCommand: (
     command: KeyCommand,
@@ -29,7 +33,7 @@ export type EditorApi = {
   handlerKeyBinding: (e: React.KeyboardEvent) => KeyCommand | null;
 };
 
-const decorator = new CompositeDecorator([LinkDecorator]);
+const decorator = new CompositeDecorator([LinkDecorator, ImageDecorator]);
 
 export const useEditor = (html?: string): EditorApi => {
   const [state, setState] = useState(() =>
@@ -113,6 +117,41 @@ export const useEditor = (html?: string): EditorApi => {
     [addEntity]
   );
 
+  const addImg = useCallback((img: string) => {
+    setState((currentState) => {
+      const contentState = currentState.getCurrentContent();
+      const contentStateWithEntity = contentState.createEntity(
+        EntityType.img,
+        "IMMUTABLE",
+        { img }
+      );
+      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+
+      const newState = EditorState.set(currentState, {
+        currentContent: contentStateWithEntity,
+      });
+
+      return AtomicBlockUtils.insertAtomicBlock(newState, entityKey, " ");
+    });
+  }, []);
+
+  const addImgInline = useCallback((img: string) => {
+    setState((currentState) => {
+      const contentState = currentState.getCurrentContent();
+      const contentStateWithEntity = contentState.createEntity(
+        EntityType.img,
+        "IMMUTABLE",
+        { img }
+      );
+      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+      const newState = EditorState.set(currentState, {
+        currentContent: contentStateWithEntity,
+      });
+
+      return RichUtils.toggleLink(newState, newState.getSelection(), entityKey);
+    });
+  }, []);
+
   const handleKeyCommand = useCallback(
     (command: KeyCommand, editorState: EditorState) => {
       // if (command === "accent") {
@@ -155,6 +194,8 @@ export const useEditor = (html?: string): EditorApi => {
       hasInlineStyle,
       toHtml,
       addLink,
+      addImg,
+      addImgInline,
       setEntityData,
       handleKeyCommand,
       handlerKeyBinding,
@@ -167,6 +208,8 @@ export const useEditor = (html?: string): EditorApi => {
       hasInlineStyle,
       toHtml,
       addLink,
+      addImg,
+      addImgInline,
       setEntityData,
       handleKeyCommand,
       handlerKeyBinding,

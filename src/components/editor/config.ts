@@ -7,6 +7,7 @@ import { RiUnderline } from "react-icons/ri";
 
 export enum EntityType {
   link = "link",
+  img = "img",
 }
 
 export enum BlockType {

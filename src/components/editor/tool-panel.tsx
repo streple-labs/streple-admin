@@ -12,10 +12,11 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 
-const ToolPanel: React.FC = () => {
+const ToolPanel = () => {
   const {
     toHtml,
     addLink,
+    addImg,
     toggleBlockType,
     currentBlockType,
     toggleInlineStyle,
@@ -31,9 +32,26 @@ const ToolPanel: React.FC = () => {
   return (
     <div className="flex flex-wrap items-center justify-between">
       <div className="shrink-0 flex items-center gap-3">
-        <span className="shrink-0 px-3 py-2 rounded-[4px] bg-[#CBB0FD0D] cursor-pointer">
+        <label
+          htmlFor="image-input"
+          className="shrink-0 px-3 py-2 rounded-[4px] bg-[#CBB0FD0D] cursor-pointer"
+        >
           <IoImageOutline color="#D28BF6CC" width={12} />
-        </span>
+          <input
+            id="image-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const imageUrl = URL.createObjectURL(file);
+                addImg(imageUrl);
+                e.target.value = "";
+              }
+            }}
+          />
+        </label>
         <span className="shrink-0 px-3 py-2 rounded-[4px] bg-[#F4E90E0D] cursor-pointer relative">
           <span
             onClick={() => {

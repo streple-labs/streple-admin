@@ -30,7 +30,7 @@ export default function Login() {
 
   const { mutate: handleLogin, isPending: loading } = useMutation({
     mutationKey: ["login"],
-    mutationFn: async () => await api.post("/auth/login/user", formData),
+    mutationFn: async () => await api.post("/auth/login/admin", formData),
     onSuccess: (res) => {
       setCookie("streple_auth_token", res.data.streple_auth_token);
       router.push("/");
@@ -104,7 +104,7 @@ export default function Login() {
             <div className="flex flex-col gap-2 w-full">
               <span className="relative">
                 <input
-                  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!.%*?&])[A-Za-z\d@$!.%*?&]{8,}$"
+                  // pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!.%*?&])[A-Za-z\d@$!.%*?&]{8,}$"
                   title="Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
                   value={formData.password}
                   name="password"
