@@ -1,6 +1,12 @@
 import { DefaultDraftBlockRenderMap, DraftEditorCommand } from "draft-js";
 import Immutable from "immutable";
 import { createElement } from "react";
+import {
+  FaAlignCenter,
+  FaAlignJustify,
+  FaAlignLeft,
+  FaAlignRight,
+} from "react-icons/fa6";
 import { GoItalic } from "react-icons/go";
 import { LuBold } from "react-icons/lu";
 import { RiUnderline } from "react-icons/ri";
@@ -37,6 +43,13 @@ export enum InlineStyle {
   COLOR_WHITE = "COLOR_WHITE",
 }
 
+export enum AlignmentType {
+  LEFT = "ALIGN_LEFT",
+  CENTER = "ALIGN_CENTER",
+  RIGHT = "ALIGN_RIGHT",
+  JUSTIFY = "ALIGN_JUSTIFY",
+}
+
 export const InlineStyle_LABELS: Record<
   "BOLD" | "ITALIC" | "UNDERLINE",
   React.ReactNode
@@ -46,13 +59,20 @@ export const InlineStyle_LABELS: Record<
   [InlineStyle.UNDERLINE]: createElement(RiUnderline),
 };
 
+export const Align_LABELS = {
+  [AlignmentType.LEFT]: createElement(FaAlignLeft),
+  [AlignmentType.CENTER]: createElement(FaAlignCenter),
+  [AlignmentType.RIGHT]: createElement(FaAlignRight),
+  [AlignmentType.JUSTIFY]: createElement(FaAlignJustify),
+};
+
 export const COLOR_OPTIONS = {
-  COLOR_BLACK: "#111111",
-  COLOR_PURPLE: "#A082F9",
-  COLOR_BLUE: "#28175F",
-  COLOR_YELLOW: "#F4E90E",
-  COLOR_GREY: "#666666",
-  COLOR_WHITE: "#FFFFFF",
+  [InlineStyle.COLOR_BLACK]: "#111111",
+  [InlineStyle.COLOR_PURPLE]: "#A082F9",
+  [InlineStyle.COLOR_BLUE]: "#28175F",
+  [InlineStyle.COLOR_YELLOW]: "#F4E90E",
+  [InlineStyle.COLOR_GREY]: "#666666",
+  [InlineStyle.COLOR_WHITE]: "#FFFFFF",
 };
 
 export const CUSTOM_STYLE_MAP = {
@@ -97,3 +117,10 @@ const CUSTOM_BLOCK_RENDER_MAP = Immutable.Map({
 export const BLOCK_RENDER_MAP = DefaultDraftBlockRenderMap.merge(
   CUSTOM_BLOCK_RENDER_MAP
 );
+
+export const ALIGNMENT_STYLES = {
+  [AlignmentType.LEFT]: { textAlign: "left" },
+  [AlignmentType.CENTER]: { textAlign: "center" },
+  [AlignmentType.RIGHT]: { textAlign: "right" },
+  [AlignmentType.JUSTIFY]: { textAlign: "justify" },
+} as const;

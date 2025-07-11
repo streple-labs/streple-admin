@@ -3,7 +3,10 @@ import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
 import { GoLink } from "react-icons/go";
 import { IoImageOutline } from "react-icons/io5";
+import ColorPicker from "./color-picker";
 import {
+  Align_LABELS,
+  AlignmentType,
   BLOCK_LABELS,
   BlockType,
   HEADING_BLOCK_LABELS,
@@ -11,7 +14,6 @@ import {
   InlineStyle_LABELS,
 } from "./config";
 import { useEditorApi } from "./context";
-import ColorPicker from "./color-picker";
 
 const ToolPanel = () => {
   const {
@@ -24,6 +26,8 @@ const ToolPanel = () => {
     hasInlineStyle,
     openLinkForm,
     setOpenLinkForm,
+    hasAlignment,
+    toggleAlignment,
   } = useEditorApi();
 
   const [showHeadingOptions, setShowHeadingOptions] = useState(false);
@@ -31,7 +35,7 @@ const ToolPanel = () => {
   const [url, setUrl] = useState("");
 
   return (
-    <div className="flex flex-wrap items-center justify-between">
+    <div className="flex items-center justify-between">
       <div className="shrink-0 flex items-center gap-3">
         <label
           htmlFor="image-input"
@@ -122,23 +126,44 @@ const ToolPanel = () => {
           )}
         </div>
 
-        {Object.values(InlineStyle).map((v) => (
+        {Object.values(InlineStyle)
+          .filter(
+            (style) =>
+              !style.startsWith("COLOR_") && !style.startsWith("ALIGN_")
+          )
+          .map((v) => (
+            <button
+              key={v}
+              className={cn(
+                "shrink-0 my-2.5 mr-1.5",
+                hasInlineStyle(v) ? "text-[#A082F9]" : "text-[#FFFFFF99]"
+              )}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                toggleInlineStyle(v);
+              }}
+            >
+              {InlineStyle_LABELS[v]}
+            </button>
+          ))}
+
+        <ColorPicker />
+
+        {Object.values(AlignmentType).map((alignment) => (
           <button
-            key={v}
+            key={alignment}
             className={cn(
               "shrink-0 my-2.5 mr-1.5",
-              hasInlineStyle(v) ? "text-[#A082F9]" : "text-[#FFFFFF99]"
+              hasAlignment(alignment) ? "text-[#A082F9]" : "text-[#FFFFFF99]"
             )}
             onMouseDown={(e) => {
               e.preventDefault();
-              toggleInlineStyle(v);
+              toggleAlignment(alignment);
             }}
           >
-            {InlineStyle_LABELS[v]}
+            {Align_LABELS[alignment]}
           </button>
         ))}
-
-        <ColorPicker />
 
         <button
           className="shrink-0 my-2.5 mr-1.5"

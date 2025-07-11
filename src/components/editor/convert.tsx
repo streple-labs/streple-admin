@@ -1,5 +1,11 @@
 import { convertFromHTML, convertToHTML } from "draft-convert";
-import { BlockType, COLOR_OPTIONS, EntityType, InlineStyle } from "./config";
+import {
+  AlignmentType,
+  BlockType,
+  COLOR_OPTIONS,
+  EntityType,
+  InlineStyle,
+} from "./config";
 
 export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
   styleToHTML: (style) => {
@@ -12,13 +18,6 @@ export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
         return (
           <span className="underline" style={{ textDecoration: "underline" }} />
         );
-      // case InlineStyle.ACCENT:
-      //   return (
-      //     <span
-      //       className="accent"
-      //       style={CUSTOM_STYLE_MAP[InlineStyle.ACCENT]}
-      //     />
-      //   );
       default:
         if (style.startsWith("COLOR_")) {
           const colorValue = COLOR_OPTIONS[style as keyof typeof COLOR_OPTIONS];
@@ -28,35 +27,40 @@ export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
     }
   },
   blockToHTML: (block) => {
+    const alignment = block.data?.textAlign as AlignmentType;
+    const alignmentStyle = alignment
+      ? { textAlign: getAlignmentValue(alignment) }
+      : {};
+
     switch (block.type) {
       case BlockType.cite:
-        return <cite />;
+        return <cite style={alignmentStyle as React.CSSProperties} />;
       case BlockType.h1:
-        return <h1 />;
+        return <h1 style={alignmentStyle as React.CSSProperties} />;
       case BlockType.h2:
-        return <h2 />;
+        return <h2 style={alignmentStyle as React.CSSProperties} />;
       case BlockType.h3:
-        return <h3 />;
+        return <h3 style={alignmentStyle as React.CSSProperties} />;
       case BlockType.h4:
-        return <h4 />;
+        return <h4 style={alignmentStyle as React.CSSProperties} />;
       case BlockType.h5:
-        return <h5 />;
+        return <h5 style={alignmentStyle as React.CSSProperties} />;
       case BlockType.h6:
-        return <h6 />;
+        return <h6 style={alignmentStyle as React.CSSProperties} />;
       case BlockType.orderList:
         return {
-          element: <li />,
+          element: <li style={alignmentStyle as React.CSSProperties} />,
           nest: <ol />,
         };
       case BlockType.list:
         return {
-          element: <li />,
+          element: <li style={alignmentStyle as React.CSSProperties} />,
           nest: <ul />,
         };
       case BlockType.blockquote:
-        return <blockquote />;
+        return <blockquote style={alignmentStyle as React.CSSProperties} />;
       case BlockType.default:
-        return <p />;
+        return <p style={alignmentStyle as React.CSSProperties} />;
       default:
         return null;
     }
@@ -94,37 +98,51 @@ export const HTMLtoState = convertFromHTML<DOMStringMap, BlockType>({
 
     if (nodeName === "h3") return currentStyle.add(BlockType.h3);
 
-    // if (nodeName === "span" && node.classList.contains("accent")) {
-    //   return currentStyle.add(InlineStyle.ACCENT);
-    // }
-
     return currentStyle;
   },
-  /** Типизация пакета не предусматривает параметр last, но он есть */
+
   // @ts-expect-error //some versions of draft-convert have this parameter
   htmlToBlock(nodeName, node, last) {
-    switch (nodeName) {
-      case "h1":
-        return BlockType.h1;
-      case "h2":
-        return BlockType.h2;
-      case "h3":
-        return BlockType.h3;
-      case "h4":
-        return BlockType.h4;
-      case "li":
-        if (last === "ol") return BlockType.orderList;
-        return BlockType.list;
-      case "blockquote":
-        return BlockType.blockquote;
-      case "cite":
-        return BlockType.cite;
-      case "div":
-      case "p":
-        return BlockType.default;
-      default:
-        return null;
+    const blockType = (() => {
+      switch (nodeName) {
+        case "h1":
+          return BlockType.h1;
+        case "h2":
+          return BlockType.h2;
+        case "h3":
+          return BlockType.h3;
+        case "h4":
+          return BlockType.h4;
+        case "h5":
+          return BlockType.h5;
+        case "h6":
+          return BlockType.h6;
+        case "li":
+          if (last === "ol") return BlockType.orderList;
+          return BlockType.list;
+        case "blockquote":
+          return BlockType.blockquote;
+        case "cite":
+          return BlockType.cite;
+        case "div":
+        case "p":
+          return BlockType.default;
+        default:
+          return null;
+      }
+    })();
+
+    if (blockType && node.style && node.style.textAlign) {
+      const alignment = getAlignmentEnum(node.style.textAlign);
+      if (alignment) {
+        return {
+          type: blockType,
+          data: { textAlign: alignment },
+        };
+      }
     }
+
+    return blockType;
   },
   htmlToEntity: (nodeName, node, createEntity) => {
     if (nodeName === "a" && node.href)
@@ -135,3 +153,32 @@ export const HTMLtoState = convertFromHTML<DOMStringMap, BlockType>({
     return undefined;
   },
 });
+
+function getAlignmentValue(alignment: AlignmentType): string {
+  switch (alignment) {
+    case AlignmentType.CENTER:
+      return "center";
+    case AlignmentType.RIGHT:
+      return "right";
+    case AlignmentType.JUSTIFY:
+      return "justify";
+    case AlignmentType.LEFT:
+    default:
+      return "left";
+  }
+}
+
+function getAlignmentEnum(textAlign: string): AlignmentType | null {
+  switch (textAlign) {
+    case "center":
+      return AlignmentType.CENTER;
+    case "right":
+      return AlignmentType.RIGHT;
+    case "justify":
+      return AlignmentType.JUSTIFY;
+    case "left":
+      return AlignmentType.LEFT;
+    default:
+      return null;
+  }
+}

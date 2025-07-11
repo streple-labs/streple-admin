@@ -4,12 +4,15 @@ import {
   DraftEntityMutability,
   DraftHandleValue,
   EditorState,
-  KeyBindingUtil,
-  RichUtils,
   getDefaultKeyBinding,
+  KeyBindingUtil,
+  Modifier,
+  RichUtils,
+  SelectionState,
 } from "draft-js";
 import { useCallback, useMemo, useState } from "react";
 import {
+  AlignmentType,
   BlockType,
   COLOR_OPTIONS,
   EntityType,
@@ -40,6 +43,9 @@ export type EditorApi = {
   applyColor: (color: InlineStyle) => void;
   getCurrentColor: () => InlineStyle | null;
   removeColor: () => void;
+  toggleAlignment: (alignment: AlignmentType) => void;
+  getCurrentAlignment: () => AlignmentType | null;
+  hasAlignment: (alignment: AlignmentType) => boolean;
 };
 
 const decorator = new CompositeDecorator([LinkDecorator, ImageDecorator]);
@@ -163,11 +169,6 @@ export const useEditor = (html?: string): EditorApi => {
 
   const handleKeyCommand = useCallback(
     (command: KeyCommand, editorState: EditorState) => {
-      // if (command === "accent") {
-      //   toggleInlineStyle(InlineStyle.ACCENT);
-      //   return "handled";
-      // }
-
       const newState = RichUtils.handleKeyCommand(editorState, command);
 
       if (newState) {
@@ -235,6 +236,74 @@ export const useEditor = (html?: string): EditorApi => {
     setState(newState);
   }, [state, removeAllColorStyles]);
 
+  const toggleAlignment = useCallback((alignment: AlignmentType) => {
+    setState((currentState) => {
+      const selection = currentState.getSelection();
+      const contentState = currentState.getCurrentContent();
+
+      const startKey = selection.getStartKey();
+      const endKey = selection.getEndKey();
+      const blockMap = contentState.getBlockMap();
+
+      let newContentState = contentState;
+
+      blockMap
+        .skipUntil((_, k) => k === startKey)
+        .takeUntil((_, k) => k === endKey)
+        .concat([[endKey, blockMap.get(endKey)]])
+        .forEach((block, blockKey) => {
+          if (block) {
+            const currentData = block.getData();
+            const currentAlignment = currentData.get("textAlign");
+
+            const newAlignment =
+              currentAlignment === alignment ? null : alignment;
+
+            const newData = newAlignment
+              ? currentData.set("textAlign", newAlignment)
+              : currentData.remove("textAlign");
+
+            const blockSelection = SelectionState.createEmpty(
+              blockKey as string
+            ).merge({
+              anchorOffset: 0,
+              focusOffset: block.getLength(),
+            });
+
+            newContentState = Modifier.setBlockData(
+              newContentState,
+              blockSelection,
+              newData
+            );
+          }
+        });
+
+      const newEditorState = EditorState.push(
+        currentState,
+        newContentState,
+        "change-block-data"
+      );
+
+      return EditorState.acceptSelection(newEditorState, selection);
+    });
+  }, []);
+
+  const getCurrentAlignment = useCallback((): AlignmentType | null => {
+    const selection = state.getSelection();
+    const contentState = state.getCurrentContent();
+    const block = contentState.getBlockForKey(selection.getStartKey());
+
+    return block.getData().get("textAlign") as AlignmentType | null;
+  }, [state]);
+
+  const hasAlignment = useCallback(
+    (alignment: AlignmentType) => {
+      const currentAlignment = getCurrentAlignment();
+      return currentAlignment === alignment;
+    },
+    [getCurrentAlignment]
+  );
+
   return useMemo(
     () => ({
       state,
@@ -253,6 +322,9 @@ export const useEditor = (html?: string): EditorApi => {
       applyColor,
       getCurrentColor,
       removeColor,
+      toggleAlignment,
+      getCurrentAlignment,
+      hasAlignment,
     }),
     [
       state,
@@ -270,6 +342,9 @@ export const useEditor = (html?: string): EditorApi => {
       applyColor,
       getCurrentColor,
       removeColor,
+      toggleAlignment,
+      getCurrentAlignment,
+      hasAlignment,
     ]
   );
 };
