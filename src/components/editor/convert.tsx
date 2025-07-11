@@ -1,5 +1,5 @@
 import { convertFromHTML, convertToHTML } from "draft-convert";
-import { BlockType, EntityType, InlineStyle } from "./config";
+import { BlockType, COLOR_OPTIONS, EntityType, InlineStyle } from "./config";
 
 export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
   styleToHTML: (style) => {
@@ -20,6 +20,10 @@ export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
       //     />
       //   );
       default:
+        if (style.startsWith("COLOR_")) {
+          const colorValue = COLOR_OPTIONS[style as keyof typeof COLOR_OPTIONS];
+          if (colorValue) return <span style={{ color: colorValue }} />;
+        }
         return null;
     }
   },

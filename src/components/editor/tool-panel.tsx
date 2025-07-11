@@ -11,6 +11,7 @@ import {
   InlineStyle_LABELS,
 } from "./config";
 import { useEditorApi } from "./context";
+import ColorPicker from "./color-picker";
 
 const ToolPanel = () => {
   const {
@@ -136,6 +137,8 @@ const ToolPanel = () => {
             {InlineStyle_LABELS[v]}
           </button>
         ))}
+
+        <ColorPicker />
 
         <button
           className="shrink-0 my-2.5 mr-1.5"

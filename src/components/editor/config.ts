@@ -29,12 +29,39 @@ export enum InlineStyle {
   BOLD = "BOLD",
   ITALIC = "ITALIC",
   UNDERLINE = "UNDERLINE",
+  COLOR_BLACK = "COLOR_BLACK",
+  COLOR_PURPLE = "COLOR_PURPLE",
+  COLOR_BLUE = "COLOR_BLUE",
+  COLOR_YELLOW = "COLOR_YELLOW",
+  COLOR_GREY = "COLOR_GREY",
+  COLOR_WHITE = "COLOR_WHITE",
 }
 
-export const InlineStyle_LABELS: Record<InlineStyle, React.ReactNode> = {
+export const InlineStyle_LABELS: Record<
+  "BOLD" | "ITALIC" | "UNDERLINE",
+  React.ReactNode
+> = {
   [InlineStyle.BOLD]: createElement(LuBold),
   [InlineStyle.ITALIC]: createElement(GoItalic),
   [InlineStyle.UNDERLINE]: createElement(RiUnderline),
+};
+
+export const COLOR_OPTIONS = {
+  COLOR_BLACK: "#111111",
+  COLOR_PURPLE: "#A082F9",
+  COLOR_BLUE: "#28175F",
+  COLOR_YELLOW: "#F4E90E",
+  COLOR_GREY: "#666666",
+  COLOR_WHITE: "#FFFFFF",
+};
+
+export const CUSTOM_STYLE_MAP = {
+  COLOR_BLACK: { color: COLOR_OPTIONS.COLOR_BLACK },
+  COLOR_PURPLE: { color: COLOR_OPTIONS.COLOR_PURPLE },
+  COLOR_BLUE: { color: COLOR_OPTIONS.COLOR_BLUE },
+  COLOR_YELLOW: { color: COLOR_OPTIONS.COLOR_YELLOW },
+  COLOR_GREY: { color: COLOR_OPTIONS.COLOR_GREY },
+  COLOR_WHITE: { color: COLOR_OPTIONS.COLOR_WHITE },
 };
 
 export const BLOCK_LABELS = {
@@ -70,5 +97,3 @@ const CUSTOM_BLOCK_RENDER_MAP = Immutable.Map({
 export const BLOCK_RENDER_MAP = DefaultDraftBlockRenderMap.merge(
   CUSTOM_BLOCK_RENDER_MAP
 );
-
-export const CUSTOM_STYLE_MAP = {};

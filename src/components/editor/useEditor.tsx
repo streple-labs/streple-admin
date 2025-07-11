@@ -9,7 +9,13 @@ import {
   getDefaultKeyBinding,
 } from "draft-js";
 import { useCallback, useMemo, useState } from "react";
-import { BlockType, EntityType, InlineStyle, KeyCommand } from "./config";
+import {
+  BlockType,
+  COLOR_OPTIONS,
+  EntityType,
+  InlineStyle,
+  KeyCommand,
+} from "./config";
 import { HTMLtoState, stateToHTML } from "./convert";
 import { ImageDecorator } from "./image-block";
 import LinkDecorator from "./link";
@@ -31,6 +37,9 @@ export type EditorApi = {
     editorState: EditorState
   ) => DraftHandleValue;
   handlerKeyBinding: (e: React.KeyboardEvent) => KeyCommand | null;
+  applyColor: (color: InlineStyle) => void;
+  getCurrentColor: () => InlineStyle | null;
+  removeColor: () => void;
 };
 
 const decorator = new CompositeDecorator([LinkDecorator, ImageDecorator]);
@@ -184,6 +193,48 @@ export const useEditor = (html?: string): EditorApi => {
     [state]
   );
 
+  const removeAllColorStyles = useCallback(
+    (editorState: EditorState): EditorState => {
+      const currentStyles = editorState.getCurrentInlineStyle();
+
+      let newEditorState = editorState;
+
+      currentStyles.forEach((style) => {
+        if (style?.startsWith("COLOR_"))
+          newEditorState = RichUtils.toggleInlineStyle(newEditorState, style);
+      });
+
+      return newEditorState;
+    },
+    []
+  );
+
+  const applyColor = useCallback(
+    (color: InlineStyle) => {
+      let newState = removeAllColorStyles(state);
+
+      newState = RichUtils.toggleInlineStyle(newState, color);
+
+      setState(newState);
+    },
+    [state, removeAllColorStyles]
+  );
+
+  const getCurrentColor = useCallback((): InlineStyle | null => {
+    const currentStyles = state.getCurrentInlineStyle();
+
+    for (const colorKey of Object.keys(COLOR_OPTIONS)) {
+      if (currentStyles.has(colorKey)) return colorKey as InlineStyle;
+    }
+
+    return null;
+  }, [state]);
+
+  const removeColor = useCallback(() => {
+    const newState = removeAllColorStyles(state);
+    setState(newState);
+  }, [state, removeAllColorStyles]);
+
   return useMemo(
     () => ({
       state,
@@ -199,6 +250,9 @@ export const useEditor = (html?: string): EditorApi => {
       setEntityData,
       handleKeyCommand,
       handlerKeyBinding,
+      applyColor,
+      getCurrentColor,
+      removeColor,
     }),
     [
       state,
@@ -213,6 +267,9 @@ export const useEditor = (html?: string): EditorApi => {
       setEntityData,
       handleKeyCommand,
       handlerKeyBinding,
+      applyColor,
+      getCurrentColor,
+      removeColor,
     ]
   );
 };
