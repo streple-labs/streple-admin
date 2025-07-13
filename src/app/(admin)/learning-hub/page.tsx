@@ -85,7 +85,10 @@ export default function Page() {
     <>
       <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22]">
         {uploadFormat === "text" ? (
-          <MyEditor setUploadFormat={setUploadFormat} />
+          <TextEditorProvider>
+            <ToolPanel setUploadFormat={setUploadFormat} />
+            <TextEditor />
+          </TextEditorProvider>
         ) : (
           <>
             <h4
@@ -678,44 +681,3 @@ const UploadCourseModal = ({
     </div>
   );
 };
-
-function MyEditor({
-  setUploadFormat,
-}: {
-  setUploadFormat: Dispatch<SetStateAction<"pdf" | "text" | null>>;
-}) {
-  return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex gap-8 justify-between pb-4 border-b border-b-white/5">
-        <div className="flex items-center gap-6">
-          <span
-            className="cursor-pointer"
-            onClick={() => {
-              setUploadFormat(null);
-            }}
-          >
-            <FaArrowLeft className="w-5 stroke-white/80" />
-          </span>
-          <input
-            name="title"
-            className="bg-transparent outline-0 ring-0 border-0 placeholder:text-white/80 text-white/80 text-xl font-semibold"
-            placeholder="Untitled document"
-          />
-        </div>
-        <div className="flex items-center gap-6">
-          <button className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5">
-            Save as draft
-          </button>
-          <button className="text-xs text-[#2B2B37] font-normal bg-[#A082F9] rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5">
-            Publish
-          </button>
-        </div>
-      </div>
-
-      <TextEditorProvider>
-        <ToolPanel />
-        <TextEditor />
-      </TextEditorProvider>
-    </div>
-  );
-}

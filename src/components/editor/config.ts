@@ -6,6 +6,8 @@ import {
   FaAlignJustify,
   FaAlignLeft,
   FaAlignRight,
+  FaList,
+  FaListOl,
 } from "react-icons/fa6";
 import { GoItalic } from "react-icons/go";
 import { LuBold } from "react-icons/lu";
@@ -64,6 +66,11 @@ export const Align_LABELS = {
   [AlignmentType.CENTER]: createElement(FaAlignCenter),
   [AlignmentType.RIGHT]: createElement(FaAlignRight),
   [AlignmentType.JUSTIFY]: createElement(FaAlignJustify),
+};
+
+export const LIST_LABELS = {
+  [BlockType.list]: createElement(FaList),
+  [BlockType.orderList]: createElement(FaListOl),
 };
 
 export const COLOR_OPTIONS = {

@@ -28,7 +28,12 @@ const TextEditor: React.FC<TextEditorProps> = ({ className }) => {
   };
 
   return (
-    <div className={cn("min-h-40 caret-white cursor-pointer", className)}>
+    <div
+      className={cn(
+        "min-h-40 caret-white cursor-pointer text-editor",
+        className
+      )}
+    >
       <Editor
         spellCheck
         handleKeyCommand={editorApi.handleKeyCommand}

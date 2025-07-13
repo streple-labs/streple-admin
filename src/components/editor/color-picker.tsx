@@ -10,7 +10,6 @@ const ColorPicker = () => {
   } = useEditorApi();
   const [isOpen, setIsOpen] = useState(false);
   const currentColor = getCurrentColor();
-  console.log(currentColor);
 
   const handleColorSelect = (color: InlineStyle) => {
     applyColor(color);
