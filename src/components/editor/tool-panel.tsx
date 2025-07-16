@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { FaArrowLeft, FaChevronDown } from "react-icons/fa6";
 import { GoLink } from "react-icons/go";
 import { IoImageOutline } from "react-icons/io5";
@@ -17,9 +17,11 @@ import {
 import { useEditorApi } from "./context";
 
 const ToolPanel = ({
-  setUploadFormat,
+  close,
+  setText,
 }: {
-  setUploadFormat: Dispatch<SetStateAction<"pdf" | "text" | null>>;
+  close: () => void;
+  setText: (text: string) => void;
 }) => {
   const {
     toHtml,
@@ -43,12 +45,7 @@ const ToolPanel = ({
     <div className="flex flex-col gap-6 w-full">
       <div className="flex gap-8 justify-between pb-4 border-b border-b-white/5">
         <div className="flex items-center gap-6">
-          <span
-            className="cursor-pointer"
-            onClick={() => {
-              setUploadFormat(null);
-            }}
-          >
+          <span className="cursor-pointer" onClick={close}>
             <FaArrowLeft className="w-5 stroke-white/80" />
           </span>
           <input
@@ -63,7 +60,7 @@ const ToolPanel = ({
           </button>
           <button
             onClick={() => {
-              console.log(toHtml());
+              setText(toHtml());
             }}
             title="publish article"
             aria-label="publish article"

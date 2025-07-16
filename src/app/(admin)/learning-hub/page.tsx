@@ -62,6 +62,16 @@ const dummy_courses = [
   },
 ];
 
+const initialState = {
+  title: "",
+  description: "",
+  track: null,
+  cover_img: null,
+  file: null,
+  article: null,
+  status: null,
+};
+
 export default function Page() {
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const toggleFilterOptions = () => {
@@ -81,12 +91,24 @@ export default function Page() {
 
   const [uploadFormat, setUploadFormat] = useState<"pdf" | "text" | null>(null);
 
+  const [courseDetails, setCourseDetails] =
+    useState<FileCourseDetails>(initialState);
+
+  // const handlePublish = () => {}
+
   return (
     <>
       <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22]">
         {uploadFormat === "text" ? (
           <TextEditorProvider>
-            <ToolPanel setUploadFormat={setUploadFormat} />
+            <ToolPanel
+              close={() => {
+                setUploadFormat(null);
+              }}
+              setText={(article: string) => {
+                setCourseDetails((prev) => ({ ...prev, article }));
+              }}
+            />
             <TextEditor />
           </TextEditorProvider>
         ) : (
@@ -102,9 +124,9 @@ export default function Page() {
                   <div className="w-full relative">
                     <input
                       name="search"
-                      title="search for traders"
+                      title="search for courses"
                       type="text"
-                      placeholder="search for traders"
+                      placeholder="search for courses"
                       className={`h-[50px] w-full text-base font-normal py-5 px-4 rounded-[15px] border border-white/10 gap-4 leading-4 tracking-normal placeholder:text-xs placeholder:text-white/60 outline-0 ring-0 caret-[#B39FF0]`}
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
@@ -286,39 +308,27 @@ export default function Page() {
           toggleModal={toggleUploadModal}
           uploadFormat={uploadFormat}
           setUploadFormat={setUploadFormat}
+          courseDetails={courseDetails}
+          setCourseDetails={setCourseDetails}
         />
       )}
     </>
   );
 }
 
-type FileCourseDetails = {
-  title: string;
-  description: string;
-  track: "Beginner" | "Advanced" | null;
-  cover_img: File | null;
-  file: File | null;
-  status: "Draft" | "Published" | null;
-};
-
 const UploadCourseModal = ({
   toggleModal,
   uploadFormat,
   setUploadFormat,
+  courseDetails,
+  setCourseDetails,
 }: {
   toggleModal: () => void;
   uploadFormat: "pdf" | "text" | null;
   setUploadFormat: Dispatch<SetStateAction<"pdf" | "text" | null>>;
+  courseDetails: FileCourseDetails;
+  setCourseDetails: Dispatch<SetStateAction<FileCourseDetails>>;
 }) => {
-  const [courseDetails, setCourseDetails] = useState<FileCourseDetails>({
-    title: "",
-    description: "",
-    track: null,
-    cover_img: null,
-    file: null,
-    status: null,
-  });
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
@@ -338,14 +348,7 @@ const UploadCourseModal = ({
   };
 
   const reset = () => {
-    setCourseDetails({
-      title: "",
-      description: "",
-      track: null,
-      cover_img: null,
-      file: null,
-      status: null,
-    });
+    setCourseDetails(initialState);
     setUploadFormat(null);
     setFillCourseDetails(false);
     toggleModal();
@@ -363,7 +366,7 @@ const UploadCourseModal = ({
           <div className="absolute inset-0 bg-black/70" onClick={reset} />
 
           <form
-            className="bg-[#242324] w-full max-w-3xl overflow-y-auto rounded-[20px] p-8 flex flex-col gap-10 items-center justify-center relative"
+            className="bg-[#242324] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[20px] p-8 space-y-10 relative"
             onSubmit={(e) => {
               e.preventDefault();
             }}
@@ -376,7 +379,7 @@ const UploadCourseModal = ({
             </span>
 
             <h4
-              className={`${anton.className} text-base font-normal leading-[150%] tracking-[2px]`}
+              className={`${anton.className} text-base w-full text-center font-normal leading-[150%] tracking-[2px]`}
             >
               Add course details
             </h4>
@@ -403,7 +406,7 @@ const UploadCourseModal = ({
                 />
               </label>
 
-              <label htmlFor="title" className="space-y-3">
+              <label htmlFor="description" className="space-y-3">
                 <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
                   Course description
                 </p>
@@ -417,8 +420,8 @@ const UploadCourseModal = ({
                     }))
                   }
                   required
-                  title="Add course title"
-                  placeholder="Add course title"
+                  title="Add course description"
+                  placeholder="Add course description"
                   className={`h-[120px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] bg-white/5`}
                 />
               </label>
