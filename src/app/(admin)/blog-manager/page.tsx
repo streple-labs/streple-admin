@@ -328,25 +328,42 @@ const FillBlogDetailsModal = ({
               title="Select learning track"
               className={`h-[55px] cursor-pointer w-full py-5 px-4 rounded-[10px] bg-white/5 flex items-center gap-4 relative`}
             >
-              <div className="flex items-center gap-2.5">
-                {blogData.tags.map((tag, i) => (
-                  <p
-                    key={i}
-                    className="bg-[#2f2e2f] py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
-                  >
-                    {tag}
-                    <FiX size={12} color="#FFFFFF99" />
-                  </p>
-                ))}
-              </div>
+              {!!blogData.tags.length && (
+                <div className="flex items-center gap-2.5">
+                  {blogData.tags.map((tag, i) => (
+                    <p
+                      key={i}
+                      className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
+                    >
+                      {tag}
+                      <span
+                        onClick={() => {
+                          setBlogData((prev) => ({
+                            ...prev,
+                            tags: prev.tags.filter((_, idx) => idx !== i),
+                          }));
+                        }}
+                      >
+                        <FiX width={12} color="#FFFFFF99" />
+                      </span>
+                    </p>
+                  ))}
+                </div>
+              )}
 
               <input
-                className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white"
+                value={searchTag}
+                className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white border-0 ring-0 outline-0"
+                style={{
+                  width: `${searchTag.length + 1 || 1}ch`,
+                  minWidth: "2ch",
+                  maxWidth: "100%",
+                }}
                 onChange={(e) => setSearchTag(e.target.value.trim())}
               />
 
               {searchTag && (
-                <div className="absolute top-16 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#252326]">
+                <div className="absolute top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
                   {tag_options
                     .filter((tag) => tag.includes(searchTag))
                     .map((tag, i) => (
