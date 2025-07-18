@@ -3,16 +3,14 @@
 
 import { anton } from "@/app/fonts";
 import api from "@/utils/axios";
-import { base_url } from "@/utils/constants";
 import { useMutation } from "@tanstack/react-query";
 import { setCookie } from "cookies-next";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
-import GoogleIcon from "../../../public/google-icon";
 import Loader from "../loader";
-import { useRouter } from "next/navigation";
 
 export default function Login() {
   const router = useRouter();
@@ -61,22 +59,6 @@ export default function Login() {
           Welcome back
         </h4>
         <div className="w-full flex flex-col gap-4 md:gap-6">
-          <div
-            onClick={() => (window.location.href = `${base_url}/auth/google`)}
-            className="h-[55px] md:h-[82px] cursor-pointer w-full text-base px-6 py-5 rounded-[10px] md:rounded-[20px] gap-4 bg-[#242324] flex items-center justify-center"
-          >
-            <GoogleIcon className="size-5 md:size-6" />
-            <p className="text-base md:text-[21px] leading-6 md:leading-8 tracking-[1px] font-normal">
-              Continue with Google
-            </p>
-          </div>
-
-          <span className="text-xs md:text-base font-normal leading-4 md:leading-6 tracking-[1px] flex items-center w-full gap-4">
-            <span className="h-[1px] bg-[#FFFFFF33] rounded-full w-full" />
-            Or
-            <span className="h-[1px] bg-[#FFFFFF33] rounded-full w-full" />
-          </span>
-
           <label className="space-y-1.5 md:space-y-3">
             <p className="font-normal text-sm md:text-base leading-6 tracking-[1px]">
               Email address
@@ -148,15 +130,6 @@ export default function Login() {
         >
           {loading ? <Loader /> : "Continue"}
         </button>
-        <p className="text-sm leading-[25px] tracking-[1px]">
-          Don&apos;t have an account?{" "}
-          <Link
-            href={"/signup"}
-            className="text-[#B39FF0] cursor-pointer font-bold"
-          >
-            Create account
-          </Link>
-        </p>
       </div>
     </form>
   );
