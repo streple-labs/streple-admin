@@ -113,10 +113,8 @@ const ToolPanel = ({
                 <button
                   className="w-full text-xs font-bold leading-4 tracking-[1px] text-end text-[#A082F9CC]"
                   onClick={() => {
-                    if (url) {
-                      addLink(url);
-                      setUrl("");
-                    }
+                    if (url) addLink(url);
+                    setUrl("");
                     setOpenLinkForm(false);
                   }}
                 >
