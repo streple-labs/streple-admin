@@ -15,6 +15,14 @@ body {
   @apply duration-300 ease-in-out transition-all;
 }
 
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 button {
   cursor: pointer;
   @apply disabled:opacity-80;

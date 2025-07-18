@@ -67,7 +67,7 @@ export default function Sidebar() {
   const router = useRouter();
 
   return (
-    <aside className="flex py-8 px-6 w-full max-w-[249px] h-full max-h-screen rounded-[20px] bg-[#5A555C1A]">
+    <aside className="hide-scrollbar flex shrink-0 py-8 px-6 w-full max-w-[249px] h-full overflow-y-auto rounded-[20px] bg-[#5A555C1A]">
       <nav className="flex flex-col gap-4 w-full">
         {nav_items.map((item) => (
           <Link

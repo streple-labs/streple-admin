@@ -87,7 +87,7 @@ export default function Page() {
   // const handlePublish = () => {};
 
   return (
-    <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22]">
+    <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
       {writeBlog ? (
         <TextEditorProvider>
           <ToolPanel
@@ -136,7 +136,7 @@ export default function Page() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-xs font-normal text-white">
               <thead>
-                <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4">
+                <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
                   <th>Course Title</th>
                   <th>Track</th>
                   <th>Date Added</th>
@@ -152,7 +152,7 @@ export default function Page() {
                     key={idx}
                     className={`${
                       idx % 2 ? "" : "bg-white/[2%]"
-                    } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4`}
+                    } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:text-nowrap`}
                   >
                     <td className=" max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
                       {course.title}
