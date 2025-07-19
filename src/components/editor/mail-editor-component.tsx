@@ -14,6 +14,7 @@ import {
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
 import { RxTextAlignCenter } from "react-icons/rx";
+import { MdOutlineTouchApp } from "react-icons/md";
 
 export default function MailEditorComponent({
   close,
@@ -26,6 +27,7 @@ export default function MailEditorComponent({
     toHtml,
     addLink,
     addImg,
+    addButton,
     toggleBlockType,
     currentBlockType,
     toggleInlineStyle,
@@ -37,6 +39,10 @@ export default function MailEditorComponent({
   const [showHeadingOptions, setShowHeadingOptions] = useState(false);
 
   const [url, setUrl] = useState("");
+
+  const [openButtonForm, setOpenButtonForm] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("");
+  const [buttonLink, setButtonLink] = useState("");
 
   return (
     <div>
@@ -150,7 +156,7 @@ export default function MailEditorComponent({
                 }}
               />
             </label>
-            <div className="h-[60px] rounded-[5px] border border-white/15 relative">
+            <div className="h-[60px] relative">
               <span
                 onClick={() => {
                   setOpenLinkForm(true);
@@ -158,7 +164,7 @@ export default function MailEditorComponent({
                 style={{
                   backgroundColor: openLinkForm ? "#2B2B37" : "transparent",
                 }}
-                className="flex flex-col gap-2.5 items-center justify-center cursor-pointer size-full p-2"
+                className="flex flex-col gap-2.5 items-center justify-center cursor-pointer size-full p-2 rounded-[5px] border border-white/15"
               >
                 <GoLink color="#FFFFFFB2" width={14} />
                 <span className="text-white/70 text-[11px]">Link</span>
@@ -202,6 +208,61 @@ export default function MailEditorComponent({
             >
               <RxTextAlignCenter color="#FFFFFFB2" width={14} />
               <span className="text-white/70 text-[11px]">Divider</span>
+            </div>
+
+            <div className="h-[60px] relative">
+              <span
+                onClick={() => {
+                  setOpenButtonForm(true);
+                }}
+                style={{
+                  backgroundColor: openButtonForm ? "#2B2B37" : "transparent",
+                }}
+                className="flex flex-col gap-2.5 items-center justify-center cursor-pointer size-full p-2 rounded-[5px] border border-white/15"
+              >
+                <MdOutlineTouchApp color="#FFFFFFB2" width={14} />
+                <span className="text-white/70 text-[11px]">Button</span>
+              </span>
+
+              {openButtonForm && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10 cursor-pointer"
+                    onClick={() => {
+                      setOpenButtonForm(false);
+                    }}
+                  />
+                  <div className="absolute z-20 top-16 left-0 w-[300px] rounded-[15px] p-3 flex flex-col gap-3 bg-[#252326]">
+                    <input
+                      type="text"
+                      placeholder="Button Label"
+                      className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-[45px] px-4 py-3 text-xs text-white/40"
+                      value={buttonLabel}
+                      onChange={(e) => setButtonLabel(e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Button URL"
+                      className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-[45px] px-4 py-3 text-xs text-white/40"
+                      value={buttonLink}
+                      onChange={(e) => setButtonLink(e.target.value)}
+                    />
+                    <button
+                      className="w-full text-xs font-bold leading-4 tracking-[1px] text-end text-[#A082F9CC]"
+                      onClick={() => {
+                        if (buttonLabel && buttonLink) {
+                          addButton(buttonLabel, buttonLink);
+                        }
+                        setOpenButtonForm(false);
+                        setButtonLabel("");
+                        setButtonLink("");
+                      }}
+                    >
+                      Add button
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

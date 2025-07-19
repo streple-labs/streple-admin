@@ -2,6 +2,7 @@ import { ContentBlock, ContentState } from "draft-js";
 import { BlockType, EntityType } from "./config";
 import ImageBlock from "./image-block";
 import { DividerBlock } from "./divider-block";
+import ButtonBlock from "./button-block";
 
 export const blockRenderer = (
   contentBlock: ContentBlock,
@@ -30,6 +31,16 @@ export const blockRenderer = (
           editable: false,
           props: {
             contentState: contentState,
+          },
+        };
+
+      if (entity.getType() === EntityType.button)
+        return {
+          component: ButtonBlock,
+          editable: false,
+          props: {
+            contentState: contentState,
+            block: contentBlock,
           },
         };
     }

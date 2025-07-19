@@ -81,6 +81,34 @@ export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
         />
       );
 
+    if (entity.type === EntityType.button)
+      return (
+        <a
+          href={entity.data.url}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingLeft: "1rem",
+            paddingRight: "1rem",
+            paddingTop: "0.75rem",
+            paddingBottom: "0.75rem",
+            height: "2.5rem",
+            minWidth: "10rem",
+            borderRadius: "10px",
+            fontWeight: 600,
+            letterSpacing: "2px",
+            lineHeight: "150%",
+            fontSize: "0.875rem",
+            backgroundColor: "#8b6af5",
+            marginTop: "0.25rem",
+            marginBottom: "0.25rem",
+          }}
+        >
+          {entity.data.label || "Button"}
+        </a>
+      );
+
     return originalText;
   },
 });

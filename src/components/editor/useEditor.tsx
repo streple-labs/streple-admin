@@ -46,6 +46,7 @@ export type EditorApi = {
   toggleAlignment: (alignment: AlignmentType) => void;
   getCurrentAlignment: () => AlignmentType | null;
   hasAlignment: (alignment: AlignmentType) => boolean;
+  addButton: (label: string, url: string) => void;
 };
 
 const decorator = new CompositeDecorator([LinkDecorator, ImageDecorator]);
@@ -344,6 +345,24 @@ export const useEditor = (html?: string): EditorApi => {
     [getCurrentAlignment]
   );
 
+  const addButton = useCallback((label: string, url: string) => {
+    setState((currentState) => {
+      const contentState = currentState.getCurrentContent();
+      const contentStateWithEntity = contentState.createEntity(
+        EntityType.button,
+        "IMMUTABLE",
+        { label, url }
+      );
+      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+
+      const newState = EditorState.set(currentState, {
+        currentContent: contentStateWithEntity,
+      });
+
+      return AtomicBlockUtils.insertAtomicBlock(newState, entityKey, " ");
+    });
+  }, []);
+
   return useMemo(
     () => ({
       state,
@@ -365,6 +384,7 @@ export const useEditor = (html?: string): EditorApi => {
       toggleAlignment,
       getCurrentAlignment,
       hasAlignment,
+      addButton,
     }),
     [
       state,
@@ -385,6 +405,7 @@ export const useEditor = (html?: string): EditorApi => {
       toggleAlignment,
       getCurrentAlignment,
       hasAlignment,
+      addButton,
     ]
   );
 };

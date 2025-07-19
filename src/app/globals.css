@@ -155,3 +155,23 @@ button {
   width: 100% !important;
   opacity: 0.1 !important;
 }
+
+.text-editor button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  height: 2.5rem !important;
+  min-width: 10rem !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2px !important;
+  line-height: 150% !important;
+  font-size: 0.875rem !important;
+  background-color: #8b6af5 !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
