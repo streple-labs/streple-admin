@@ -39,12 +39,16 @@ export default function ForgotPassword() {
         setStage("otp");
       },
       onError: (error: any) => {
-        toast.error(
-          error?.response?.data?.message ||
-            error?.userMessage ||
-            error?.message ||
-            "Signup failed. Please try again later."
-        );
+        let errorMessage = "Signup failed. Please try again later.";
+
+        if (error?.response?.data?.message) {
+          if (Array.isArray(error.response.data.message))
+            errorMessage = error.response.data.message.join(", ");
+          else errorMessage = error.response.data.message;
+        } else if (error?.userMessage) errorMessage = error.userMessage;
+        else if (error?.message) errorMessage = error.message;
+
+        toast.error(errorMessage);
       },
     });
 
@@ -90,12 +94,16 @@ export default function ForgotPassword() {
       setStage("reset-password");
     },
     onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message ||
-          error?.userMessage ||
-          error?.message ||
-          "Signup failed. Please try again later."
-      );
+      let errorMessage = "Signup failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
     },
   });
 
@@ -112,12 +120,16 @@ export default function ForgotPassword() {
         setStage("success");
       },
       onError: (error: any) => {
-        toast.error(
-          error?.response?.data?.message ||
-            error?.userMessage ||
-            error?.message ||
-            "password reset failed. Please try again later."
-        );
+        let errorMessage = "Signup failed. Please try again later.";
+
+        if (error?.response?.data?.message) {
+          if (Array.isArray(error.response.data.message))
+            errorMessage = error.response.data.message.join(", ");
+          else errorMessage = error.response.data.message;
+        } else if (error?.userMessage) errorMessage = error.userMessage;
+        else if (error?.message) errorMessage = error.message;
+
+        toast.error(errorMessage);
       },
     });
 
@@ -131,12 +143,16 @@ export default function ForgotPassword() {
       );
     },
     onError: (error: any) => {
-      toast.error(
-        error?.response?.data?.message ||
-          error?.userMessage ||
-          error?.message ||
-          "otp request failed. Please try again later."
-      );
+      let errorMessage = "Signup failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
     },
   });
 

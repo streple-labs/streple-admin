@@ -1,8 +1,10 @@
 import cn from "classnames";
 import { useState } from "react";
 import { FaArrowLeft, FaChevronDown, FaPlus } from "react-icons/fa6";
-import { GoLink } from "react-icons/go";
+import { GoCheckCircle, GoLink } from "react-icons/go";
 import { IoImageOutline } from "react-icons/io5";
+import { MdOutlineTouchApp } from "react-icons/md";
+import { RxTextAlignCenter } from "react-icons/rx";
 import ColorPicker from "./color-picker";
 import {
   BLOCK_LABELS,
@@ -13,8 +15,6 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
-import { RxTextAlignCenter } from "react-icons/rx";
-import { MdOutlineTouchApp } from "react-icons/md";
 
 export default function MailEditorComponent({
   close,
@@ -43,6 +43,8 @@ export default function MailEditorComponent({
   const [openButtonForm, setOpenButtonForm] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("");
   const [buttonLink, setButtonLink] = useState("");
+
+  const [showDraftMsg, setShowDraftMsg] = useState(false);
 
   return (
     <div>
@@ -112,7 +114,15 @@ export default function MailEditorComponent({
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="text-xs font-normal text-[#CFCFD3] flex items-center justify-center gap-2.5">
+          <button
+            className="text-xs font-normal text-[#CFCFD3] flex items-center justify-center gap-2.5"
+            onClick={() => {
+              setShowDraftMsg(true);
+              setTimeout(() => {
+                setShowDraftMsg(false);
+              }, 5000);
+            }}
+          >
             Save as draft
           </button>
           <button className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5">
@@ -131,7 +141,24 @@ export default function MailEditorComponent({
           </button>
         </div>
       </div>
-      <div className="flex">
+      <div className="flex relative overflow-y-hidden hide-scrollbar">
+        <div
+          className={`absolute z-50 rounded-[20px] text-nowrap ${
+            showDraftMsg ? "translate-y-4" : " -translate-y-20"
+          } left-1/2 -translate-x-1/2 border border-white/[8%] bg-white/20 px-2.5 py-1 flex items-center gap-2.5 text-xs leading-5 font-normal text-[#A082F9] tracking-[1px]`}
+        >
+          <GoCheckCircle color="A082F9" size={12} />
+          <p>
+            Draft saved. You can finish it anytime.{" "}
+            <span
+              onClick={close}
+              className="cursor-pointer font-semibold underline"
+            >
+              Back to Email centre
+            </span>
+          </p>
+        </div>
+
         <div className="border-r border-r-white/5 py-6 pr-6 space-y-6 w-1/5">
           <p className="text-[12px] font-semibold">Basic formatting</p>
           <div className="w-full grid grid-cols-2 gap-y-6 gap-x-3">
@@ -250,9 +277,8 @@ export default function MailEditorComponent({
                     <button
                       className="w-full text-xs font-bold leading-4 tracking-[1px] text-end text-[#A082F9CC]"
                       onClick={() => {
-                        if (buttonLabel && buttonLink) {
+                        if (buttonLabel && buttonLink)
                           addButton(buttonLabel, buttonLink);
-                        }
                         setOpenButtonForm(false);
                         setButtonLabel("");
                         setButtonLink("");
@@ -281,7 +307,17 @@ export default function MailEditorComponent({
                 className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs text-white/50"
               />
               <div className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs text-white/50 flex items-center justify-between">
-                <FaPlus size={8} className="ml-auto cursor-pointer" />
+                <input
+                  className="p-0 bg-transparent text-[11px] leading-4 tracking-[1px] text-white/50 caret-[#A082F9] border-0 ring-0 outline-0"
+                  style={{
+                    width: `${1}ch`,
+                    minWidth: "2ch",
+                    maxWidth: "100%",
+                  }}
+                  // value={searchTag}
+                  // onChange={(e) => setSearchTag(e.target.value.trim())}
+                />
+                <FaPlus width={8} className="ml-auto cursor-pointer" />
               </div>
             </div>
           </div>

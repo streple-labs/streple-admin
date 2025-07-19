@@ -4,8 +4,12 @@ import { anton, dmSans } from "@/app/fonts";
 import { TextEditorProvider } from "@/components/editor/context";
 import TextEditor from "@/components/editor/text-editor";
 import ToolPanel from "@/components/editor/tool-panel";
-import { formatFileSize } from "@/utils/utils";
+import Loader from "@/components/loader";
+import api from "@/utils/axios";
+import { fileToBase64, formatFileSize } from "@/utils/utils";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaRegFileAlt } from "react-icons/fa";
 import { FaArrowLeft, FaChevronDown } from "react-icons/fa6";
@@ -65,14 +69,17 @@ const dummy_courses = [
 const initialState = {
   title: "",
   description: "",
-  track: null,
-  cover_img: null,
-  file: null,
-  article: null,
+  level: null,
+  thumbnail: null,
+  document: null,
+  content: null,
   status: null,
+  type: null,
 };
 
 export default function Page() {
+  const router = useRouter();
+
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const toggleFilterOptions = () => {
     setShowFilterOptions((prev) => !prev);
@@ -89,26 +96,69 @@ export default function Page() {
     setOpenUploadModal((prev) => !prev);
   };
 
-  const [uploadFormat, setUploadFormat] = useState<"pdf" | "text" | null>(null);
-
   const [courseDetails, setCourseDetails] =
     useState<FileCourseDetails>(initialState);
 
   const [fillCouseDetails, setFillCourseDetails] = useState(false);
 
-  // const handlePublish = () => {}
+  const { mutate: handleUploadCourse, isPending: isUploadingCourse } =
+    useMutation({
+      mutationKey: ["upload-course"],
+      mutationFn: async () => {
+        const payload = { ...courseDetails };
+
+        if (courseDetails.thumbnail)
+          payload.thumbnail = await fileToBase64(
+            courseDetails.thumbnail as File
+          );
+
+        if (courseDetails.document)
+          payload.document = await fileToBase64(courseDetails.document as File);
+
+        return await api.post("/learning", payload);
+      },
+      onSuccess: (res) => {
+        router.refresh();
+        toast.success(res.data.message || "Course uploaded successfully!");
+        setCourseDetails(initialState);
+        setFillCourseDetails(false);
+        setOpenUploadModal(false);
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError: (error: any) => {
+        let errorMessage = "Signup failed. Please try again later.";
+
+        if (error?.response?.data?.message) {
+          if (Array.isArray(error.response.data.message))
+            errorMessage = error.response.data.message.join(", ");
+          else errorMessage = error.response.data.message;
+        } else if (error?.userMessage) errorMessage = error.userMessage;
+        else if (error?.message) errorMessage = error.message;
+
+        toast.error(errorMessage);
+      },
+    });
 
   return (
     <>
       <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
-        {uploadFormat === "text" ? (
+        {courseDetails.type === "article" ? (
           <TextEditorProvider>
             <ToolPanel
               close={() => {
-                setUploadFormat(null);
+                setCourseDetails((prev) => ({
+                  ...prev,
+                  type: null,
+                  content: null,
+                }));
+                setFillCourseDetails(false);
               }}
-              setText={(article: string) => {
-                setCourseDetails((prev) => ({ ...prev, article }));
+              setText={(content: string) => {
+                setCourseDetails((prev) => ({
+                  ...prev,
+                  type: "article",
+                  content,
+                }));
                 setOpenUploadModal(true);
                 setFillCourseDetails(true);
               }}
@@ -201,8 +251,7 @@ export default function Page() {
                 </button>
               </div>
             </div>
-
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto hide-scrollbar">
               <table className="min-w-full text-left text-xs font-normal text-white">
                 <thead>
                   <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
@@ -256,10 +305,7 @@ export default function Page() {
 
                           <span className="z-10 hidden group-hover:flex flex-col gap-3 absolute top-8 left-0 w-40 rounded-[20px] border border-white/5 px-3 py-4 bg-[#252326]">
                             <p
-                              onClick={() => {
-                                // handleTrackChange("Beginner");
-                                // toggleFilterOptions();
-                              }}
+                              onClick={() => {}}
                               className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
                                 dmSans.className
                               } cursor-pointer ${
@@ -271,10 +317,7 @@ export default function Page() {
                               Published
                             </p>
                             <p
-                              onClick={() => {
-                                // handleTrackChange("Advanced");
-                                // toggleFilterOptions();
-                              }}
+                              onClick={() => {}}
                               className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
                                 dmSans.className
                               } cursor-pointer ${
@@ -310,12 +353,12 @@ export default function Page() {
       {openUploadModal && (
         <UploadCourseModal
           toggleModal={toggleUploadModal}
-          uploadFormat={uploadFormat}
-          setUploadFormat={setUploadFormat}
           courseDetails={courseDetails}
           setCourseDetails={setCourseDetails}
           fillCourseDetails={fillCouseDetails}
           setFillCourseDetails={setFillCourseDetails}
+          handleUploadCourse={handleUploadCourse}
+          isUploadingCourse={isUploadingCourse}
         />
       )}
     </>
@@ -324,37 +367,38 @@ export default function Page() {
 
 const UploadCourseModal = ({
   toggleModal,
-  uploadFormat,
-  setUploadFormat,
   courseDetails,
   setCourseDetails,
   fillCourseDetails,
   setFillCourseDetails,
+  handleUploadCourse,
+  isUploadingCourse,
 }: {
   toggleModal: () => void;
-  uploadFormat: "pdf" | "text" | null;
-  setUploadFormat: Dispatch<SetStateAction<"pdf" | "text" | null>>;
   courseDetails: FileCourseDetails;
   setCourseDetails: Dispatch<SetStateAction<FileCourseDetails>>;
   fillCourseDetails: boolean;
   setFillCourseDetails: Dispatch<SetStateAction<boolean>>;
+  handleUploadCourse: () => void;
+  isUploadingCourse: boolean;
 }) => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setCourseDetails((prev) => ({ ...prev, file }));
       toast.success(`selected file: ${file.name}`);
-      setUploadFormat(file.type.includes("pdf") ? "pdf" : null);
+      setCourseDetails((prev) => ({
+        ...prev,
+        document: file,
+        type: file.type.includes("pdf") ? "pdf" : null,
+      }));
     } else {
       toast.error("No file selected");
-      setCourseDetails((prev) => ({ ...prev, file: null }));
-      setUploadFormat(null);
+      setCourseDetails((prev) => ({ ...prev, document: null, type: null }));
     }
   };
 
   const reset = () => {
     setCourseDetails(initialState);
-    setUploadFormat(null);
     setFillCourseDetails(false);
     toggleModal();
   };
@@ -373,6 +417,7 @@ const UploadCourseModal = ({
           className="bg-[#242324] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[20px] p-8 space-y-10 relative"
           onSubmit={(e) => {
             e.preventDefault();
+            handleUploadCourse();
           }}
         >
           <span
@@ -395,6 +440,7 @@ const UploadCourseModal = ({
               </p>
               <input
                 name="title"
+                readOnly={isUploadingCourse}
                 required
                 value={courseDetails.title}
                 onChange={(e) =>
@@ -416,6 +462,7 @@ const UploadCourseModal = ({
               </p>
               <textarea
                 name="description"
+                readOnly={isUploadingCourse}
                 value={courseDetails.description}
                 onChange={(e) =>
                   setCourseDetails((prev) => ({
@@ -436,11 +483,14 @@ const UploadCourseModal = ({
               <div
                 title="Select learning track"
                 className={`h-[55px] cursor-pointer w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
-                onClick={toggleTrackOptions}
+                onClick={() => {
+                  if (isUploadingCourse) return;
+                  toggleTrackOptions();
+                }}
               >
                 <p>
-                  {courseDetails.track
-                    ? courseDetails.track
+                  {courseDetails.level
+                    ? courseDetails.level
                     : "Select learning track"}
                 </p>
                 <FaChevronDown className="w-4 stroke-white/50" />
@@ -450,13 +500,13 @@ const UploadCourseModal = ({
                       onClick={() => {
                         setCourseDetails((prev) => ({
                           ...prev,
-                          track: "Beginner",
+                          level: "Beginner",
                         }));
                       }}
                       className={`p-2 rounded-[10px] h-12 w-full flex items-center text-sm font-normal ${
                         dmSans.className
                       } cursor-pointer ${
-                        courseDetails.track === "Beginner"
+                        courseDetails.level === "Beginner"
                           ? "bg-[#A082F9] text-[#2b2b37]"
                           : "hover:bg-white/5 text-white/60"
                       }`}
@@ -473,7 +523,7 @@ const UploadCourseModal = ({
                       className={`p-2 rounded-[10px] h-12 w-full flex items-center text-sm font-normal ${
                         dmSans.className
                       } cursor-pointer ${
-                        courseDetails.track === "Advanced"
+                        courseDetails.level === "Advanced"
                           ? "bg-[#A082F9] text-[#2b2b37]"
                           : "hover:bg-white/5 text-white/60"
                       }`}
@@ -485,14 +535,14 @@ const UploadCourseModal = ({
               </div>
             </div>
 
-            <label htmlFor="cover_img" className="space-y-3">
+            <label htmlFor="thumbnail" className="space-y-3">
               <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
                 Cover Image
               </p>
-              {courseDetails.cover_img ? (
+              {courseDetails.thumbnail ? (
                 <div className="relative w-full h-[120px] rounded-[10px] overflow-hidden cursor-pointer active:scale-95 active:opacity-25">
                   <Image
-                    src={URL.createObjectURL(courseDetails.cover_img)}
+                    src={URL.createObjectURL(courseDetails.thumbnail as File)}
                     alt="cover image"
                     fill
                     className="object-contain"
@@ -508,14 +558,15 @@ const UploadCourseModal = ({
               )}
               <input
                 type="file"
-                id="cover_img"
+                id="thumbnail"
                 accept="image/*"
+                readOnly={isUploadingCourse}
                 onChange={(e) => {
                   const file = e.target.files?.[0] || null;
                   if (file) {
                     setCourseDetails((prev) => ({
                       ...prev,
-                      cover_img: file,
+                      thumbnail: file,
                     }));
                     toast.success(`selected cover image: ${file.name}`);
                   } else toast.error("No cover image selected");
@@ -527,6 +578,7 @@ const UploadCourseModal = ({
             <label className="flex items-center gap-6 text-white/80">
               <p
                 onClick={() => {
+                  if (isUploadingCourse) return;
                   setCourseDetails((prev) => ({
                     ...prev,
                     status: "Published",
@@ -545,6 +597,7 @@ const UploadCourseModal = ({
               </p>
               <p
                 onClick={() => {
+                  if (isUploadingCourse) return;
                   setCourseDetails((prev) => ({
                     ...prev,
                     status: "Draft",
@@ -566,17 +619,19 @@ const UploadCourseModal = ({
 
           <div className="flex items-center justify-end w-full">
             <button
+              disabled={isUploadingCourse}
               type="submit"
+              title="upload course"
               className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
             >
-              Upload
+              {isUploadingCourse ? <Loader /> : "Upload"}
             </button>
           </div>
         </form>
       </div>
     );
 
-  if (uploadFormat === "pdf" && courseDetails.file)
+  if (courseDetails.type === "pdf" && courseDetails.document)
     return (
       <div className="fixed inset-0 p-[10%] flex justify-center">
         <div className="absolute inset-0 bg-black/70" onClick={reset} />
@@ -594,19 +649,21 @@ const UploadCourseModal = ({
                 <FaRegFileAlt size={16} className="stroke-white/70" />
                 <div className="space-y-1 text-white/70">
                   <p className="text-xs leading-4 tracking-[1px] font-normal">
-                    {courseDetails.file.name}
+                    {(courseDetails.document as File).name}
                   </p>
                   <p className="text-xs leading-4 tracking-[1px] font-normal">
-                    {formatFileSize(courseDetails.file.size)}
+                    {formatFileSize((courseDetails.document as File).size)}
                   </p>
                 </div>
               </div>
               <span
                 className="cursor-pointer"
                 onClick={() => {
-                  setCourseDetails((prev) => ({ ...prev, file: null }));
-
-                  setUploadFormat(null);
+                  setCourseDetails((prev) => ({
+                    ...prev,
+                    document: null,
+                    type: null,
+                  }));
                 }}
               >
                 <GoX className="stroke-white/50" size={16} />
@@ -672,7 +729,7 @@ const UploadCourseModal = ({
           </label>
           <label
             onClick={() => {
-              setUploadFormat("text");
+              setCourseDetails((prev) => ({ ...prev, type: "article" }));
               toggleModal();
             }}
             className="size-full flex items-center justify-center flex-col gap-4 border-dashed border border-white/30 p-3 rounded-[10px] cursor-pointer active:scale-95 active:opacity-25"

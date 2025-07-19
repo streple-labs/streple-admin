@@ -48,11 +48,9 @@ const ToolPanel = ({
           <span className="cursor-pointer" onClick={close}>
             <FaArrowLeft className="w-5 stroke-white/80" />
           </span>
-          <input
-            name="title"
-            className="bg-transparent outline-0 ring-0 border-0 placeholder:text-white/80 text-white/80 text-xl font-semibold"
-            placeholder="Untitled document"
-          />
+          <p className="text-xl text-white/80 font-semibold">
+            Untitled document
+          </p>
         </div>
         <div className="flex items-center gap-6">
           <button className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5">

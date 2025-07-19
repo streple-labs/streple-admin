@@ -1,9 +1,10 @@
 type FileCourseDetails = {
   title: string;
   description: string;
-  track: "Beginner" | "Advanced" | null;
-  cover_img: File | null;
-  file: File | null;
-  article: string | null;
+  level: "Beginner" | "Advanced" | null;
+  thumbnail: File | null | string;
+  document: File | null | string;
+  content: string | null;
   status: "Draft" | "Published" | null;
+  type: "pdf" | "article" | null;
 };
