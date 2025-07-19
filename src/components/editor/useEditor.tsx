@@ -58,9 +58,49 @@ export const useEditor = (html?: string): EditorApi => {
   );
 
   const toggleBlockType = useCallback((blockType: BlockType) => {
-    setState((currentState) =>
-      RichUtils.toggleBlockType(currentState, blockType)
-    );
+    if (blockType === BlockType.divider) {
+      setState((currentState) => {
+        const contentState = currentState.getCurrentContent();
+        const selection = currentState.getSelection();
+
+        const contentStateAfterSplit = Modifier.splitBlock(
+          contentState,
+          selection
+        );
+
+        const contentStateWithDivider = Modifier.setBlockType(
+          contentStateAfterSplit,
+          contentStateAfterSplit.getSelectionAfter(),
+          BlockType.divider
+        );
+
+        const contentStateWithNewBlock = Modifier.splitBlock(
+          contentStateWithDivider,
+          contentStateWithDivider.getSelectionAfter()
+        );
+
+        const finalContentState = Modifier.setBlockType(
+          contentStateWithNewBlock,
+          contentStateWithNewBlock.getSelectionAfter(),
+          BlockType.default
+        );
+
+        const newSelection = finalContentState.getSelectionAfter().merge({
+          hasFocus: true,
+        }) as SelectionState;
+
+        const newEditorState = EditorState.push(
+          currentState,
+          finalContentState,
+          "split-block"
+        );
+
+        return EditorState.forceSelection(newEditorState, newSelection);
+      });
+    } else
+      setState((currentState) =>
+        RichUtils.toggleBlockType(currentState, blockType)
+      );
   }, []);
 
   const currentBlockType = useMemo(() => {

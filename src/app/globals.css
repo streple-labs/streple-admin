@@ -125,6 +125,12 @@ button {
   font-weight: 500 !important;
 }
 
+.text-editor p {
+  font-size: 1rem !important;
+  line-height: 1.5rem !important;
+  font-weight: 400 !important;
+}
+
 .text-editor ul {
   list-style-type: disc !important;
   margin-left: 1.5rem !important;
@@ -139,4 +145,13 @@ button {
 
 .text-editor li {
   margin-bottom: 0.5rem !important;
+}
+
+.text-editor hr {
+  height: 1px !important;
+  background-color: #ffffff !important;
+  border: none !important;
+  margin: 1rem 0 !important;
+  width: 100% !important;
+  opacity: 0.1 !important;
 }

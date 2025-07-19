@@ -61,6 +61,8 @@ export const stateToHTML = convertToHTML<InlineStyle | "a", BlockType>({
         return <blockquote style={alignmentStyle as React.CSSProperties} />;
       case BlockType.default:
         return <p style={alignmentStyle as React.CSSProperties} />;
+      case BlockType.divider:
+        return <hr />;
       default:
         return null;
     }
@@ -127,6 +129,8 @@ export const HTMLtoState = convertFromHTML<DOMStringMap, BlockType>({
         case "div":
         case "p":
           return BlockType.default;
+        case "hr":
+          return BlockType.divider;
         default:
           return null;
       }

@@ -30,6 +30,7 @@ export enum BlockType {
   list = "unordered-list-item",
   orderList = "ordered-list-item",
   cite = "cite",
+  divider = "divider",
   default = "unstyled",
 }
 

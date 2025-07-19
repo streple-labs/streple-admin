@@ -1,12 +1,22 @@
 import { ContentBlock, ContentState } from "draft-js";
-import { EntityType } from "./config";
+import { BlockType, EntityType } from "./config";
 import ImageBlock from "./image-block";
+import { DividerBlock } from "./divider-block";
 
 export const blockRenderer = (
   contentBlock: ContentBlock,
   { getContentState }: { getContentState: () => ContentState }
 ) => {
   const type = contentBlock.getType();
+
+  if (type === BlockType.divider)
+    return {
+      component: DividerBlock,
+      editable: false,
+      props: {
+        block: contentBlock,
+      },
+    };
 
   if (type === "atomic") {
     const entityKey = contentBlock.getEntityAt(0);

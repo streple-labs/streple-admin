@@ -13,6 +13,7 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
+import { RxTextAlignCenter } from "react-icons/rx";
 
 export default function MailEditorComponent({
   close,
@@ -113,6 +114,7 @@ export default function MailEditorComponent({
           </button>
           <button
             onClick={() => {
+              console.log(toHtml());
               setText(toHtml());
             }}
             title="publish article"
@@ -153,6 +155,9 @@ export default function MailEditorComponent({
                 onClick={() => {
                   setOpenLinkForm(true);
                 }}
+                style={{
+                  backgroundColor: openLinkForm ? "#2B2B37" : "transparent",
+                }}
                 className="flex flex-col gap-2.5 items-center justify-center cursor-pointer size-full p-2"
               >
                 <GoLink color="#FFFFFFB2" width={14} />
@@ -188,6 +193,15 @@ export default function MailEditorComponent({
                   </div>
                 </>
               )}
+            </div>
+            <div
+              onClick={() => {
+                toggleBlockType(BlockType.divider);
+              }}
+              className="h-[60px] p-2 rounded-[5px] border border-white/15 flex flex-col gap-2.5 items-center justify-center cursor-pointer"
+            >
+              <RxTextAlignCenter color="#FFFFFFB2" width={14} />
+              <span className="text-white/70 text-[11px]">Divider</span>
             </div>
           </div>
         </div>
