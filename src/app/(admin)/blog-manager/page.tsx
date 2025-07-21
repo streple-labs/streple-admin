@@ -18,6 +18,8 @@ import { MdDeleteOutline } from "react-icons/md";
 import { PiPencilSimpleLineBold } from "react-icons/pi";
 import { toast } from "sonner";
 
+export const dynamic = "force-dynamic";
+
 const initialState = {
   schedule: false,
   title: "",
