@@ -6,10 +6,8 @@ import TextEditor from "@/components/editor/text-editor";
 import ToolPanel from "@/components/editor/tool-panel";
 import Loader from "@/components/loader";
 import api from "@/utils/axios";
-import { fileToBase64 } from "@/utils/utils";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
 import { FiX } from "react-icons/fi";
@@ -18,58 +16,8 @@ import { MdDeleteOutline } from "react-icons/md";
 import { PiPencilSimpleLineBold } from "react-icons/pi";
 import { toast } from "sonner";
 
-const dummy_blogs = [
-  {
-    title: "Intro to Trading",
-    track: "Beginner",
-    date: "01 May 2024",
-    author: "Jane Doe",
-    views: 1200,
-    status: "Published",
-  },
-  {
-    title: "Advanced Chart Analysis",
-    track: "Advanced",
-    date: "15 Apr 2024",
-    author: "John Smith",
-    views: 850,
-    status: "Draft",
-  },
-  {
-    title: "Risk Management Basics",
-    track: "Beginner",
-    date: "20 Mar 2024",
-    author: "Alice Johnson",
-    views: 430,
-    status: "Sheduled",
-  },
-  {
-    title: "Options Strategies",
-    track: "Advanced",
-    date: "12 May 2025",
-    author: "Bob Lee",
-    views: 670,
-    status: "Published",
-  },
-  {
-    title: "Technical Indicators 101",
-    track: "Beginner",
-    date: "05 Feb 2025",
-    author: "Emily Clark",
-    views: 390,
-    status: "Draft",
-  },
-  {
-    title: "Market Psychology",
-    track: "Beginner",
-    date: "17 Sep 2024",
-    author: "David Kim",
-    views: 2100,
-    status: "Published",
-  },
-];
-
 const initialState = {
+  schedule: false,
   title: "",
   tags: [],
   thumbnail: null,
@@ -77,10 +25,11 @@ const initialState = {
   description: "",
   content: "",
   status: null,
+  scheduleDate: new Date(Date.now() + Math.floor(Math.random() * 10000000000)), // random future date
 };
 
 export default function Page() {
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [writeBlog, setWriteBlog] = useState(false);
   const toggle = () => {
@@ -94,16 +43,77 @@ export default function Page() {
     setOpenBlogDetailsModal((prev) => !prev);
   };
 
+  const { data: blogs, isPending: isBlogsLoading } = useQuery<BlogsResponse>({
+    queryKey: ["blog-data"],
+    queryFn: async () =>
+      (
+        await api.get("/blog-manager", {
+          params: {},
+        })
+      ).data,
+
+    // onError: (error: any) => {
+    //   let errorMessage = "Failed to fetch blog data. Please try again later.";
+
+    //   if (error?.response?.data?.message) {
+    //     if (Array.isArray(error.response.data.message))
+    //       errorMessage = error.response.data.message.join(", ");
+    //     else errorMessage = error.response.data.message;
+    //   } else if (error?.userMessage) errorMessage = error.userMessage;
+    //   else if (error?.message) errorMessage = error.message;
+
+    //   toast.error(errorMessage);
+    // },
+  });
+
+  const [editBlog, setEditBlog] = useState(false);
+  const { mutate: handleEditBlog, isPending: isEditingBlog } = useMutation({
+    mutationKey: ["edit-blog"],
+    mutationFn: async (blogId: string) =>
+      await api.patch(`/blog-manager/${blogId}`, {
+        ...(() => {
+          const { thumbnail, ...rest } = blogData;
+          return rest;
+        })(),
+
+        draft: Boolean(blogData.status === "draft"),
+      }),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["blog-data"] });
+      toast.success(res.data.message || "Blog updated successfully!");
+      setBlogData(initialState);
+      setWriteBlog(false);
+      setOpenBlogDetailsModal(false);
+      setEditBlog(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "Blog update failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
+
   const { mutate: handleUploadBlog, isPending: isUploadingBlog } = useMutation({
     mutationKey: ["upload-blog"],
     mutationFn: async () =>
       await api.post("/blog-manager", {
-        ...blogData,
-        thumbnail: await fileToBase64(blogData.thumbnail as File),
+        ...(() => {
+          const { thumbnail, ...rest } = blogData;
+          return rest;
+        })(),
+
         draft: Boolean(blogData.status === "draft"),
       }),
     onSuccess: (res) => {
-      router.refresh();
+      queryClient.invalidateQueries({ queryKey: ["blog-data"] });
       toast.success(res.data.message || "Course uploaded successfully!");
       setBlogData(initialState);
       setWriteBlog(false);
@@ -183,89 +193,130 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-xs font-normal text-white">
-              <thead>
-                <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
-                  <th>Course Title</th>
-                  <th>Track</th>
-                  <th>Date Added</th>
-                  <th>Author</th>
-                  <th>Views</th>
-                  <th>Status</th>
-                  <th>Quick actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dummy_blogs.map((course, idx) => (
-                  <tr
-                    key={idx}
-                    className={`${
-                      idx % 2 ? "" : "bg-white/[2%]"
-                    } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:text-nowrap`}
-                  >
-                    <td className=" max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
-                      {course.title}
-                    </td>
-                    <td>{course.track}</td>
-                    <td>{course.date}</td>
-                    <td>{course.author}</td>
-                    <td>{course.views}</td>
-                    <td className="relative">
-                      <span
-                        className={`px-2 py-1 h-6 w-fit flex items-center justify-center cursor-pointer rounded-[14px] group ${
-                          course.status === "Published"
-                            ? "bg-[#A082F9] text-[#313127CC]"
-                            : course.status === "Draft"
-                            ? "bg-[#807C8B] text-[#141315]"
-                            : "bg-[#F4E90ECC] text-[#171716CC]"
-                        }`}
-                      >
-                        {course.status}
-
-                        <span className="z-10 hidden group-hover:flex flex-col gap-3 absolute top-8 left-0 w-40 rounded-[20px] border border-white/5 px-3 py-4 bg-[#252326]">
-                          <p
-                            onClick={() => {}}
-                            className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
-                              dmSans.className
-                            } cursor-pointer ${
-                              false
-                                ? "bg-[#A082F9] text-[#2b2b37]"
-                                : "hover:bg-white/5 text-white/60"
-                            }`}
-                          >
-                            Published
-                          </p>
-                          <p
-                            onClick={() => {}}
-                            className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
-                              dmSans.className
-                            } cursor-pointer ${
-                              false
-                                ? "bg-[#A082F9] text-[#2b2b37]"
-                                : "hover:bg-white/5 text-white/60"
-                            }`}
-                          >
-                            Draft
-                          </p>
-                        </span>
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex gap-4 items-center">
-                        <button className="">
-                          <PiPencilSimpleLineBold size={15} />
-                        </button>
-                        <button className="">
-                          <MdDeleteOutline size={15} />
-                        </button>
-                      </div>
-                    </td>
+          {isBlogsLoading ? (
+            <div className="flex items-center justify-center w-full h-full">
+              <Loader />
+            </div>
+          ) : blogs?.data.length === 0 ? (
+            <div className="flex items-center justify-center w-full h-full">
+              <p className="text-white/50 text-sm font-normal">
+                No blogs found. Start creating your first blog!
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto h-full">
+              <table className="min-w-full text-left text-xs font-normal text-white">
+                <thead>
+                  <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
+                    <th>Course Title</th>
+                    <th>Track</th>
+                    <th>Date Added</th>
+                    <th>Author</th>
+                    <th>Views</th>
+                    <th>Status</th>
+                    <th>Quick actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="">
+                  {blogs?.data.map((blog, idx) => (
+                    <tr
+                      key={idx}
+                      className={`${
+                        idx % 2 ? "" : "bg-white/[2%]"
+                      } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:text-nowrap`}
+                    >
+                      <td className="max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
+                        {blog.title}
+                      </td>
+                      <td className="max-w-[100px] whitespace-nowrap overflow-hidden text-ellipsis">
+                        {blog.tags.join(", ")}
+                      </td>
+                      <td>
+                        {new Date(blog.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td>{blog.creatorId}</td>
+                      <td>{blog.view}</td>
+                      <td className="relative">
+                        <span
+                          className={`px-2 py-1 h-6 flex items-center justify-center cursor-pointer rounded-[14px] group ${
+                            blog.status === "Published"
+                              ? "bg-[#A082F9] text-[#313127CC]"
+                              : blog.status === "Draft"
+                              ? "bg-[#807C8B] text-[#141315]"
+                              : "bg-[#F4E90ECC] text-[#171716CC]"
+                          }`}
+                        >
+                          {blog.status}
+
+                          <span className="z-10 hidden group-hover:flex flex-col items-center justify-center gap-3 absolute top-8 left-0 w-40 rounded-[20px] border border-white/5 px-3 py-4 bg-[#252326]">
+                            <p
+                              onClick={() => {
+                                setBlogData({
+                                  ...blog,
+                                  status: "Published",
+                                });
+                                handleEditBlog(blog.id);
+                              }}
+                              className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
+                                dmSans.className
+                              } cursor-pointer ${
+                                blog.status === "Published"
+                                  ? "bg-[#A082F9] text-[#2b2b37]"
+                                  : "hover:bg-white/5 text-white/60"
+                              }`}
+                            >
+                              Published
+                            </p>
+                            <p
+                              onClick={() => {
+                                setBlogData({
+                                  ...blog,
+                                  status: "Draft",
+                                });
+                                handleEditBlog(blog.id);
+                              }}
+                              className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
+                                dmSans.className
+                              } cursor-pointer ${
+                                blog.status === "Draft"
+                                  ? "bg-[#A082F9] text-[#2b2b37]"
+                                  : "hover:bg-white/5 text-white/60"
+                              }`}
+                            >
+                              Draft
+                            </p>
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex gap-4 items-center">
+                          <button
+                            onClick={() => {
+                              setBlogData({
+                                ...blog,
+                                thumbnail: blog.thumbnail,
+                              });
+                              setEditBlog(true);
+                              toggleBlogDetailsModal();
+                            }}
+                          >
+                            <PiPencilSimpleLineBold size={15} />
+                          </button>
+                          <button className="">
+                            <MdDeleteOutline size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
 
@@ -275,7 +326,13 @@ export default function Page() {
           blogData={blogData}
           setBlogData={setBlogData}
           handleBlogUpload={handleUploadBlog}
-          isUploadingBlog={isUploadingBlog}
+          isLoading={isUploadingBlog || isEditingBlog}
+          isEditingBlog={editBlog}
+          handleEditBlog={(blogId: string) => {
+            handleEditBlog(blogId);
+            setEditBlog(false);
+            toggleBlogDetailsModal();
+          }}
         />
       )}
     </div>
@@ -321,13 +378,17 @@ const FillBlogDetailsModal = ({
   blogData,
   setBlogData,
   handleBlogUpload,
-  isUploadingBlog,
+  isLoading,
+  isEditingBlog,
+  handleEditBlog,
 }: {
   toggleModal: () => void;
   blogData: BlogDataType;
   setBlogData: Dispatch<SetStateAction<BlogDataType>>;
   handleBlogUpload: () => void;
-  isUploadingBlog: boolean;
+  isLoading: boolean;
+  isEditingBlog: boolean;
+  handleEditBlog: (blogId: string) => void;
 }) => {
   const [searchTag, setSearchTag] = useState("");
 
@@ -339,7 +400,8 @@ const FillBlogDetailsModal = ({
         className="bg-[#242324] w-full max-w-3xl overflow-y-auto max-h-[90vh] rounded-[20px] p-8  space-y-10 relative"
         onSubmit={(e) => {
           e.preventDefault();
-          handleBlogUpload();
+          if (isEditingBlog) handleEditBlog(blogData.id as string);
+          else handleBlogUpload();
         }}
       >
         <span
@@ -356,12 +418,16 @@ const FillBlogDetailsModal = ({
         </h4>
 
         <div className="flex flex-col gap-4 w-full">
+          <h5 className="font-bold leading-6 text-base tracking-[1px] text-white/80">
+            Blog details
+          </h5>
+
           <label htmlFor="title" className="space-y-3">
             <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
               Title
             </p>
             <input
-              readOnly={isUploadingBlog}
+              readOnly={isLoading}
               name="title"
               required
               value={blogData.title}
@@ -411,7 +477,7 @@ const FillBlogDetailsModal = ({
 
               <input
                 value={searchTag}
-                readOnly={isUploadingBlog}
+                readOnly={isLoading}
                 className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white border-0 ring-0 outline-0"
                 style={{
                   width: `${searchTag.length + 1 || 1}ch`,
@@ -424,7 +490,9 @@ const FillBlogDetailsModal = ({
               {searchTag && (
                 <div className="absolute top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
                   {tag_options
-                    .filter((tag) => tag.includes(searchTag))
+                    .filter((tag) =>
+                      tag.toLowerCase().includes(searchTag.toLowerCase())
+                    )
                     .map((tag, i) => (
                       <p
                         key={i}
@@ -452,7 +520,11 @@ const FillBlogDetailsModal = ({
             {blogData.thumbnail ? (
               <div className="relative w-full h-[194px] rounded-[10px] overflow-hidden cursor-pointer active:scale-95 active:opacity-25">
                 <Image
-                  src={URL.createObjectURL(blogData.thumbnail)}
+                  src={
+                    typeof blogData.thumbnail === "string"
+                      ? blogData.thumbnail
+                      : URL.createObjectURL(blogData.thumbnail)
+                  }
                   alt="cover image"
                   fill
                   className="object-contain"
@@ -473,7 +545,7 @@ const FillBlogDetailsModal = ({
               type="file"
               id="cover_img"
               accept="image/*"
-              readOnly={isUploadingBlog}
+              readOnly={isLoading}
               onChange={(e) => {
                 const file = e.target.files?.[0] || null;
                 if (file) {
@@ -498,7 +570,7 @@ const FillBlogDetailsModal = ({
             </p>
             <input
               name="metatitle"
-              readOnly={isUploadingBlog}
+              readOnly={isLoading}
               required
               value={blogData.metatitle}
               onChange={(e) =>
@@ -520,7 +592,7 @@ const FillBlogDetailsModal = ({
             </p>
             <textarea
               name="metadescription"
-              readOnly={isUploadingBlog}
+              readOnly={isLoading}
               value={blogData.description}
               onChange={(e) =>
                 setBlogData((prev) => ({
@@ -541,7 +613,7 @@ const FillBlogDetailsModal = ({
             type="submit"
             className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-semibold text-[#2C2C26]"
           >
-            {isUploadingBlog ? <Loader /> : "Publish"}
+            {isLoading ? <Loader /> : isEditingBlog ? "Edit Blog" : "Publish"}
           </button>
         </div>
       </form>
