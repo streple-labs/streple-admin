@@ -126,7 +126,7 @@ export default function Page() {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
-        let errorMessage = "Signup failed. Please try again later.";
+        let errorMessage = "course upload failed. Please try again later.";
 
         if (error?.response?.data?.message) {
           if (Array.isArray(error.response.data.message))
@@ -581,14 +581,14 @@ const UploadCourseModal = ({
                   if (isUploadingCourse) return;
                   setCourseDetails((prev) => ({
                     ...prev,
-                    status: "Published",
+                    status: "published",
                   }));
                 }}
                 className="flex gap-3 items-center text-base leading-6 tracking-[1px] cursor-pointer"
               >
                 <span
                   className={`size-4 rounded-full ${
-                    courseDetails.status === "Published"
+                    courseDetails.status === "published"
                       ? "bg-[#B39FF0]"
                       : "border border-white/50"
                   }`}
@@ -600,14 +600,14 @@ const UploadCourseModal = ({
                   if (isUploadingCourse) return;
                   setCourseDetails((prev) => ({
                     ...prev,
-                    status: "Draft",
+                    status: "draft",
                   }));
                 }}
                 className="flex gap-3 items-center text-base leading-6 tracking-[1px] cursor-pointer"
               >
                 <span
                   className={`size-4 rounded-full ${
-                    courseDetails.status === "Draft"
+                    courseDetails.status === "draft"
                       ? "bg-[#B39FF0]"
                       : "border border-white/50"
                   }`}

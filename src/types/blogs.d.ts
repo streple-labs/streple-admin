@@ -1,8 +1,9 @@
 type BlogDataType = {
   title: string;
   tags: string[];
-  cover_image: File | null;
-  meta_title: string;
-  meta_description: string;
+  thumbnail: File | null | string;
+  metatitle: string;
+  description: string;
   blog: string;
+  status: "draft" | "published" | null;
 };

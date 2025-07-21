@@ -4,7 +4,11 @@ import { anton, dmSans } from "@/app/fonts";
 import { TextEditorProvider } from "@/components/editor/context";
 import TextEditor from "@/components/editor/text-editor";
 import ToolPanel from "@/components/editor/tool-panel";
+import api from "@/utils/axios";
+import { fileToBase64 } from "@/utils/utils";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
 import { FiX } from "react-icons/fi";
@@ -64,27 +68,62 @@ const dummy_blogs = [
   },
 ];
 
+const initialState = {
+  title: "",
+  tags: [],
+  thumbnail: null,
+  metatitle: "",
+  description: "",
+  blog: "",
+  status: null,
+};
+
 export default function Page() {
+  const router = useRouter();
+
   const [writeBlog, setWriteBlog] = useState(false);
   const toggle = () => {
     setWriteBlog((prev) => !prev);
   };
 
-  const [blogData, setBlogData] = useState<BlogDataType>({
-    title: "",
-    tags: [],
-    cover_image: null,
-    meta_title: "",
-    meta_description: "",
-    blog: "",
-  });
+  const [blogData, setBlogData] = useState<BlogDataType>(initialState);
 
   const [openBlogDetailsModal, setOpenBlogDetailsModal] = useState(false);
   const toggleBlogDetailsModal = () => {
     setOpenBlogDetailsModal((prev) => !prev);
   };
 
-  // const handlePublish = () => {};
+  const { mutate: handleUploadBlog, isPending: isUploadingBlog } = useMutation({
+    mutationKey: ["upload-blog"],
+    mutationFn: async () => {
+      const payload = { ...blogData };
+
+      if (blogData.thumbnail)
+        payload.thumbnail = await fileToBase64(blogData.thumbnail as File);
+
+      return await api.post("/blog-manager", payload);
+    },
+    onSuccess: (res) => {
+      router.refresh();
+      toast.success(res.data.message || "Course uploaded successfully!");
+      setBlogData(initialState);
+      setWriteBlog(false);
+      setOpenBlogDetailsModal(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "blog upload failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
 
   return (
     <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
@@ -224,6 +263,8 @@ export default function Page() {
           toggleModal={toggleBlogDetailsModal}
           blogData={blogData}
           setBlogData={setBlogData}
+          handleBlogUpload={handleUploadBlog}
+          isUploadingBlog={isUploadingBlog}
         />
       )}
     </div>
@@ -268,10 +309,14 @@ const FillBlogDetailsModal = ({
   toggleModal,
   blogData,
   setBlogData,
+  handleBlogUpload,
+  isUploadingBlog,
 }: {
   toggleModal: () => void;
   blogData: BlogDataType;
   setBlogData: Dispatch<SetStateAction<BlogDataType>>;
+  handleBlogUpload: () => void;
+  isUploadingBlog: boolean;
 }) => {
   const [searchTag, setSearchTag] = useState("");
 
@@ -283,6 +328,7 @@ const FillBlogDetailsModal = ({
         className="bg-[#242324] w-full max-w-3xl overflow-y-auto max-h-[90vh] rounded-[20px] p-8  space-y-10 relative"
         onSubmit={(e) => {
           e.preventDefault();
+          handleBlogUpload();
         }}
       >
         <span
@@ -301,9 +347,10 @@ const FillBlogDetailsModal = ({
         <div className="flex flex-col gap-4 w-full">
           <label htmlFor="title" className="space-y-3">
             <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
-              Course title
+              Title
             </p>
             <input
+              readOnly={isUploadingBlog}
               name="title"
               required
               value={blogData.title}
@@ -353,6 +400,7 @@ const FillBlogDetailsModal = ({
 
               <input
                 value={searchTag}
+                readOnly={isUploadingBlog}
                 className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white border-0 ring-0 outline-0"
                 style={{
                   width: `${searchTag.length + 1 || 1}ch`,
@@ -390,10 +438,10 @@ const FillBlogDetailsModal = ({
             <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
               Cover Image
             </p>
-            {blogData.cover_image ? (
+            {blogData.thumbnail ? (
               <div className="relative w-full h-[120px] rounded-[10px] overflow-hidden cursor-pointer active:scale-95 active:opacity-25">
                 <Image
-                  src={URL.createObjectURL(blogData.cover_image)}
+                  src={URL.createObjectURL(blogData.thumbnail as File)}
                   alt="cover image"
                   fill
                   className="object-contain"
@@ -403,7 +451,10 @@ const FillBlogDetailsModal = ({
               <div className="w-full h-[120px] flex items-center justify-center flex-col gap-4 border-dashed border border-white/30 p-3 rounded-[10px] cursor-pointer active:scale-95 active:opacity-25">
                 <IoImageOutline size={24} color="#FFFFFF80" />
                 <p className="text-base leading-6 tracking-[1px] font-normal">
-                  Drag and drop or browse
+                  Drag and drop or browse (Max. 10MB)
+                </p>
+                <p className="text-base leading-6 tracking-[1px] font-normal">
+                  Recommended size: 1200 x 600
                 </p>
               </div>
             )}
@@ -411,12 +462,13 @@ const FillBlogDetailsModal = ({
               type="file"
               id="cover_img"
               accept="image/*"
+              readOnly={isUploadingBlog}
               onChange={(e) => {
                 const file = e.target.files?.[0] || null;
                 if (file) {
                   setBlogData((prev) => ({
                     ...prev,
-                    cover_image: file,
+                    thumbnail: file,
                   }));
                   toast.success(`selected cover image: ${file.name}`);
                 } else toast.error("No cover image selected");
@@ -434,13 +486,14 @@ const FillBlogDetailsModal = ({
               Meta title
             </p>
             <input
-              name="meta title"
+              name="metatitle"
+              readOnly={isUploadingBlog}
               required
-              value={blogData.title}
+              value={blogData.metatitle}
               onChange={(e) =>
                 setBlogData((prev) => ({
                   ...prev,
-                  meta_title: e.target.value,
+                  metatitle: e.target.value,
                 }))
               }
               title="Add meta title"
@@ -452,11 +505,12 @@ const FillBlogDetailsModal = ({
 
           <label htmlFor="title" className="space-y-3">
             <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
-              Course description
+              Meta description
             </p>
             <textarea
-              name="meat description"
-              value={blogData.meta_description}
+              name="metadescription"
+              readOnly={isUploadingBlog}
+              value={blogData.description}
               onChange={(e) =>
                 setBlogData((prev) => ({
                   ...prev,
@@ -464,8 +518,8 @@ const FillBlogDetailsModal = ({
                 }))
               }
               required
-              title="Add meta description"
-              placeholder="Add meta description"
+              title="Add description"
+              placeholder="Add description"
               className={`h-[120px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] bg-white/5`}
             />
           </label>

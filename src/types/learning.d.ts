@@ -5,6 +5,6 @@ type FileCourseDetails = {
   thumbnail: File | null | string;
   document: File | null | string;
   content: string | null;
-  status: "Draft" | "Published" | null;
+  status: "draft" | "published" | null;
   type: "pdf" | "article" | null;
 };
