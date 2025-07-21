@@ -104,19 +104,16 @@ export default function Page() {
   const { mutate: handleUploadCourse, isPending: isUploadingCourse } =
     useMutation({
       mutationKey: ["upload-course"],
-      mutationFn: async () => {
-        const payload = { ...courseDetails };
-
-        if (courseDetails.thumbnail)
-          payload.thumbnail = await fileToBase64(
-            courseDetails.thumbnail as File
-          );
-
-        if (courseDetails.document)
-          payload.document = await fileToBase64(courseDetails.document as File);
-
-        return await api.post("/learning", payload);
-      },
+      mutationFn: async () =>
+        await api.post("/learning", {
+          ...courseDetails,
+          thumbnail: courseDetails.thumbnail
+            ? await fileToBase64(courseDetails.thumbnail)
+            : null,
+          document: courseDetails.document
+            ? await fileToBase64(courseDetails.document)
+            : null,
+        }),
       onSuccess: (res) => {
         router.refresh();
         toast.success(res.data.message || "Course uploaded successfully!");
@@ -153,10 +150,21 @@ export default function Page() {
                 }));
                 setFillCourseDetails(false);
               }}
-              setText={(content: string) => {
+              saveAsDraft={(content: string) => {
+                setCourseDetails((prev) => ({
+                  ...prev,
+                  status: "draft",
+                  type: "article",
+                  content,
+                }));
+                setOpenUploadModal(true);
+                setFillCourseDetails(true);
+              }}
+              handlePublish={(content: string) => {
                 setCourseDetails((prev) => ({
                   ...prev,
                   type: "article",
+                  status: "published",
                   content,
                 }));
                 setOpenUploadModal(true);
@@ -542,7 +550,7 @@ const UploadCourseModal = ({
               {courseDetails.thumbnail ? (
                 <div className="relative w-full h-[120px] rounded-[10px] overflow-hidden cursor-pointer active:scale-95 active:opacity-25">
                   <Image
-                    src={URL.createObjectURL(courseDetails.thumbnail as File)}
+                    src={URL.createObjectURL(courseDetails.thumbnail)}
                     alt="cover image"
                     fill
                     className="object-contain"
@@ -649,10 +657,10 @@ const UploadCourseModal = ({
                 <FaRegFileAlt size={16} className="stroke-white/70" />
                 <div className="space-y-1 text-white/70">
                   <p className="text-xs leading-4 tracking-[1px] font-normal">
-                    {(courseDetails.document as File).name}
+                    {courseDetails.document.name}
                   </p>
                   <p className="text-xs leading-4 tracking-[1px] font-normal">
-                    {formatFileSize((courseDetails.document as File).size)}
+                    {formatFileSize(courseDetails.document.size)}
                   </p>
                 </div>
               </div>

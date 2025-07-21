@@ -4,6 +4,7 @@ import { anton, dmSans } from "@/app/fonts";
 import { TextEditorProvider } from "@/components/editor/context";
 import TextEditor from "@/components/editor/text-editor";
 import ToolPanel from "@/components/editor/tool-panel";
+import Loader from "@/components/loader";
 import api from "@/utils/axios";
 import { fileToBase64 } from "@/utils/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -74,7 +75,7 @@ const initialState = {
   thumbnail: null,
   metatitle: "",
   description: "",
-  blog: "",
+  content: "",
   status: null,
 };
 
@@ -95,14 +96,12 @@ export default function Page() {
 
   const { mutate: handleUploadBlog, isPending: isUploadingBlog } = useMutation({
     mutationKey: ["upload-blog"],
-    mutationFn: async () => {
-      const payload = { ...blogData };
-
-      if (blogData.thumbnail)
-        payload.thumbnail = await fileToBase64(blogData.thumbnail as File);
-
-      return await api.post("/blog-manager", payload);
-    },
+    mutationFn: async () =>
+      await api.post("/blog-manager", {
+        ...blogData,
+        thumbnail: await fileToBase64(blogData.thumbnail as File),
+        draft: Boolean(blogData.status === "draft"),
+      }),
     onSuccess: (res) => {
       router.refresh();
       toast.success(res.data.message || "Course uploaded successfully!");
@@ -131,8 +130,20 @@ export default function Page() {
         <TextEditorProvider>
           <ToolPanel
             close={toggle}
-            setText={(blog: string) => {
-              setBlogData((prev) => ({ ...prev, blog }));
+            saveAsDraft={(content: string) => {
+              setBlogData((prev) => ({
+                ...prev,
+                status: "draft",
+                content,
+              }));
+              toggleBlogDetailsModal();
+            }}
+            handlePublish={(content: string) => {
+              setBlogData((prev) => ({
+                ...prev,
+                status: "published",
+                content,
+              }));
               toggleBlogDetailsModal();
             }}
           />
@@ -439,21 +450,21 @@ const FillBlogDetailsModal = ({
               Cover Image
             </p>
             {blogData.thumbnail ? (
-              <div className="relative w-full h-[120px] rounded-[10px] overflow-hidden cursor-pointer active:scale-95 active:opacity-25">
+              <div className="relative w-full h-[194px] rounded-[10px] overflow-hidden cursor-pointer active:scale-95 active:opacity-25">
                 <Image
-                  src={URL.createObjectURL(blogData.thumbnail as File)}
+                  src={URL.createObjectURL(blogData.thumbnail)}
                   alt="cover image"
                   fill
                   className="object-contain"
                 />
               </div>
             ) : (
-              <div className="w-full h-[120px] flex items-center justify-center flex-col gap-4 border-dashed border border-white/30 p-3 rounded-[10px] cursor-pointer active:scale-95 active:opacity-25">
+              <div className="w-full h-[194px] flex items-center justify-center flex-col gap-4 border-dashed border border-white/20 p-3 rounded-[10px] cursor-pointer active:scale-95 active:opacity-25">
                 <IoImageOutline size={24} color="#FFFFFF80" />
                 <p className="text-base leading-6 tracking-[1px] font-normal">
                   Drag and drop or browse (Max. 10MB)
                 </p>
-                <p className="text-base leading-6 tracking-[1px] font-normal">
+                <p className="text-base leading-6 tracking-[1px] font-normal -mt-2">
                   Recommended size: 1200 x 600
                 </p>
               </div>
@@ -528,9 +539,9 @@ const FillBlogDetailsModal = ({
         <div className="flex items-center justify-end w-full">
           <button
             type="submit"
-            className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
+            className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-semibold text-[#2C2C26]"
           >
-            publish
+            {isUploadingBlog ? <Loader /> : "Publish"}
           </button>
         </div>
       </form>

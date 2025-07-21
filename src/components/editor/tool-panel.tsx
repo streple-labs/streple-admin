@@ -18,10 +18,12 @@ import { useEditorApi } from "./context";
 
 const ToolPanel = ({
   close,
-  setText,
+  handlePublish,
+  saveAsDraft,
 }: {
   close: () => void;
-  setText: (text: string) => void;
+  handlePublish: (text: string) => void;
+  saveAsDraft: (text: string) => void;
 }) => {
   const {
     toHtml,
@@ -53,15 +55,22 @@ const ToolPanel = ({
           </p>
         </div>
         <div className="flex items-center gap-6">
-          <button className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5">
+          <button
+            onClick={() => {
+              saveAsDraft(toHtml());
+            }}
+            title="save as draft"
+            aria-label="save as draft"
+            className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
+          >
             Save as draft
           </button>
           <button
             onClick={() => {
-              setText(toHtml());
+              handlePublish(toHtml());
             }}
-            title="publish article"
-            aria-label="publish article"
+            title="publish document"
+            aria-label="publish document"
             className="text-xs text-[#2B2B37] font-normal bg-[#A082F9] rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
           >
             Publish
