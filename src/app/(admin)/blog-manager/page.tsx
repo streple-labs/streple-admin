@@ -5,13 +5,15 @@ import { TextEditorProvider } from "@/components/editor/context";
 import TextEditor from "@/components/editor/text-editor";
 import ToolPanel from "@/components/editor/tool-panel";
 import Loader from "@/components/loader";
+import Search from "@/components/search";
 import api from "@/utils/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
 import { FiX } from "react-icons/fi";
-import { IoImageOutline, IoSearch } from "react-icons/io5";
+import { IoImageOutline } from "react-icons/io5";
 import { MdDeleteOutline } from "react-icons/md";
 import { PiPencilSimpleLineBold } from "react-icons/pi";
 import { toast } from "sonner";
@@ -29,6 +31,8 @@ const initialState = {
 };
 
 export default function Page() {
+  const params = useSearchParams();
+
   const queryClient = useQueryClient();
 
   const [writeBlog, setWriteBlog] = useState(false);
@@ -48,7 +52,7 @@ export default function Page() {
     queryFn: async () =>
       (
         await api.get("/blog-manager", {
-          params: {},
+          params: params.get("query") ? { title: params.get("query") } : {},
         })
       ).data,
 
@@ -71,11 +75,7 @@ export default function Page() {
     mutationKey: ["edit-blog"],
     mutationFn: async (blogId: string) =>
       await api.patch(`/blog-manager/${blogId}`, {
-        ...(() => {
-          const { thumbnail, ...rest } = blogData;
-          return rest;
-        })(),
-
+        ...blogData,
         draft: Boolean(blogData.status === "draft"),
       }),
     onSuccess: (res) => {
@@ -105,11 +105,7 @@ export default function Page() {
     mutationKey: ["upload-blog"],
     mutationFn: async () =>
       await api.post("/blog-manager", {
-        ...(() => {
-          const { thumbnail, ...rest } = blogData;
-          return rest;
-        })(),
-
+        ...blogData,
         draft: Boolean(blogData.status === "draft"),
       }),
     onSuccess: (res) => {
@@ -167,20 +163,7 @@ export default function Page() {
             Blogs manager
           </h4>
           <div className="flex w-full items-center justify-between gap-8">
-            <div className="flex w-full max-w-[400px]">
-              <div className="w-full relative">
-                <input
-                  name="search"
-                  title="search for blogs"
-                  type="text"
-                  placeholder="search for blogs"
-                  className={`h-[50px] w-full text-base font-normal py-5 px-4 rounded-[15px] border border-white/10 gap-4 leading-4 tracking-normal placeholder:text-xs placeholder:text-white/60 outline-0 ring-0 caret-[#B39FF0]`}
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                  <IoSearch size={20} color="#FFFFFF99" />
-                </span>
-              </div>
-            </div>
+            <Search title="search for blogs" placeholder="search for blogs" />
 
             <div className="flex w-full items-center justify-end">
               <button
@@ -242,7 +225,7 @@ export default function Page() {
                       <td>{blog.view}</td>
                       <td className="relative">
                         <span
-                          className={`px-2 py-1 h-6 flex items-center justify-center cursor-pointer rounded-[14px] group ${
+                          className={`px-2 py-1 h-6 w-fit flex items-center justify-center cursor-pointer rounded-[14px] group ${
                             blog.status === "Published"
                               ? "bg-[#A082F9] text-[#313127CC]"
                               : blog.status === "Draft"
