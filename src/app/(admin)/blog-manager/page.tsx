@@ -10,7 +10,7 @@ import api from "@/utils/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, Suspense, useState } from "react";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
 import { FiX } from "react-icons/fi";
 import { IoImageOutline } from "react-icons/io5";
@@ -163,7 +163,9 @@ export default function Page() {
             Blogs manager
           </h4>
           <div className="flex w-full items-center justify-between gap-8">
-            <Search title="search for blogs" placeholder="search for blogs" />
+            <Suspense>
+              <Search title="search for blogs" placeholder="search for blogs" />
+            </Suspense>
 
             <div className="flex w-full items-center justify-end">
               <button
