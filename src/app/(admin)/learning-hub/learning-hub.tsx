@@ -437,7 +437,7 @@ const UploadCourseModal = ({
         ...prev,
         document: null,
         type: null,
-        contnet: null,
+        content: null,
       }));
     }
   };
