@@ -43,10 +43,10 @@ export default function LearningHub() {
     setShowFilterOptions((prev) => !prev);
   };
 
-  const [track, setTracks] = useState<null | "Beginner" | "Advanced">(null);
+  const [level, setLevel] = useState<null | "Beginner" | "Advanced">(null);
   const handleTrackChange = (newTrack: "Beginner" | "Advanced") => {
-    if (track === newTrack) setTracks(null);
-    else setTracks(newTrack);
+    if (level === newTrack) setLevel(null);
+    else setLevel(newTrack);
   };
 
   const [openUploadModal, setOpenUploadModal] = useState(false);
@@ -61,41 +61,31 @@ export default function LearningHub() {
 
   const { data: courses, isPending: isCoursesLoading } =
     useQuery<LearningResponse>({
-      queryKey: ["courses-data", params.get("query")],
+      queryKey: ["courses-data", params.get("query"), level],
       queryFn: async () =>
         (
           await api.get("/learnings", {
-            params: params.get("query") ? { search: params.get("query") } : {},
+            params: {
+              ...(params.get("query") ? { title: params.get("query") } : {}),
+              ...(level ? { level } : {}),
+            },
           })
         ).data,
-
-      // onError: (error: any) => {
-      //   let errorMessage = "Failed to fetch blog data. Please try again later.";
-
-      //   if (error?.response?.data?.message) {
-      //     if (Array.isArray(error.response.data.message))
-      //       errorMessage = error.response.data.message.join(", ");
-      //     else errorMessage = error.response.data.message;
-      //   } else if (error?.userMessage) errorMessage = error.userMessage;
-      //   else if (error?.message) errorMessage = error.message;
-
-      //   toast.error(errorMessage);
-      // },
     });
 
   const [editCourse, setEditCourse] = useState(false);
   const { mutate: handleEditCourse, isPending: isEditingCourse } = useMutation({
     mutationKey: ["edit-course"],
     mutationFn: async (courseid: string) =>
-      await api.patch(`/learing/${courseid}`, courseDetails),
+      await api.patch(`/learning/${courseid}`, courseDetails),
     onSuccess: (res) => {
       queryClient.invalidateQueries({
-        queryKey: ["courses-data", params.get("query")],
+        queryKey: ["courses-data", params.get("query"), level],
       });
       toast.success(res.data.message || "Blog updated successfully!");
-      setCourseDetails(initialState);
-      toggleUploadModal();
+      setOpenUploadModal(false);
       setEditCourse(false);
+      setCourseDetails(initialState);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -109,16 +99,26 @@ export default function LearningHub() {
       else if (error?.message) errorMessage = error.message;
 
       toast.error(errorMessage);
+      setCourseDetails(initialState);
     },
   });
 
   const { mutate: handleUploadCourse, isPending: isUploadingCourse } =
     useMutation({
       mutationKey: ["upload-course"],
-      mutationFn: async () => await api.post("/learning", courseDetails),
+      mutationFn: async () => {
+        const formData = new FormData();
+        for (const key in courseDetails) {
+          const value = courseDetails[key as keyof typeof courseDetails];
+          if (value !== null && value !== undefined)
+            formData.append(key, value);
+        }
+
+        return api.post("/learning", formData);
+      },
       onSuccess: (res) => {
         queryClient.invalidateQueries({
-          queryKey: ["courses-data", params.get("query")],
+          queryKey: ["courses-data", params.get("query"), level],
         });
         toast.success(res.data.message || "Course uploaded successfully!");
         setCourseDetails(initialState);
@@ -140,10 +140,38 @@ export default function LearningHub() {
       },
     });
 
+  const { mutate: handleDeleteCourse } = useMutation({
+    mutationKey: ["delete-course"],
+    mutationFn: async (courseid: string) =>
+      await api.delete(`/learning/${courseid}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["courses-data", params.get("query"), level],
+      });
+      toast.success("Course deleted successfully!");
+      setCourseDetails(initialState);
+      setFillCourseDetails(false);
+      setOpenUploadModal(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "Course update failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
+
   return (
     <>
       <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
-        {courseDetails.type === "article" ? (
+        {courseDetails.type === "article" && !editCourse && !isEditingCourse ? (
           <TextEditorProvider>
             <ToolPanel
               close={() => {
@@ -192,12 +220,12 @@ export default function LearningHub() {
                 />
 
                 <div className="relative">
-                  {track ? (
+                  {level ? (
                     <button
                       className="border-2 border-[#F4E90E4D] rounded-[15px] h-[50px] py-1 px-2 flex items-center justify-center gap-2 text-white/70 text-sm leading-[100%] font-normal"
-                      onClick={() => handleTrackChange(track)}
+                      onClick={() => handleTrackChange(level)}
                     >
-                      <GoX className="stroke-white/70" size={16} /> {track}
+                      <GoX className="stroke-white/70" size={16} /> {level}
                     </button>
                   ) : (
                     <button
@@ -217,7 +245,7 @@ export default function LearningHub() {
                         className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
                           dmSans.className
                         } cursor-pointer ${
-                          track === "Beginner"
+                          level === "Beginner"
                             ? "bg-[#A082F9] text-[#2b2b37]"
                             : "hover:bg-white/5 text-white/60"
                         }`}
@@ -232,7 +260,7 @@ export default function LearningHub() {
                         className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
                           dmSans.className
                         } cursor-pointer ${
-                          track === "Advanced"
+                          level === "Advanced"
                             ? "bg-[#A082F9] text-[#2b2b37]"
                             : "hover:bg-white/5 text-white/60"
                         }`}
@@ -265,7 +293,7 @@ export default function LearningHub() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto hide-scrollbar">
+              <div className="overflow-x-auto hide-scrollbar h-full">
                 <table className="min-w-full text-left text-xs font-normal text-white">
                   <thead>
                     <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
@@ -327,11 +355,24 @@ export default function LearningHub() {
 
                             <span className="z-10 hidden group-hover:flex flex-col gap-3 absolute top-8 left-0 w-40 rounded-[20px] border border-white/5 px-3 py-4 bg-[#252326]">
                               <p
-                                onClick={() => {}}
+                                onClick={() => {
+                                  setCourseDetails({
+                                    title: course.title,
+                                    description: course.description,
+                                    level: course.level,
+                                    thumbnail: course.thumbnail,
+                                    document: course.document,
+                                    content: course.content,
+                                    type: course.type,
+                                    status: "Published",
+                                  });
+                                  handleEditCourse(course.id);
+                                  setEditCourse(true);
+                                }}
                                 className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
                                   dmSans.className
                                 } cursor-pointer ${
-                                  false
+                                  course.status === "Published"
                                     ? "bg-[#A082F9] text-[#2b2b37]"
                                     : "hover:bg-white/5 text-white/60"
                                 }`}
@@ -339,11 +380,24 @@ export default function LearningHub() {
                                 Published
                               </p>
                               <p
-                                onClick={() => {}}
+                                onClick={() => {
+                                  setCourseDetails({
+                                    title: course.title,
+                                    description: course.description,
+                                    level: course.level,
+                                    thumbnail: course.thumbnail,
+                                    document: course.document,
+                                    content: course.content,
+                                    type: course.type,
+                                    status: "Draft",
+                                  });
+                                  handleEditCourse(course.id);
+                                  setEditCourse(true);
+                                }}
                                 className={`p-2 rounded-[10px] h-8 w-full flex items-center text-xs font-normal ${
                                   dmSans.className
                                 } cursor-pointer ${
-                                  false
+                                  course.status === "Draft"
                                     ? "bg-[#A082F9] text-[#2b2b37]"
                                     : "hover:bg-white/5 text-white/60"
                                 }`}
@@ -357,14 +411,29 @@ export default function LearningHub() {
                           <div className="flex gap-4 items-center">
                             <button
                               onClick={() => {
-                                setCourseDetails(course);
+                                setCourseDetails({
+                                  id: course.id,
+                                  title: course.title,
+                                  description: course.description,
+                                  level: course.level,
+                                  thumbnail: course.thumbnail,
+                                  document: course.document,
+                                  content: course.content,
+                                  status: course.status,
+                                  type: course.type,
+                                });
+                                setFillCourseDetails(true);
                                 setEditCourse(true);
                                 toggleUploadModal();
                               }}
                             >
                               <PiPencilSimpleLineBold size={15} />
                             </button>
-                            <button className="">
+                            <button
+                              onClick={() => {
+                                handleDeleteCourse(course.id);
+                              }}
+                            >
                               <MdDeleteOutline size={15} />
                             </button>
                           </div>
@@ -422,7 +491,7 @@ const UploadCourseModal = ({
   handleEditCourse: (courseid: string) => void;
 }) => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
+    const file = e.target.files?.[0];
     if (file) {
       toast.success(`selected file: ${file.name}`);
       setCourseDetails((prev) => ({
@@ -541,7 +610,7 @@ const UploadCourseModal = ({
                 </p>
                 <FaChevronDown className="w-4 stroke-white/50" />
                 {showTrackOptions && (
-                  <div className="absolute top-16 left-0 w-full rounded-[20px] border border-white/5 px-3 py-4 flex flex-col gap-3 bg-[#252326]">
+                  <div className="absolute z-10 top-16 left-0 w-full rounded-[20px] border border-white/5 px-3 py-4 flex flex-col gap-3 bg-[#252326]">
                     <p
                       onClick={() => {
                         setCourseDetails((prev) => ({
@@ -563,7 +632,7 @@ const UploadCourseModal = ({
                       onClick={() => {
                         setCourseDetails((prev) => ({
                           ...prev,
-                          track: "Advanced",
+                          level: "Advanced",
                         }));
                       }}
                       className={`p-2 rounded-[10px] h-12 w-full flex items-center text-sm font-normal ${

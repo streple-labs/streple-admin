@@ -15,9 +15,6 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 const api = axios.create({
   baseURL: base_url,
   timeout: 20000,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 api.interceptors.request.use(
@@ -56,14 +53,13 @@ api.interceptors.response.use(
       ? endTime.getTime() - config.metadata.startTime.getTime()
       : 0;
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development")
       console.log("✅ Response:", {
         status: response.status,
         url: response.config.url,
         duration: `${duration}ms`,
         data: response.data,
       });
-    }
 
     return response;
   },
@@ -86,11 +82,8 @@ api.interceptors.response.use(
 
       console.error("🔥 Response Error:", errorInfo);
 
-      if (response.status === 401)
-        if (typeof window !== "undefined") {
-          deleteCookie("streple_auth_token");
-          // window.location.href = "/login"; // Uncomment to redirect
-        }
+      if (response.status === 401 && typeof window !== "undefined")
+        deleteCookie("streple_auth_token");
     } else if (request) {
       console.error("🌐 Network Error:", {
         message: "No response received",
@@ -99,9 +92,7 @@ api.interceptors.response.use(
       });
       const networkError = createNetworkError(error, config, duration);
       return Promise.reject(networkError);
-    } else {
-      console.error("⚙️ Request Setup Error:", error.message);
-    }
+    } else console.error("⚙️ Request Setup Error:", error.message);
 
     return Promise.reject(error);
   }

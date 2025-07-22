@@ -55,19 +55,6 @@ export default function BlogManager() {
           params: params.get("query") ? { search: params.get("query") } : {},
         })
       ).data,
-
-    // onError: (error: any) => {
-    //   let errorMessage = "Failed to fetch blog data. Please try again later.";
-
-    //   if (error?.response?.data?.message) {
-    //     if (Array.isArray(error.response.data.message))
-    //       errorMessage = error.response.data.message.join(", ");
-    //     else errorMessage = error.response.data.message;
-    //   } else if (error?.userMessage) errorMessage = error.userMessage;
-    //   else if (error?.message) errorMessage = error.message;
-
-    //   toast.error(errorMessage);
-    // },
   });
 
   const [editBlog, setEditBlog] = useState(false);
@@ -76,7 +63,7 @@ export default function BlogManager() {
     mutationFn: async (blogId: string) =>
       await api.patch(`/blog/${blogId}`, {
         ...blogData,
-        draft: Boolean(blogData.status === "draft"),
+        draft: Boolean(blogData.status === "Draft"),
       }),
     onSuccess: (res) => {
       queryClient.invalidateQueries({
@@ -108,7 +95,7 @@ export default function BlogManager() {
     mutationFn: async () =>
       await api.post("/blog", {
         ...blogData,
-        draft: Boolean(blogData.status === "draft"),
+        draft: Boolean(blogData.status === "Draft"),
       }),
     onSuccess: (res) => {
       queryClient.invalidateQueries({
@@ -134,6 +121,34 @@ export default function BlogManager() {
     },
   });
 
+  const { mutate: handleDeleteBlog } = useMutation({
+    mutationKey: ["delete-blog"],
+    mutationFn: async (blogId: string) => await api.delete(`/blog/${blogId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["blog-data", params.get("query")],
+      });
+      toast.success("Blog deleted successfully!");
+      setBlogData(initialState);
+      setWriteBlog(false);
+      setOpenBlogDetailsModal(false);
+      setEditBlog(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "Blog update failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
+
   return (
     <>
       <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
@@ -144,7 +159,7 @@ export default function BlogManager() {
               saveAsDraft={(content: string) => {
                 setBlogData((prev) => ({
                   ...prev,
-                  status: "draft",
+                  status: "Draft",
                   content,
                 }));
                 toggleBlogDetailsModal();
@@ -152,7 +167,7 @@ export default function BlogManager() {
               handlePublish={(content: string) => {
                 setBlogData((prev) => ({
                   ...prev,
-                  status: "published",
+                  status: "Published",
                   content,
                 }));
                 toggleBlogDetailsModal();
@@ -247,7 +262,13 @@ export default function BlogManager() {
                               <p
                                 onClick={() => {
                                   setBlogData({
-                                    ...blog,
+                                    title: blog.title,
+                                    tags: blog.tags,
+                                    thumbnail: blog.thumbnail,
+                                    metatitle: blog.metatitle,
+                                    description: blog.description,
+                                    content: blog.content,
+                                    scheduleDate: blog.scheduleDate,
                                     status: "Published",
                                   });
                                   handleEditBlog(blog.id);
@@ -265,7 +286,13 @@ export default function BlogManager() {
                               <p
                                 onClick={() => {
                                   setBlogData({
-                                    ...blog,
+                                    title: blog.title,
+                                    tags: blog.tags,
+                                    thumbnail: blog.thumbnail,
+                                    metatitle: blog.metatitle,
+                                    description: blog.description,
+                                    content: blog.content,
+                                    scheduleDate: blog.scheduleDate,
                                     status: "Draft",
                                   });
                                   handleEditBlog(blog.id);
@@ -287,14 +314,29 @@ export default function BlogManager() {
                           <div className="flex gap-4 items-center">
                             <button
                               onClick={() => {
-                                setBlogData(blog);
+                                console.log(blog);
+                                setBlogData({
+                                  title: blog.title,
+                                  tags: blog.tags,
+                                  thumbnail: blog.thumbnail,
+                                  metatitle: blog.metatitle,
+                                  description: blog.description,
+                                  content: blog.content,
+                                  scheduleDate: blog.scheduleDate,
+                                  status: blog.status,
+                                  id: blog.id,
+                                });
                                 setEditBlog(true);
                                 toggleBlogDetailsModal();
                               }}
                             >
                               <PiPencilSimpleLineBold size={15} />
                             </button>
-                            <button className="">
+                            <button
+                              onClick={() => {
+                                handleDeleteBlog(blog.id);
+                              }}
+                            >
                               <MdDeleteOutline size={15} />
                             </button>
                           </div>
@@ -328,39 +370,7 @@ export default function BlogManager() {
   );
 }
 
-const tag_options = [
-  "Bitcoin",
-  "Ethereum",
-  "Altcoins",
-  "DeFi",
-  "NFTs",
-  "Blockchain",
-  "Technical Analysis",
-  "Fundamental Analysis",
-  "Trading Strategies",
-  "Market News",
-  "Crypto Regulations",
-  "Risk Management",
-  "Portfolio Management",
-  "Web3",
-  "Metaverse",
-  "Crypto Security",
-  "Tokenomics",
-  "ICO",
-  "Trading Psychology",
-  "On-chain Analysis",
-  "Yield Farming",
-  "Staking",
-  "Crypto Wallets",
-  "Exchanges",
-  "Futures & Derivatives",
-  "Scalping",
-  "Swing Trading",
-  "Day Trading",
-  "HODL",
-  "Airdrops",
-  "Crypto Taxes",
-];
+const tag_options = ["Crypto Basics"];
 
 const FillBlogDetailsModal = ({
   toggleModal,
@@ -380,6 +390,7 @@ const FillBlogDetailsModal = ({
   handleEditBlog: (blogId: string) => void;
 }) => {
   const [searchTag, setSearchTag] = useState("");
+  // const [isTagInputFocused, setIsTagInputFocused] = useState(false);
 
   return (
     <div className="fixed inset-0 flex p-[5%] justify-center items-center">
@@ -477,7 +488,7 @@ const FillBlogDetailsModal = ({
               />
 
               {searchTag && (
-                <div className="absolute top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
+                <div className="absolute z-10 top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
                   {tag_options
                     .filter((tag) =>
                       tag.toLowerCase().includes(searchTag.toLowerCase())
@@ -542,7 +553,6 @@ const FillBlogDetailsModal = ({
                     ...prev,
                     thumbnail: file,
                   }));
-                  toast.success(`selected cover image: ${file.name}`);
                 } else toast.error("No cover image selected");
               }}
               className="hidden"

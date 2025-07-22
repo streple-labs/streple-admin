@@ -7,7 +7,8 @@ type BlogDataType = {
   metatitle: string;
   description: string;
   content: string;
-  status: "draft" | "published" | "Draft" | "Published" | null;
+  status: "Draft" | "Published" | null;
+  scheduleDate?: Date | string | null;
 };
 
 type Blog = {
@@ -19,7 +20,7 @@ type Blog = {
   content: string;
   tags: string[];
   thumbnail: File | string | null;
-  status: "draft" | "published" | "Draft" | "Published" | null;
+  status: "Draft" | "Published" | null;
   scheduleDate?: string;
   createdAt: string;
   updatedAt: string;
