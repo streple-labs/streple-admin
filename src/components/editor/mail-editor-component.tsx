@@ -15,14 +15,24 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import api from "@/utils/axios";
+import Loader from "../loader";
 
-export default function MailEditorComponent({
-  close,
-  setText,
-}: {
-  close: () => void;
-  setText: (text: string) => void;
-}) {
+const initialState = {
+  schedule: false,
+  draft: false,
+  subject: "",
+  message: "",
+  recipient: "All users" as Recipient,
+  selected: [],
+  scheduleDate: null,
+};
+
+export default function MailEditorComponent({ close }: { close: () => void }) {
+  const queryClient = useQueryClient();
+
   const {
     toHtml,
     addLink,
@@ -45,9 +55,49 @@ export default function MailEditorComponent({
   const [buttonLink, setButtonLink] = useState("");
 
   const [showDraftMsg, setShowDraftMsg] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [emailData, setEmailData] = useState<EmailType>(initialState);
+
+  const { mutate: handleSendEmail, isPending: isSendingEmail } = useMutation({
+    mutationKey: ["upload-email"],
+    mutationFn: async () => api.post("/email", emailData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["email-data"],
+      });
+      toast.success("Email Sent successfully!");
+      if (emailData.draft) {
+        setShowDraftMsg(true);
+        setTimeout(() => {
+          setShowDraftMsg(false);
+        }, 5000);
+      } else {
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 5000);
+      }
+      close();
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "email upload failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
 
   return (
-    <div>
+    <div className="relative">
+      {showSuccessModal && ""}
       <div className="pb-[18px] border-b border-b-white/5 flex items-center justify-between">
         <div className="shrink-0 flex items-center gap-6">
           <span className="cursor-pointer" onClick={close}>
@@ -115,29 +165,37 @@ export default function MailEditorComponent({
 
         <div className="flex items-center gap-3">
           <button
+            disabled={isSendingEmail}
             className="text-xs font-normal text-[#CFCFD3] flex items-center justify-center gap-2.5"
-            onClick={() => {
-              setShowDraftMsg(true);
-              setTimeout(() => {
-                setShowDraftMsg(false);
-              }, 5000);
-            }}
+            onClick={() => {}}
           >
-            Save as draft
-          </button>
-          <button className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5">
-            Schedule for later
+            {isSendingEmail ? <Loader /> : "Save as draft"}
           </button>
           <button
+            disabled={isSendingEmail}
+            className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
+          >
+            {isSendingEmail ? <Loader /> : "Schedule for later"}
+          </button>
+          <button
+            disabled={isSendingEmail}
             onClick={() => {
-              console.log(toHtml());
-              setText(toHtml());
+              if (!emailData.subject) {
+                toast.error("Subject is required.");
+                return;
+              }
+              if (!toHtml()) {
+                toast.error("Email content is required.");
+                return;
+              }
+              setEmailData((prev) => ({ ...prev, message: toHtml() }));
+              handleSendEmail();
             }}
             title="publish article"
             aria-label="publish article"
             className="text-xs text-[#2B2B37] font-normal bg-[#A082F9] min-w-[83px] rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
           >
-            Send
+            {isSendingEmail ? <Loader /> : "Send"}
           </button>
         </div>
       </div>
@@ -304,7 +362,14 @@ export default function MailEditorComponent({
               <input
                 type="text"
                 placeholder="Add subject line"
-                className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs text-white/50"
+                value={emailData.subject}
+                onChange={(e) =>
+                  setEmailData((prev) => ({
+                    ...prev,
+                    subject: e.target.value,
+                  }))
+                }
+                className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs placeholder:text-white/50"
               />
               <div className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs text-white/50 flex items-center justify-between">
                 <input
@@ -323,34 +388,55 @@ export default function MailEditorComponent({
           </div>
           <div className="space-y-3 text-white/50">
             <p
-              onClick={() => {}}
+              onClick={() => {
+                setEmailData((prev) => ({
+                  ...prev,
+                  recipient: "All users",
+                }));
+              }}
               className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"
             >
               <span
                 className={`size-4 rounded-full ${
-                  false ? "bg-[#B39FF0]" : "border border-white/50"
+                  emailData.recipient === "All users"
+                    ? "bg-[#B39FF0]"
+                    : "border border-white/50"
                 }`}
               />
               All
             </p>
             <p
-              onClick={() => {}}
+              onClick={() => {
+                setEmailData((prev) => ({
+                  ...prev,
+                  recipient: "Copiers",
+                }));
+              }}
               className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"
             >
               <span
                 className={`size-4 rounded-full ${
-                  false ? "bg-[#B39FF0]" : "border border-white/50"
+                  emailData.recipient === "Copiers"
+                    ? "bg-[#B39FF0]"
+                    : "border border-white/50"
                 }`}
               />
               Copiers
             </p>
             <p
-              onClick={() => {}}
+              onClick={() => {
+                setEmailData((prev) => ({
+                  ...prev,
+                  recipient: "Protraders",
+                }));
+              }}
               className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"
             >
               <span
                 className={`size-4 rounded-full ${
-                  false ? "bg-[#B39FF0]" : "border border-white/50"
+                  emailData.recipient === "Protraders"
+                    ? "bg-[#B39FF0]"
+                    : "border border-white/50"
                 }`}
               />
               Protraders

@@ -47,6 +47,7 @@ export type EditorApi = {
   getCurrentAlignment: () => AlignmentType | null;
   hasAlignment: (alignment: AlignmentType) => boolean;
   addButton: (label: string, url: string) => void;
+  loadFromHTML: (html: string) => void;
 };
 
 const decorator = new CompositeDecorator([LinkDecorator, ImageDecorator]);
@@ -362,6 +363,14 @@ export const useEditor = (html?: string): EditorApi => {
     });
   }, []);
 
+  const loadFromHTML = useCallback((html: string) => {
+    const newState = EditorState.createWithContent(
+      HTMLtoState(html),
+      decorator
+    );
+    setState(newState);
+  }, []);
+
   return useMemo(
     () => ({
       state,
@@ -384,6 +393,7 @@ export const useEditor = (html?: string): EditorApi => {
       getCurrentAlignment,
       hasAlignment,
       addButton,
+      loadFromHTML,
     }),
     [
       state,
@@ -405,6 +415,7 @@ export const useEditor = (html?: string): EditorApi => {
       getCurrentAlignment,
       hasAlignment,
       addButton,
+      loadFromHTML,
     ]
   );
 };

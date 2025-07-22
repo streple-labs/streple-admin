@@ -3,6 +3,9 @@
 import { anton, dmSans } from "@/app/fonts";
 import { TextEditorProvider } from "@/components/editor/context";
 import MailEditorComponent from "@/components/editor/mail-editor-component";
+import Loader from "@/components/loader";
+import api from "@/utils/axios";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa6";
 import { GoFile, GoFilter, GoX } from "react-icons/go";
@@ -23,109 +26,6 @@ const side_options = [
   { label: "Sent", icon: LuSend },
   { label: "Scheduled", icon: PiClockClockwiseLight },
   { label: "Draft", icon: GoFile },
-];
-
-const dummy_email_data = [
-  {
-    subject: "Welcome to Streple!",
-    recipient: "All Users",
-    dateAdded: "2024-05-01",
-    status: "Sent",
-    openRate: 75,
-    clickRate: 30,
-    content:
-      "Hello and welcome to Streple! We're excited to have you on board. Explore our platform and let us know if you have any questions.",
-  },
-  {
-    subject: "Platform Update Notice",
-    recipient: "Protraders",
-    dateAdded: "2024-04-20",
-    status: "Scheduled",
-    openRate: 0,
-    clickRate: 0,
-    content:
-      "Dear Protraders, we will be rolling out new features next week. Please check your dashboard for more details.",
-  },
-  {
-    subject: "Weekly Newsletter",
-    recipient: "Copiers",
-    dateAdded: "2024-04-15",
-    status: "Draft",
-    openRate: 0,
-    clickRate: 0,
-    content:
-      "Here is your weekly newsletter with the latest updates, tips, and community highlights from Streple.",
-  },
-  {
-    subject: "Security Alert: Password Change",
-    recipient: "Users",
-    dateAdded: "2024-05-03",
-    status: "Sent",
-    openRate: 60,
-    clickRate: 10,
-    content:
-      "Your password was changed successfully. If this wasn't you, please contact support immediately.",
-  },
-  {
-    subject: "Upcoming Maintenance",
-    recipient: "All Users",
-    dateAdded: "2024-05-05",
-    status: "Scheduled",
-    openRate: 0,
-    clickRate: 0,
-    content:
-      "We will be performing scheduled maintenance on May 10th. The platform may be unavailable during this time.",
-  },
-  {
-    subject: "Exclusive Tips for Protraders",
-    recipient: "Protraders",
-    dateAdded: "2024-05-02",
-    status: "Sent",
-    openRate: 80,
-    clickRate: 45,
-    content:
-      "Check out these exclusive trading tips to maximize your performance this month!",
-  },
-  {
-    subject: "Draft: New Feature Announcement",
-    recipient: "Users",
-    dateAdded: "2024-05-06",
-    status: "Draft",
-    openRate: 0,
-    clickRate: 0,
-    content:
-      "We're preparing to announce a new feature. Stay tuned for more details!",
-  },
-  {
-    subject: "Copiers: Action Required",
-    recipient: "Copiers",
-    dateAdded: "2024-05-04",
-    status: "Sent",
-    openRate: 55,
-    clickRate: 20,
-    content:
-      "Please update your account information to continue copying trades without interruption.",
-  },
-  {
-    subject: "Scheduled: Webinar Invitation",
-    recipient: "Users",
-    dateAdded: "2024-05-07",
-    status: "Scheduled",
-    openRate: 0,
-    clickRate: 0,
-    content:
-      "Join our upcoming webinar to learn about advanced trading strategies.",
-  },
-  {
-    subject: "Draft: Community Guidelines Update",
-    recipient: "All Users",
-    dateAdded: "2024-05-08",
-    status: "Draft",
-    openRate: 0,
-    clickRate: 0,
-    content:
-      "We're updating our community guidelines. Please review the draft and provide feedback.",
-  },
 ];
 
 export default function Page() {
@@ -156,17 +56,21 @@ export default function Page() {
     []
   );
 
-  const [showEmailEditor, setShowEmailEditor] = useState(false);
+  const [sendEmail, setSendEmail] = useState(false);
+
+  const { data: emails, isPending: isEmailLoading } = useQuery<EmailResponse>({
+    queryKey: ["email-data"],
+    queryFn: async () => (await api.get("/emails")).data,
+  });
 
   return (
     <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
-      {showEmailEditor ? (
+      {sendEmail ? (
         <TextEditorProvider>
           <MailEditorComponent
             close={() => {
-              setShowEmailEditor(false);
+              setSendEmail(false);
             }}
-            setText={() => {}}
           />
         </TextEditorProvider>
       ) : (
@@ -280,7 +184,7 @@ export default function Page() {
             <div className="flex w-full items-center justify-end">
               <button
                 onClick={() => {
-                  setShowEmailEditor(true);
+                  setSendEmail(true);
                 }}
                 className="flex items-center justify-center gap-2.5 bg-[#A082F9] rounded-[10px] p-3 h-[40px] font-normal text-xs leading-3 text-[#2b2b37]"
               >
@@ -340,108 +244,124 @@ export default function Page() {
                 </>
               ))}
             </div>
-            <div className="overflow-x-auto bg-[#242324] rounded-[15px]">
-              <table className="min-w-full text-left text-xs font-normal text-white">
-                <thead>
-                  <tr className="[&>th]:text-xs [&>td]:leading-3 [&>td]:tracking-0 [&>th]:font-normal [&>th]:p-4 [&>th]:text-nowrap border-b border-b-white/5">
-                    <th>Subject</th>
-                    <th>Recipient</th>
-                    <th>Date Added</th>
-                    <th>Status</th>
-                    <th>Open rate</th>
-                    <th>Click rate</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(filterOption && filterOptionType
-                    ? dummy_email_data.filter(
-                        (data) => data[filterOptionType] === filterOption
-                      )
-                    : dummy_email_data
-                  ).map((data) => (
-                    <tr
-                      key={Math.random()}
-                      className="[&>td]:text-xs [&>td]:leading-3 [&>td]:tracking-0 [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:h-[72px] border-b border-b-white/5"
-                    >
-                      <td className="flex flex-col justify-center gap-2">
-                        <span className="font-semibold max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
-                          {data.subject}
-                        </span>
-                        <span className="text-white/80 max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
-                          {data.content}
-                        </span>
-                      </td>
-                      <td>{data.recipient}</td>
-                      <td>{data.dateAdded}</td>
-                      <td>
-                        <span
-                          className={`px-2 py-1 h-6 w-fit flex items-center justify-center cursor-pointer rounded-[14px] group ${
-                            data.status === "Sent"
-                              ? "bg-[#A082F9] text-[#313127CC]"
-                              : data.status === "Draft"
-                              ? "bg-[#807C8B] text-[#141315]"
-                              : "bg-[#F4E90ECC] text-[#171716CC]"
-                          }`}
-                        >
-                          {data.status}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="flex items-center gap-2.5">
-                          {data.openRate ? (
-                            <>
-                              <span
-                                className={`rotate-45 size-2.5 ${
-                                  data.openRate >= 70
-                                    ? "bg-[#1C7E0F]"
-                                    : data.openRate >= 40
-                                    ? "bg-[#6F760D]"
-                                    : "bg-[#C83232]"
-                                }`}
-                              />
-                              <span>{data.openRate}%</span>
-                            </>
-                          ) : (
-                            "--"
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="flex items-center gap-2.5">
-                          {data.clickRate ? (
-                            <>
-                              <span
-                                className={`rotate-45 size-2.5 ${
-                                  data.clickRate >= 70
-                                    ? "bg-[#1C7E0F]"
-                                    : data.clickRate >= 40
-                                    ? "bg-[#6F760D]"
-                                    : "bg-[#C83232]"
-                                }`}
-                              />
-                              <span>{data.clickRate}%</span>
-                            </>
-                          ) : (
-                            "--"
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="flex gap-4 items-center">
-                          <button className="">
-                            <PiPencilSimpleLineBold size={15} />
-                          </button>
-                          <button className="">
-                            <MdDeleteOutline size={15} />
-                          </button>
-                        </div>
-                      </td>
+            {isEmailLoading ? (
+              <div className="flex items-center justify-center w-full h-full">
+                <Loader />
+              </div>
+            ) : emails?.data.length === 0 ? (
+              <div className="flex items-center justify-center w-full h-full">
+                <p className="text-white/50 text-sm font-normal">
+                  No emails found. Create your first email!
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto h-full hide-scrollbar bg-[#242324] rounded-[15px]">
+                <table className="min-w-full text-left text-xs font-normal text-white">
+                  <thead>
+                    <tr className="[&>th]:text-xs [&>td]:leading-3 [&>td]:tracking-0 [&>th]:font-normal [&>th]:p-4 [&>th]:text-nowrap border-b border-b-white/5">
+                      <th>Subject</th>
+                      <th>Recipient</th>
+                      <th>Date Added</th>
+                      <th>Status</th>
+                      <th>Open rate</th>
+                      <th>Click rate</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {emails?.data.map((email) => (
+                      <tr
+                        key={Math.random()}
+                        className="[&>td]:text-xs [&>td]:leading-3 [&>td]:tracking-0 [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:h-[72px] border-b border-b-white/5"
+                      >
+                        <td className="flex flex-col justify-center gap-2">
+                          <span className="font-semibold max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            {email.subject}
+                          </span>
+                          <span className="text-white/80 max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            {email.message}
+                          </span>
+                        </td>
+                        <td>{email.recipient}</td>
+                        <td>
+                          {new Date(email.createdAt).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </td>
+                        <td>
+                          {/* <span
+                            className={`px-2 py-1 h-6 w-fit flex items-center justify-center cursor-pointer rounded-[14px] group ${
+                              email.status === "Sent"
+                                ? "bg-[#A082F9] text-[#313127CC]"
+                                : email.status === "Draft"
+                                ? "bg-[#807C8B] text-[#141315]"
+                                : "bg-[#F4E90ECC] text-[#171716CC]"
+                            }`}
+                          >
+                            {email.status}
+                          </span> */}
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-2.5">
+                            {email.openRate ? (
+                              <>
+                                <span
+                                  className={`rotate-45 size-2.5 ${
+                                    Number(email.openRate) >= 70
+                                      ? "bg-[#1C7E0F]"
+                                      : Number(email.openRate) >= 40
+                                      ? "bg-[#6F760D]"
+                                      : "bg-[#C83232]"
+                                  }`}
+                                />
+                                <span>{email.openRate}%</span>
+                              </>
+                            ) : (
+                              "--"
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-2.5">
+                            {email.clickRate ? (
+                              <>
+                                <span
+                                  className={`rotate-45 size-2.5 ${
+                                    Number(email.clickRate) >= 70
+                                      ? "bg-[#1C7E0F]"
+                                      : Number(email.clickRate) >= 40
+                                      ? "bg-[#6F760D]"
+                                      : "bg-[#C83232]"
+                                  }`}
+                                />
+                                <span>{email.clickRate}%</span>
+                              </>
+                            ) : (
+                              "--"
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex gap-4 items-center">
+                            <button className="">
+                              <PiPencilSimpleLineBold size={15} />
+                            </button>
+                            <button className="">
+                              <MdDeleteOutline size={15} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </>
       )}
