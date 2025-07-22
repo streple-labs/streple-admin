@@ -48,11 +48,11 @@ export default function BlogManager() {
   };
 
   const { data: blogs, isPending: isBlogsLoading } = useQuery<BlogsResponse>({
-    queryKey: ["blog-data"],
+    queryKey: ["blog-data", params.get("query")],
     queryFn: async () =>
       (
-        await api.get("/blog-manager", {
-          params: params.get("query") ? { title: params.get("query") } : {},
+        await api.get("/blogs", {
+          params: params.get("query") ? { search: params.get("query") } : {},
         })
       ).data,
 
@@ -74,12 +74,14 @@ export default function BlogManager() {
   const { mutate: handleEditBlog, isPending: isEditingBlog } = useMutation({
     mutationKey: ["edit-blog"],
     mutationFn: async (blogId: string) =>
-      await api.patch(`/blog-manager/${blogId}`, {
+      await api.patch(`/blog/${blogId}`, {
         ...blogData,
         draft: Boolean(blogData.status === "draft"),
       }),
     onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["blog-data"] });
+      queryClient.invalidateQueries({
+        queryKey: ["blog-data", params.get("query")],
+      });
       toast.success(res.data.message || "Blog updated successfully!");
       setBlogData(initialState);
       setWriteBlog(false);
@@ -104,12 +106,14 @@ export default function BlogManager() {
   const { mutate: handleUploadBlog, isPending: isUploadingBlog } = useMutation({
     mutationKey: ["upload-blog"],
     mutationFn: async () =>
-      await api.post("/blog-manager", {
+      await api.post("/blog", {
         ...blogData,
         draft: Boolean(blogData.status === "draft"),
       }),
     onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["blog-data"] });
+      queryClient.invalidateQueries({
+        queryKey: ["blog-data", params.get("query")],
+      });
       toast.success(res.data.message || "Course uploaded successfully!");
       setBlogData(initialState);
       setWriteBlog(false);
@@ -283,10 +287,7 @@ export default function BlogManager() {
                           <div className="flex gap-4 items-center">
                             <button
                               onClick={() => {
-                                setBlogData({
-                                  ...blog,
-                                  thumbnail: blog.thumbnail,
-                                });
+                                setBlogData(blog);
                                 setEditBlog(true);
                                 toggleBlogDetailsModal();
                               }}
@@ -306,23 +307,23 @@ export default function BlogManager() {
             )}
           </>
         )}
-
-        {openBlogDetailsModal && (
-          <FillBlogDetailsModal
-            toggleModal={toggleBlogDetailsModal}
-            blogData={blogData}
-            setBlogData={setBlogData}
-            handleBlogUpload={handleUploadBlog}
-            isLoading={isUploadingBlog || isEditingBlog}
-            isEditingBlog={editBlog}
-            handleEditBlog={(blogId: string) => {
-              handleEditBlog(blogId);
-              setEditBlog(false);
-              toggleBlogDetailsModal();
-            }}
-          />
-        )}
       </div>
+
+      {openBlogDetailsModal && (
+        <FillBlogDetailsModal
+          toggleModal={toggleBlogDetailsModal}
+          blogData={blogData}
+          setBlogData={setBlogData}
+          handleBlogUpload={handleUploadBlog}
+          isLoading={isUploadingBlog || isEditingBlog}
+          isEditingBlog={editBlog}
+          handleEditBlog={(blogId: string) => {
+            handleEditBlog(blogId);
+            setEditBlog(false);
+            toggleBlogDetailsModal();
+          }}
+        />
+      )}
     </>
   );
 }
@@ -388,7 +389,7 @@ const FillBlogDetailsModal = ({
         className="bg-[#242324] w-full max-w-3xl overflow-y-auto max-h-[90vh] rounded-[20px] p-8  space-y-10 relative"
         onSubmit={(e) => {
           e.preventDefault();
-          if (isEditingBlog) handleEditBlog(blogData.id as string);
+          if (isEditingBlog) handleEditBlog(blogData.id!);
           else handleBlogUpload();
         }}
       >
@@ -598,6 +599,8 @@ const FillBlogDetailsModal = ({
 
         <div className="flex items-center justify-end w-full">
           <button
+            disabled={isLoading}
+            title="Publish or edit blog"
             type="submit"
             className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-semibold text-[#2C2C26]"
           >

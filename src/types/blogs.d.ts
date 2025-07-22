@@ -32,6 +32,6 @@ type BlogsResponse = {
   data: Blog[];
   hasNextPage: boolean;
   hasPrevPage: boolean;
-  totalCount: 1;
-  totalPages: 1;
+  totalCount: number;
+  totalPages: number;
 };
