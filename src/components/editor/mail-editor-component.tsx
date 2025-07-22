@@ -19,6 +19,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import api from "@/utils/axios";
 import Loader from "../loader";
+import { anton } from "@/app/fonts";
+import DatePicker from "react-datepicker";
 
 const initialState = {
   schedule: false,
@@ -56,8 +58,12 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
 
   const [showDraftMsg, setShowDraftMsg] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
 
   const [emailData, setEmailData] = useState<EmailType>(initialState);
+
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<Date | null>(null);
 
   const { mutate: handleSendEmail, isPending: isSendingEmail } = useMutation({
     mutationKey: ["upload-email"],
@@ -67,6 +73,7 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
         queryKey: ["email-data"],
       });
       toast.success("Email Sent successfully!");
+      setShowScheduleForm(false);
       if (emailData.draft) {
         setShowDraftMsg(true);
         setTimeout(() => {
@@ -77,8 +84,8 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
         setTimeout(() => {
           setShowSuccessModal(false);
         }, 5000);
+        close();
       }
-      close();
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -97,7 +104,178 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
 
   return (
     <div className="relative">
-      {showSuccessModal && ""}
+      {showScheduleForm && (
+        <div className="fixed inset-0 flex p-[5%] justify-center items-center z-50">
+          <div
+            className="absolute inset-0 bg-black/70"
+            onClick={() => {
+              setShowScheduleForm(false);
+            }}
+          />
+
+          <div className="bg-[#242324] w-full max-w-xl min-h-[65vh] max-h-[90vh] overflow-y-auto rounded-[20px] p-8 space-y-10 relative">
+            <span
+              className="absolute top-8 left-8 cursor-pointer"
+              onClick={() => {
+                setShowScheduleForm(false);
+              }}
+            >
+              <FaArrowLeft />
+            </span>
+
+            <h4
+              className={`${anton.className} text-base w-full text-center font-normal leading-[150%] tracking-[2px]`}
+            >
+              Schedule for later
+            </h4>
+
+            <div className="space-y-4 w-full">
+              <div className="space-y-3">
+                <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
+                  Add date
+                </p>
+                <span className="h-[55px] flex items-center w-full px-4 rounded-[10px] gap-4 bg-white/5">
+                  <DatePicker
+                    placeholderText="DD/MM/YYYY"
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    required
+                    minDate={new Date()}
+                    dateFormat="P"
+                    locale="en-GB"
+                    className={`size-full text-base font-normal leading-6 tracking-[1px] text-white/50 outline-0 ring-0 caret-[#B39FF0]`}
+                  />
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
+                  Add time
+                </p>
+                <span className="h-[55px] flex items-center w-full px-4 rounded-[10px] gap-4 bg-white/5">
+                  <DatePicker
+                    placeholderText="00:00 AM"
+                    selected={selectedTime}
+                    onChange={(date) => setSelectedTime(date)}
+                    required
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="h:mm aa"
+                    className={`size-full text-base font-normal leading-6 tracking-[1px] text-white/50 outline-0 ring-0 caret-[#B39FF0]`}
+                  />
+                </span>
+              </div>
+
+              <div className="flex items-center justify-end w-full">
+                <button
+                  onClick={() => {
+                    if (!selectedDate || !selectedTime) {
+                      toast.error(
+                        "Please select a valid future date and time to schedule."
+                      );
+                      return;
+                    }
+                    const combined = new Date(
+                      selectedDate.getFullYear(),
+                      selectedDate.getMonth(),
+                      selectedDate.getDate(),
+                      selectedTime.getHours(),
+                      selectedTime.getMinutes()
+                    );
+                    if (combined.getTime() < Date.now()) {
+                      toast.error(
+                        "Please select a valid future date and time to schedule."
+                      );
+                      return;
+                    }
+                    setEmailData((prev) => ({
+                      ...prev,
+                      schedule: true,
+                      message: toHtml(),
+                      scheduleDate: combined,
+                      draft: false,
+                    }));
+                    handleSendEmail();
+                  }}
+                  disabled={isSendingEmail}
+                  type="submit"
+                  title="schedule mail"
+                  className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
+                >
+                  {isSendingEmail ? <Loader /> : "Schedule"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 flex p-[5%] justify-center items-center z-50">
+          <div
+            className="absolute inset-0 bg-black/70"
+            onClick={() => {
+              setShowSuccessModal(false);
+            }}
+          />
+          <div className="bg-[#242324] w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[20px] p-8 flex items-center justify-center flex-col gap-6 relative">
+            <span
+              className="absolute top-8 left-8 cursor-pointer"
+              onClick={() => {
+                setShowSuccessModal(false);
+              }}
+            >
+              <FaArrowLeft />
+            </span>
+            <h4
+              className={`${anton.className} text-2xl w-full text-center font-normal leading-[150%] tracking-[2px]`}
+            >
+              {emailData.schedule
+                ? "Scheduled successfully"
+                : "Sent successfully"}
+            </h4>
+            <p className="text-base font-normal leading-6 tracking-[1px] -mt-3">
+              {emailData.schedule
+                ? `Email scheduled for ${
+                    emailData.scheduleDate
+                      ? new Date(emailData.scheduleDate).toLocaleString(
+                          "en-US",
+                          {
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
+                      : ""
+                  } at ${
+                    emailData.scheduleDate
+                      ? new Date(emailData.scheduleDate).toLocaleTimeString(
+                          "en-US",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )
+                      : ""
+                  }`
+                : "Email sent successfully to 1,204 users."}
+            </p>
+
+            <button
+              onClick={() => {
+                setShowScheduleForm(false);
+                setShowSuccessModal(false);
+                close();
+              }}
+              className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
+            >
+              Back to email center
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="pb-[18px] border-b border-b-white/5 flex items-center justify-between">
         <div className="shrink-0 flex items-center gap-6">
           <span className="cursor-pointer" onClick={close}>
@@ -167,12 +345,23 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
           <button
             disabled={isSendingEmail}
             className="text-xs font-normal text-[#CFCFD3] flex items-center justify-center gap-2.5"
-            onClick={() => {}}
+            onClick={() => {
+              setEmailData((prev) => ({
+                ...prev,
+                schedule: false,
+                message: toHtml(),
+                draft: true,
+              }));
+              handleSendEmail();
+            }}
           >
             {isSendingEmail ? <Loader /> : "Save as draft"}
           </button>
           <button
             disabled={isSendingEmail}
+            onClick={() => {
+              setShowScheduleForm(true);
+            }}
             className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
           >
             {isSendingEmail ? <Loader /> : "Schedule for later"}

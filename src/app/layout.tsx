@@ -1,5 +1,6 @@
 import Providers from "@/providers/providers";
 import type { Metadata, Viewport } from "next";
+import "react-datepicker/dist/react-datepicker.css";
 import { openSans } from "./fonts";
 import "./globals.css";
 
