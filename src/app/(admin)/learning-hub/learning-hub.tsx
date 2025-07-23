@@ -531,6 +531,12 @@ const UploadCourseModal = ({
           className="bg-[#242324] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[20px] p-8 space-y-10 relative"
           onSubmit={(e) => {
             e.preventDefault();
+
+            if (!courseDetails.level) {
+              toast.error("Please select a learning track");
+              return;
+            }
+
             if (isEditingCourse) handleEditCourse(courseDetails.id!);
             else handleUploadCourse();
           }}
@@ -676,6 +682,7 @@ const UploadCourseModal = ({
                 </div>
               )}
               <input
+                required
                 type="file"
                 id="thumbnail"
                 accept="image/*"

@@ -211,8 +211,8 @@ export default function BlogManager() {
                 <table className="min-w-full text-left text-xs font-normal text-white">
                   <thead>
                     <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
-                      <th>Course Title</th>
-                      <th>Track</th>
+                      <th>Blog Title</th>
+                      <th>Tags</th>
                       <th>Date Added</th>
                       <th>Author</th>
                       <th>Views</th>
@@ -400,6 +400,12 @@ const FillBlogDetailsModal = ({
         className="bg-[#242324] w-full max-w-3xl overflow-y-auto max-h-[90vh] rounded-[20px] p-8  space-y-10 relative"
         onSubmit={(e) => {
           e.preventDefault();
+
+          if (!blogData.tags.length) {
+            toast.error("At least one tag is required");
+            return;
+          }
+
           if (isEditingBlog) handleEditBlog(blogData.id!);
           else handleBlogUpload();
         }}
@@ -542,6 +548,7 @@ const FillBlogDetailsModal = ({
               </div>
             )}
             <input
+              required
               type="file"
               id="cover_img"
               accept="image/*"

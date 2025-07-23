@@ -1,10 +1,16 @@
+import { anton } from "@/app/fonts";
+import api from "@/utils/axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import cn from "classnames";
 import { useState } from "react";
+import DatePicker from "react-datepicker";
 import { FaArrowLeft, FaChevronDown, FaPlus } from "react-icons/fa6";
 import { GoCheckCircle, GoLink } from "react-icons/go";
 import { IoImageOutline } from "react-icons/io5";
 import { MdOutlineTouchApp } from "react-icons/md";
 import { RxTextAlignCenter } from "react-icons/rx";
+import { toast } from "sonner";
+import Loader from "../loader";
 import ColorPicker from "./color-picker";
 import {
   BLOCK_LABELS,
@@ -15,12 +21,6 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import api from "@/utils/axios";
-import Loader from "../loader";
-import { anton } from "@/app/fonts";
-import DatePicker from "react-datepicker";
 
 const initialState = {
   schedule: false,
@@ -83,8 +83,8 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
         setShowSuccessModal(true);
         setTimeout(() => {
           setShowSuccessModal(false);
+          close();
         }, 5000);
-        close();
       }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -220,7 +220,7 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
               setShowSuccessModal(false);
             }}
           />
-          <div className="bg-[#242324] w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[20px] p-8 flex items-center justify-center flex-col gap-6 relative">
+          <div className="bg-[#242324] w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-[20px] p-16 flex items-center justify-center flex-col gap-6 relative">
             <span
               className="absolute top-8 left-8 cursor-pointer"
               onClick={() => {
@@ -268,7 +268,7 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
                 setShowSuccessModal(false);
                 close();
               }}
-              className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
+              className="w-full flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
             >
               Back to email center
             </button>
