@@ -2,7 +2,7 @@ import { anton } from "@/app/fonts";
 import api from "@/utils/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import cn from "classnames";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { FaArrowLeft, FaChevronDown, FaPlus } from "react-icons/fa6";
 import { GoCheckCircle, GoLink } from "react-icons/go";
@@ -22,17 +22,21 @@ import {
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
 
-const initialState = {
-  schedule: false,
-  draft: false,
-  subject: "",
-  message: "",
-  recipient: "All users" as Recipient,
-  selected: [],
-  scheduleDate: null,
-};
-
-export default function MailEditorComponent({ close }: { close: () => void }) {
+export default function MailEditorComponent({
+  close,
+  emailData,
+  setEmailData,
+  isEditing,
+  handleEditEmail,
+  isEditingEmail,
+}: {
+  close: () => void;
+  emailData: EmailType;
+  setEmailData: Dispatch<SetStateAction<EmailType>>;
+  isEditing: boolean;
+  isEditingEmail: boolean;
+  handleEditEmail: () => void;
+}) {
   const queryClient = useQueryClient();
 
   const {
@@ -46,7 +50,12 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
     hasInlineStyle,
     openLinkForm,
     setOpenLinkForm,
+    loadFromHTML,
   } = useEditorApi();
+
+  useEffect(() => {
+    if (isEditing && emailData.message) loadFromHTML(emailData.message);
+  }, [isEditing, emailData.message, loadFromHTML]);
 
   const [showHeadingOptions, setShowHeadingOptions] = useState(false);
 
@@ -59,8 +68,6 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
   const [showDraftMsg, setShowDraftMsg] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
-
-  const [emailData, setEmailData] = useState<EmailType>(initialState);
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<Date | null>(null);
@@ -199,12 +206,12 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
                     }));
                     handleSendEmail();
                   }}
-                  disabled={isSendingEmail}
+                  disabled={isSendingEmail || isEditing}
                   type="submit"
                   title="schedule mail"
                   className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
                 >
-                  {isSendingEmail ? <Loader /> : "Schedule"}
+                  {isSendingEmail || isEditing ? <Loader /> : "Schedule"}
                 </button>
               </div>
             </div>
@@ -343,9 +350,13 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
 
         <div className="flex items-center gap-3">
           <button
-            disabled={isSendingEmail}
+            disabled={isSendingEmail || isEditingEmail}
             className="text-xs font-normal text-[#CFCFD3] flex items-center justify-center gap-2.5"
             onClick={() => {
+              if (isEditing) {
+                toast.error("You are currently editing an email.");
+                return;
+              }
               setEmailData((prev) => ({
                 ...prev,
                 schedule: false,
@@ -355,19 +366,27 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
               handleSendEmail();
             }}
           >
-            {isSendingEmail ? <Loader /> : "Save as draft"}
+            {isSendingEmail || isEditingEmail ? <Loader /> : "Save as draft"}
           </button>
           <button
-            disabled={isSendingEmail}
+            disabled={isSendingEmail || isEditingEmail}
             onClick={() => {
+              if (isEditing) {
+                toast.error("You are currently editing an email.");
+                return;
+              }
               setShowScheduleForm(true);
             }}
             className="text-xs font-normal text-[#CFCFD3] border-[#FAF2F24D] border rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
           >
-            {isSendingEmail ? <Loader /> : "Schedule for later"}
+            {isSendingEmail || isEditingEmail ? (
+              <Loader />
+            ) : (
+              "Schedule for later"
+            )}
           </button>
           <button
-            disabled={isSendingEmail}
+            disabled={isSendingEmail || isEditingEmail}
             onClick={() => {
               if (!emailData.subject) {
                 toast.error("Subject is required.");
@@ -378,13 +397,21 @@ export default function MailEditorComponent({ close }: { close: () => void }) {
                 return;
               }
               setEmailData((prev) => ({ ...prev, message: toHtml() }));
-              handleSendEmail();
+
+              if (isEditing) handleEditEmail();
+              else handleSendEmail();
             }}
             title="publish article"
             aria-label="publish article"
             className="text-xs text-[#2B2B37] font-normal bg-[#A082F9] min-w-[83px] rounded-[10px] h-10 p-3 flex items-center justify-center gap-2.5"
           >
-            {isSendingEmail ? <Loader /> : "Send"}
+            {isSendingEmail || isEditingEmail ? (
+              <Loader />
+            ) : isEditing ? (
+              "Edit Mail"
+            ) : (
+              "Send"
+            )}
           </button>
         </div>
       </div>

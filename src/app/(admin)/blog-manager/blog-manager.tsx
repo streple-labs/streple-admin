@@ -123,7 +123,7 @@ export default function BlogManager() {
 
   const { mutate: handleDeleteBlog } = useMutation({
     mutationKey: ["delete-blog"],
-    mutationFn: async (blogId: string) => await api.delete(`/blog/${blogId}`),
+    mutationFn: async (id: string) => await api.delete(`/blog/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["blog-data", params.get("query")],
@@ -314,7 +314,6 @@ export default function BlogManager() {
                           <div className="flex gap-4 items-center">
                             <button
                               onClick={() => {
-                                console.log(blog);
                                 setBlogData({
                                   title: blog.title,
                                   tags: blog.tags,
@@ -548,7 +547,6 @@ const FillBlogDetailsModal = ({
               </div>
             )}
             <input
-              required
               type="file"
               id="cover_img"
               accept="image/*"

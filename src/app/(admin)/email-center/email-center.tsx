@@ -6,16 +6,18 @@ import MailEditorComponent from "@/components/editor/mail-editor-component";
 import Loader from "@/components/loader";
 import Search from "@/components/search";
 import api from "@/utils/axios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa6";
 import { GoFile, GoFilter, GoX } from "react-icons/go";
 import { HiOutlineUserGroup } from "react-icons/hi";
+import { ImCancelCircle } from "react-icons/im";
 import { LuSend } from "react-icons/lu";
 import { MdDeleteOutline, MdOutlineMailOutline } from "react-icons/md";
 import { PiClockClockwiseLight, PiPencilSimpleLineBold } from "react-icons/pi";
 import { RiEdit2Line } from "react-icons/ri";
+import { toast } from "sonner";
 
 const side_options = [
   { label: "All emails", icon: MdOutlineMailOutline },
@@ -27,10 +29,27 @@ const side_options = [
   { label: "Sent", icon: LuSend },
   { label: "Scheduled", icon: PiClockClockwiseLight },
   { label: "Draft", icon: GoFile },
+  { label: "Failed", icon: ImCancelCircle },
 ];
+
+const initialState = {
+  schedule: false,
+  draft: false,
+  subject: "",
+  message: "",
+  recipient: "All users" as Recipient,
+  selected: [],
+  scheduleDate: null,
+};
 
 export default function EmailCenter() {
   const params = useSearchParams();
+
+  const queryClient = useQueryClient();
+
+  const [emailData, setEmailData] = useState<EmailType>(initialState);
+
+  const [sendEmail, setSendEmail] = useState(false);
 
   const [emailType, setEmailType] = useState("All emails");
   const [showRecipients, setShowRecipients] = useState(false);
@@ -53,13 +72,11 @@ export default function EmailCenter() {
   };
   const filterOptions = useMemo(
     () => ({
-      status: ["Sent", "Draft", "Scheduled"],
+      status: ["Sent", "Draft", "Scheduled", "Failed"],
       recipient: ["Copiers", "Protraders"],
     }),
     []
   );
-
-  const [sendEmail, setSendEmail] = useState(false);
 
   const { data: emails, isPending: isEmailLoading } = useQuery<EmailResponse>({
     queryKey: ["email-data", params.get("query"), filterOption],
@@ -77,6 +94,60 @@ export default function EmailCenter() {
       ).data,
   });
 
+  const [editEmail, setEditEmail] = useState(false);
+  const { mutate: handleEditEmail, isPending: isEditingMail } = useMutation({
+    mutationKey: ["edit-mail"],
+    mutationFn: async (id: string) =>
+      await api.patch(`/email/${id}`, emailData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["email-data", params.get("query"), filterOption],
+      });
+      toast.success("Email updated successfully!");
+      setEmailData(initialState);
+      setSendEmail(false);
+      setEditEmail(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "Blog update failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
+
+  const { mutate: handleDeleteEmail } = useMutation({
+    mutationKey: ["delete-email"],
+    mutationFn: async (id: string) => await api.delete(`/email/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["email-data"],
+      });
+      toast.success("Email deleted successfully!");
+      setEmailData(initialState);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      let errorMessage = "Email update failed. Please try again later.";
+
+      if (error?.response?.data?.message) {
+        if (Array.isArray(error.response.data.message))
+          errorMessage = error.response.data.message.join(", ");
+        else errorMessage = error.response.data.message;
+      } else if (error?.userMessage) errorMessage = error.userMessage;
+      else if (error?.message) errorMessage = error.message;
+
+      toast.error(errorMessage);
+    },
+  });
+
   return (
     <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
       {sendEmail ? (
@@ -85,6 +156,11 @@ export default function EmailCenter() {
             close={() => {
               setSendEmail(false);
             }}
+            emailData={emailData}
+            setEmailData={setEmailData}
+            handleEditEmail={() => handleEditEmail(emailData.id!)}
+            isEditing={editEmail}
+            isEditingEmail={isEditingMail}
           />
         </TextEditorProvider>
       ) : (
@@ -295,17 +371,19 @@ export default function EmailCenter() {
                           )}
                         </td>
                         <td>
-                          {/* <span
+                          <span
                             className={`px-2 py-1 h-6 w-fit flex items-center justify-center cursor-pointer rounded-[14px] group ${
                               email.status === "Sent"
                                 ? "bg-[#A082F9] text-[#313127CC]"
                                 : email.status === "Draft"
                                 ? "bg-[#807C8B] text-[#141315]"
+                                : email.status === "Failed"
+                                ? "bg-[#F06E6E] text-[#251D1D]"
                                 : "bg-[#F4E90ECC] text-[#171716CC]"
                             }`}
                           >
                             {email.status}
-                          </span> */}
+                          </span>
                         </td>
                         <td>
                           <div className="flex items-center gap-2.5">
@@ -349,10 +427,32 @@ export default function EmailCenter() {
                         </td>
                         <td>
                           <div className="flex gap-4 items-center">
-                            <button className="">
+                            <button
+                              onClick={() => {
+                                setEmailData({
+                                  subject: email.subject,
+                                  message: email.message,
+                                  recipient: email.recipient,
+                                  selected: email.selected,
+                                  schedule: Boolean(
+                                    email.status === "Scheduled"
+                                  ),
+                                  draft: Boolean(email.status === "Draft"),
+                                  scheduleDate: email.scheduleDate,
+                                  id: email.id,
+                                });
+
+                                setEditEmail(true);
+                                setSendEmail(true);
+                              }}
+                            >
                               <PiPencilSimpleLineBold size={15} />
                             </button>
-                            <button className="">
+                            <button
+                              onClick={() => {
+                                handleDeleteEmail(email.id);
+                              }}
+                            >
                               <MdDeleteOutline size={15} />
                             </button>
                           </div>

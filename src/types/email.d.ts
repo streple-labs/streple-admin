@@ -1,6 +1,7 @@
 type Recipient = "All users" | "Copiers" | "Protraders";
 
 type EmailType = {
+  id?: string;
   schedule: boolean;
   draft: boolean;
   subject: string;
@@ -21,6 +22,7 @@ type Email = {
   updatedAt: string;
   clickRate: string;
   openRate: string;
+  status: "Draft" | "Scheduled" | "Sent" | "Failed";
 };
 
 type EmailResponse = {

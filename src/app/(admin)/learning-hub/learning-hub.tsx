@@ -142,8 +142,7 @@ export default function LearningHub() {
 
   const { mutate: handleDeleteCourse } = useMutation({
     mutationKey: ["delete-course"],
-    mutationFn: async (courseid: string) =>
-      await api.delete(`/learning/${courseid}`),
+    mutationFn: async (id: string) => await api.delete(`/learning/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["courses-data", params.get("query"), level],
@@ -682,7 +681,6 @@ const UploadCourseModal = ({
                 </div>
               )}
               <input
-                required
                 type="file"
                 id="thumbnail"
                 accept="image/*"
