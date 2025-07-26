@@ -24,8 +24,7 @@ body {
 }
 
 button {
-  cursor: pointer;
-  @apply disabled:opacity-80;
+  @apply cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed;
 }
 
 .mw {
