@@ -173,6 +173,13 @@ export default function LearningHub() {
         {courseDetails.type === "article" && !editCourse && !isEditingCourse ? (
           <TextEditorProvider>
             <ToolPanel
+              title={courseDetails.title}
+              setTitle={(title: string) => {
+                setCourseDetails((prev) => ({
+                  ...prev,
+                  title,
+                }));
+              }}
               close={() => {
                 setCourseDetails((prev) => ({
                   ...prev,

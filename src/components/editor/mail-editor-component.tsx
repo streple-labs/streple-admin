@@ -288,7 +288,24 @@ export default function MailEditorComponent({
           <span className="cursor-pointer" onClick={close}>
             <FaArrowLeft className="w-5 stroke-white/80" />
           </span>
-          <h4 className="text-xl font-semibold text-white/80">New Email</h4>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex items-center"
+          >
+            <input
+              value={emailData.subject}
+              type="text"
+              className="text-xl text-white/80 font-semibold bg-transparent border-none outline-none"
+              placeholder="New Email"
+              onChange={(e) =>
+                setEmailData((prev) => ({
+                  ...prev,
+                  subject: e.target.value,
+                }))
+              }
+              aria-label="Email Subject"
+            />
+          </form>
         </div>
 
         <div className="shrink-0 flex items-center gap-6">

@@ -155,6 +155,10 @@ export default function BlogManager() {
         {writeBlog ? (
           <TextEditorProvider>
             <ToolPanel
+              title={blogData.title}
+              setTitle={(title: string) => {
+                setBlogData((prev) => ({ ...prev, title }));
+              }}
               close={toggle}
               saveAsDraft={(content: string) => {
                 setBlogData((prev) => ({
@@ -389,7 +393,7 @@ const FillBlogDetailsModal = ({
   handleEditBlog: (blogId: string) => void;
 }) => {
   const [searchTag, setSearchTag] = useState("");
-  // const [isTagInputFocused, setIsTagInputFocused] = useState(false);
+  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
 
   return (
     <div className="fixed inset-0 flex p-[5%] justify-center items-center">
@@ -453,46 +457,21 @@ const FillBlogDetailsModal = ({
             <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
               Tags
             </p>
-            <div
-              title="Select learning track"
-              className={`h-[55px] cursor-pointer w-full py-5 px-4 rounded-[10px] bg-white/5 flex items-center gap-4 relative`}
-            >
-              {!!blogData.tags.length && (
-                <div className="flex items-center gap-2.5">
-                  {blogData.tags.map((tag, i) => (
-                    <p
-                      key={i}
-                      className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
-                    >
-                      {tag}
-                      <span
-                        onClick={() => {
-                          setBlogData((prev) => ({
-                            ...prev,
-                            tags: prev.tags.filter((_, idx) => idx !== i),
-                          }));
-                        }}
-                      >
-                        <FiX width={12} color="#FFFFFF99" />
-                      </span>
-                    </p>
-                  ))}
-                </div>
-              )}
+            {isTagInputFocused ? (
+              <div
+                title="Select learning track"
+                className={`h-[55px] cursor-pointer w-full py-5 px-4 rounded-[10px] bg-white/5 flex items-center gap-4 relative`}
+              >
+                <input
+                  autoFocus
+                  value={searchTag}
+                  readOnly={isLoading}
+                  className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white border-0 ring-0 outline-0 w-full placeholder:text-white/50"
+                  type="text"
+                  placeholder="Add tags (e.g. Crypto Basics)"
+                  onChange={(e) => setSearchTag(e.target.value.trim())}
+                />
 
-              <input
-                value={searchTag}
-                readOnly={isLoading}
-                className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white border-0 ring-0 outline-0"
-                style={{
-                  width: `${searchTag.length + 1 || 1}ch`,
-                  minWidth: "2ch",
-                  maxWidth: "100%",
-                }}
-                onChange={(e) => setSearchTag(e.target.value.trim())}
-              />
-
-              {searchTag && (
                 <div className="absolute z-10 top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
                   {tag_options
                     .filter((tag) =>
@@ -507,6 +486,7 @@ const FillBlogDetailsModal = ({
                             tags: Array.from(new Set([...prev.tags, tag])),
                           }));
                           setSearchTag("");
+                          setIsTagInputFocused(false);
                         }}
                         className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px]"
                       >
@@ -514,8 +494,37 @@ const FillBlogDetailsModal = ({
                       </p>
                     ))}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div
+                title="Select learning track"
+                className={`h-[55px] cursor-pointer w-full py-5 px-4 rounded-[10px] bg-white/5 flex items-center gap-4 relative`}
+                onClick={() => setIsTagInputFocused(true)}
+              >
+                {!!blogData.tags.length && (
+                  <div className="flex items-center gap-2.5">
+                    {blogData.tags.map((tag, i) => (
+                      <p
+                        key={i}
+                        className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
+                      >
+                        {tag}
+                        <span
+                          onClick={() => {
+                            setBlogData((prev) => ({
+                              ...prev,
+                              tags: prev.tags.filter((_, idx) => idx !== i),
+                            }));
+                          }}
+                        >
+                          <FiX width={12} color="#FFFFFF99" />
+                        </span>
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <label htmlFor="cover_img" className="space-y-3">

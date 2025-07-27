@@ -17,10 +17,14 @@ import {
 import { useEditorApi } from "./context";
 
 const ToolPanel = ({
+  title,
+  setTitle,
   close,
   handlePublish,
   saveAsDraft,
 }: {
+  title: string;
+  setTitle: (title: string) => void;
   close: () => void;
   handlePublish: (text: string) => void;
   saveAsDraft: (text: string) => void;
@@ -50,9 +54,19 @@ const ToolPanel = ({
           <span className="cursor-pointer" onClick={close}>
             <FaArrowLeft className="w-5 stroke-white/80" />
           </span>
-          <p className="text-xl text-white/80 font-semibold">
-            Untitled document
-          </p>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex items-center"
+          >
+            <input
+              value={title}
+              type="text"
+              className="text-xl text-white/80 font-semibold bg-transparent border-none outline-none"
+              placeholder="Untitled document"
+              onChange={(e) => setTitle(e.target.value)}
+              aria-label="Document title"
+            />
+          </form>
         </div>
         <div className="flex items-center gap-6">
           <button
