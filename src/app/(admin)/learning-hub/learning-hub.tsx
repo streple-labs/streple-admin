@@ -288,7 +288,7 @@ export default function LearningHub() {
             ) : courses?.data.length === 0 ? (
               <div className="flex items-center justify-center w-full h-full">
                 <p className="text-white/50 text-sm font-normal">
-                  No emails found. Create your first course!
+                  No courses found. Create your first course!
                 </p>
               </div>
             ) : (
