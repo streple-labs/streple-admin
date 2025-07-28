@@ -19,6 +19,7 @@ import { PiPencilSimpleLineBold } from "react-icons/pi";
 import { toast } from "sonner";
 
 const initialState = {
+  draft: false,
   schedule: false,
   title: "",
   tags: [],
@@ -92,11 +93,26 @@ export default function BlogManager() {
 
   const { mutate: handleUploadBlog, isPending: isUploadingBlog } = useMutation({
     mutationKey: ["upload-blog"],
-    mutationFn: async () =>
-      await api.post("/blog", {
-        ...blogData,
-        draft: Boolean(blogData.status === "Draft"),
-      }),
+    mutationFn: async () => {
+      const formData = new FormData();
+      for (const key in blogData) {
+        const value = blogData[key as keyof typeof blogData];
+        if (typeof value === "boolean") {
+          formData.append(key, value ? "true" : "false");
+          continue;
+        } else if (value !== null && value !== undefined) {
+          if (value instanceof Date) formData.append(key, value.toISOString());
+          else if (Array.isArray(value))
+            value.forEach((item) => {
+              formData.append(`${key}[]`, item);
+            });
+          else if (value instanceof File) formData.append(key, value);
+          else formData.append(key, String(value));
+        }
+      }
+
+      return api.post("/blog", formData);
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries({
         queryKey: ["blog-data", params.get("query")],
@@ -562,6 +578,12 @@ const FillBlogDetailsModal = ({
               readOnly={isLoading}
               onChange={(e) => {
                 const file = e.target.files?.[0] || null;
+
+                if (file && file.size > 5 * 1024 * 1024) {
+                  toast.error("File size exceeds 5MB limit");
+                  return;
+                }
+
                 if (file) {
                   setBlogData((prev) => ({
                     ...prev,

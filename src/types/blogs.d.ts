@@ -1,6 +1,7 @@
 type BlogDataType = {
   id?: string;
   schedule?: boolean;
+  draft?: boolean;
   title: string;
   tags: string[];
   thumbnail: File | null | string;
