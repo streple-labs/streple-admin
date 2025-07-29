@@ -96,7 +96,7 @@ export default function MailEditorComponent({
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      let errorMessage = "email upload failed. Please try again later.";
+      let errorMessage = "Email upload failed. Please try again later.";
 
       if (error?.response?.data?.message) {
         if (Array.isArray(error.response.data.message))

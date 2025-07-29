@@ -82,14 +82,14 @@ export default function LearningHub() {
       queryClient.invalidateQueries({
         queryKey: ["courses-data", params.get("query"), level],
       });
-      toast.success(res.data.message || "Blog updated successfully!");
+      toast.success(res.data.message || "Course updated successfully!");
       setOpenUploadModal(false);
       setEditCourse(false);
       setCourseDetails(initialState);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      let errorMessage = "Blog update failed. Please try again later.";
+      let errorMessage = "Course update failed. Please try again later.";
 
       if (error?.response?.data?.message) {
         if (Array.isArray(error.response.data.message))
@@ -99,6 +99,8 @@ export default function LearningHub() {
       else if (error?.message) errorMessage = error.message;
 
       toast.error(errorMessage);
+      setOpenUploadModal(false);
+      setEditCourse(false);
       setCourseDetails(initialState);
     },
   });
@@ -127,7 +129,7 @@ export default function LearningHub() {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (error: any) => {
-        let errorMessage = "course upload failed. Please try again later.";
+        let errorMessage = "Course upload failed. Please try again later.";
 
         if (error?.response?.data?.message) {
           if (Array.isArray(error.response.data.message))

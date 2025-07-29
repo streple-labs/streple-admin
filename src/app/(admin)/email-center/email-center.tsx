@@ -110,7 +110,7 @@ export default function EmailCenter() {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      let errorMessage = "Blog update failed. Please try again later.";
+      let errorMessage = "Email update failed. Please try again later.";
 
       if (error?.response?.data?.message) {
         if (Array.isArray(error.response.data.message))
@@ -120,6 +120,9 @@ export default function EmailCenter() {
       else if (error?.message) errorMessage = error.message;
 
       toast.error(errorMessage);
+      setEmailData(initialState);
+      setSendEmail(false);
+      setEditEmail(false);
     },
   });
 

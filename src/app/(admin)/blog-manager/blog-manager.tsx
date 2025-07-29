@@ -88,6 +88,9 @@ export default function BlogManager() {
       else if (error?.message) errorMessage = error.message;
 
       toast.error(errorMessage);
+      setBlogData(initialState);
+      setEditBlog(false);
+      setWriteBlog(false);
     },
   });
 
@@ -117,7 +120,7 @@ export default function BlogManager() {
       queryClient.invalidateQueries({
         queryKey: ["blog-data", params.get("query")],
       });
-      toast.success(res.data.message || "Course uploaded successfully!");
+      toast.success(res.data.message || "Blog uploaded successfully!");
       setBlogData(initialState);
       setWriteBlog(false);
       setOpenBlogDetailsModal(false);
