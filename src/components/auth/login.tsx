@@ -30,7 +30,12 @@ export default function Login() {
     mutationKey: ["login"],
     mutationFn: async () => await api.post("/auth/login", formData),
     onSuccess: (res) => {
-      setCookie("streple_auth_token", res.data.streple_auth_token);
+      setCookie("streple_auth_token", res.data.streple_auth_token, {
+        secure: true,
+        httpOnly: true,
+        sameSite: "lax",
+        expires: new Date(Date.now() + 60 * 60 * 1000),
+      });
       router.push("/");
       toast.success(res.data.message || "login successful.");
     },
