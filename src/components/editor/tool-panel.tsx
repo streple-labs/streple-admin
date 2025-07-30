@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowLeft, FaChevronDown } from "react-icons/fa6";
 import { GoLink } from "react-icons/go";
 import { IoImageOutline } from "react-icons/io5";
@@ -22,12 +22,16 @@ const ToolPanel = ({
   close,
   handlePublish,
   saveAsDraft,
+  isEditing,
+  content,
 }: {
   title: string;
   setTitle: (title: string) => void;
   close: () => void;
   handlePublish: (text: string) => void;
   saveAsDraft: (text: string) => void;
+  isEditing: boolean;
+  content?: string;
 }) => {
   const {
     toHtml,
@@ -41,7 +45,12 @@ const ToolPanel = ({
     setOpenLinkForm,
     hasAlignment,
     toggleAlignment,
+    loadFromHTML,
   } = useEditorApi();
+
+  useEffect(() => {
+    if (isEditing && content) loadFromHTML(content);
+  }, [isEditing, content, loadFromHTML]);
 
   const [showHeadingOptions, setShowHeadingOptions] = useState(false);
 

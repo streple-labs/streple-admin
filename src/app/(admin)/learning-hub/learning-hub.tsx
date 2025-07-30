@@ -183,11 +183,7 @@ export default function LearningHub() {
                 }));
               }}
               close={() => {
-                setCourseDetails((prev) => ({
-                  ...prev,
-                  type: null,
-                  content: null,
-                }));
+                setCourseDetails(initialState);
                 setFillCourseDetails(false);
               }}
               saveAsDraft={(content: string) => {
@@ -210,6 +206,8 @@ export default function LearningHub() {
                 setOpenUploadModal(true);
                 setFillCourseDetails(true);
               }}
+              isEditing={editCourse && courseDetails.type === "article"}
+              content={courseDetails.content || ""}
             />
             <TextEditor />
           </TextEditorProvider>

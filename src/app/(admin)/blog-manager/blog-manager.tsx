@@ -195,6 +195,8 @@ export default function BlogManager() {
                 }));
                 toggleBlogDetailsModal();
               }}
+              isEditing={editBlog}
+              content={blogData.content}
             />
             <TextEditor />
           </TextEditorProvider>
@@ -210,7 +212,11 @@ export default function BlogManager() {
 
               <div className="flex w-full items-center justify-end">
                 <button
-                  onClick={toggle}
+                  onClick={() => {
+                    setBlogData(initialState);
+                    setEditBlog(false);
+                    toggle();
+                  }}
                   className="flex items-center justify-center gap-2.5 bg-[#A082F9] rounded-[10px] p-3 h-[40px] font-normal text-xs leading-3 text-[#2b2b37]"
                 >
                   <FaPlus size={12} color="#2B2B37" />
@@ -349,7 +355,7 @@ export default function BlogManager() {
                                   id: blog.id,
                                 });
                                 setEditBlog(true);
-                                toggleBlogDetailsModal();
+                                setWriteBlog(true);
                               }}
                             >
                               <PiPencilSimpleLineBold size={15} />
