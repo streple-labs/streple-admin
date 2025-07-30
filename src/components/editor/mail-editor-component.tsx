@@ -21,6 +21,7 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
+import { FiX } from "react-icons/fi";
 
 export default function MailEditorComponent({
   close,
@@ -71,6 +72,9 @@ export default function MailEditorComponent({
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<Date | null>(null);
+
+  const [isSearchUserInputFocused, setSearchUserInputFocus] = useState(false);
+  const [searchUser, setSearchUser] = useState("");
 
   const { mutate: handleSendEmail, isPending: isSendingEmail } = useMutation({
     mutationKey: ["upload-email"],
@@ -320,24 +324,30 @@ export default function MailEditorComponent({
             <FaChevronDown className="w-3 stroke-white/50" />
 
             {showHeadingOptions && (
-              <div className="absolute top-6 left-0 bg-white/10 backdrop-blur-md rounded-lg p-2 flex flex-col gap-1 w-40">
-                {Object.entries(HEADING_BLOCK_LABELS).map(([type, label]) => (
-                  <button
-                    key={type}
-                    className={cn(
-                      "w-full text-left p-2 rounded text-xs",
-                      currentBlockType === type && "text-[#A082F9]"
-                    )}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      toggleBlockType(type as BlockType);
-                      setShowHeadingOptions(false);
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowHeadingOptions(false)}
+                />
+                <div className="absolute z-20 top-6 left-0 bg-white/5 backdrop-blur-md rounded-lg p-2 flex flex-col gap-1 w-40">
+                  {Object.entries(HEADING_BLOCK_LABELS).map(([type, label]) => (
+                    <button
+                      key={type}
+                      className={cn(
+                        "w-full text-left p-2 rounded text-xs",
+                        currentBlockType === type && "text-[#A082F9]"
+                      )}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        toggleBlockType(type as BlockType);
+                        setShowHeadingOptions(false);
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
@@ -604,18 +614,74 @@ export default function MailEditorComponent({
                 }
                 className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs placeholder:text-white/50"
               />
-              <div className="w-full bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs text-white/50 flex items-center justify-between">
-                <input
-                  className="p-0 bg-transparent text-[11px] leading-4 tracking-[1px] text-white/50 caret-[#A082F9] border-0 ring-0 outline-0"
-                  style={{
-                    width: `${1}ch`,
-                    minWidth: "2ch",
-                    maxWidth: "100%",
+              <div className="w-full relative bg-transparent outline-none rounded-[10px] ring-0 border border-white/10 h-10 px-3 py-5 text-xs text-white/50 flex items-center justify-between">
+                {isSearchUserInputFocused ? (
+                  <input
+                    autoFocus
+                    className="p-0 bg-transparent text-[11px] leading-4 tracking-[1px] text-white/50 caret-[#A082F9] border-0 ring-0 outline-0 w-full"
+                    value={searchUser}
+                    onChange={(e) => setSearchUser(e.target.value.trim())}
+                  />
+                ) : (
+                  <>
+                    {!!emailData.selected.length && (
+                      <div className="flex items-center gap-2.5">
+                        {emailData.selected.map((user, i) => (
+                          <p
+                            key={i}
+                            className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
+                          >
+                            {user}
+                            <span
+                              onClick={() => {
+                                setEmailData((prev) => ({
+                                  ...prev,
+                                  selected: prev.selected.filter(
+                                    (_, idx) => idx !== i
+                                  ),
+                                }));
+                              }}
+                            >
+                              <FiX width={12} color="#FFFFFF99" />
+                            </span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+                <FaPlus
+                  width={8}
+                  className="ml-auto cursor-pointer"
+                  onClick={() => {
+                    setSearchUserInputFocus((prev) => !prev);
                   }}
-                  // value={searchTag}
-                  // onChange={(e) => setSearchTag(e.target.value.trim())}
                 />
-                <FaPlus width={8} className="ml-auto cursor-pointer" />
+
+                {/* <div className="absolute z-10 top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
+                  {users
+                    .filter((user) =>
+                      user.toLowerCase().includes(user.toLowerCase())
+                    )
+                    .map((user, i) => (
+                      <p
+                        key={i}
+                        onClick={() => {
+                          setEmailData((prev) => ({
+                            ...prev,
+                            selected: Array.from(
+                              new Set([...prev.selected, user])
+                            ),
+                          }));
+                          setSearchUser("");
+                          setSearchUserInputFocus(false);
+                        }}
+                        className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px]"
+                      >
+                        {user}
+                      </p>
+                    ))}
+                </div> */}
               </div>
             </div>
           </div>

@@ -32,7 +32,6 @@ export default function Login() {
     onSuccess: (res) => {
       setCookie("streple_auth_token", res.data.streple_auth_token, {
         secure: true,
-        httpOnly: true,
         sameSite: "lax",
         expires: new Date(Date.now() + 60 * 60 * 1000),
       });

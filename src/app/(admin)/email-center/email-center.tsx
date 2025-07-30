@@ -24,7 +24,7 @@ const side_options = [
   {
     label: "Recipient",
     icon: HiOutlineUserGroup,
-    sub_options: ["Copiers", "Protraders", "Users"],
+    sub_options: ["Copiers", "Protraders", "All users"],
   },
   { label: "Sent", icon: LuSend },
   { label: "Scheduled", icon: PiClockClockwiseLight },
@@ -173,6 +173,7 @@ export default function EmailCenter() {
           >
             Email Center
           </h4>
+
           <div className="flex w-full items-center justify-between gap-8">
             <div className="flex items-center gap-6 w-full">
               <Search title="search for email" placeholder="search for email" />
@@ -273,6 +274,7 @@ export default function EmailCenter() {
               </button>
             </div>
           </div>
+
           <div className="flex w-full">
             <div className="flex flex-col shrink-0 gap-3 py-3 px-2 w-[160px]">
               {side_options.map((option) => (
@@ -287,7 +289,15 @@ export default function EmailCenter() {
                     onClick={() => {
                       if (option.label === "Recipient" || showRecipients)
                         toggleShowRecipients();
-                      else setEmailType(option.label);
+                      else {
+                        setFilterOptionType(
+                          option.label === "All emails" ? null : "status"
+                        );
+                        setEmailType(option.label);
+                        setFilterOption(
+                          option.label === "All emails" ? null : option.label
+                        );
+                      }
                     }}
                   >
                     <option.icon
@@ -310,7 +320,11 @@ export default function EmailCenter() {
                     showRecipients &&
                     option.sub_options.map((option) => (
                       <div
-                        onClick={() => setEmailType(option)}
+                        onClick={() => {
+                          setEmailType(option);
+                          setFilterOptionType("recipient");
+                          setFilterOption(option);
+                        }}
                         className={`w-full cursor-pointer h-10 p-3 flex items-center gap-2.5 rounded-[20px] text-xs leading-4 tracking-[1px] font-normal ${
                           emailType === option
                             ? "bg-[#A894E5] text-[#3A393F]"
@@ -359,7 +373,7 @@ export default function EmailCenter() {
                             {email.subject}
                           </span>
                           <span className="text-white/80 max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
-                            {email.message}
+                            {email.message.replace(/<[^>]+>/g, "")}
                           </span>
                         </td>
                         <td>{email.recipient}</td>

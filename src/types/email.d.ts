@@ -5,6 +5,7 @@ type EmailType = {
   schedule: boolean;
   draft: boolean;
   subject: string;
+  selected: string[];
   message: string;
   recipient: Recipient;
   selected: string[];

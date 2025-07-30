@@ -418,7 +418,7 @@ const FillBlogDetailsModal = ({
   handleEditBlog: (blogId: string) => void;
 }) => {
   const [searchTag, setSearchTag] = useState("");
-  const [isTagInputFocused, setIsTagInputFocused] = useState(false);
+  const [isTagInputFocused, setTagInputFocus] = useState(false);
 
   return (
     <div className="fixed inset-0 flex p-[5%] justify-center items-center">
@@ -511,7 +511,7 @@ const FillBlogDetailsModal = ({
                             tags: Array.from(new Set([...prev.tags, tag])),
                           }));
                           setSearchTag("");
-                          setIsTagInputFocused(false);
+                          setTagInputFocus(false);
                         }}
                         className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px]"
                       >
@@ -524,7 +524,7 @@ const FillBlogDetailsModal = ({
               <div
                 title="Select learning track"
                 className={`h-[55px] cursor-pointer w-full py-5 px-4 rounded-[10px] bg-white/5 flex items-center gap-4 relative`}
-                onClick={() => setIsTagInputFocused(true)}
+                onClick={() => setTagInputFocus(true)}
               >
                 {!!blogData.tags.length && (
                   <div className="flex items-center gap-2.5">
