@@ -19,11 +19,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config: CustomAxiosRequestConfig) => {
-    if (typeof window !== "undefined") {
-      const token = getCookie("streple_auth_token");
-      if (token && config.headers)
-        config.headers["Authorization"] = `Bearer ${token}`;
-    }
+    const token = getCookie("streple_auth_token");
+    if (token && config.headers)
+      config.headers["Authorization"] = `Bearer ${token}`;
 
     config.metadata = { startTime: new Date() };
 

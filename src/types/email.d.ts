@@ -1,5 +1,9 @@
 type Recipient = "All users" | "Copiers" | "Protraders";
 
+type Users = {
+  fullName: string;
+};
+
 type EmailType = {
   id?: string;
   schedule: boolean;
@@ -7,8 +11,9 @@ type EmailType = {
   subject: string;
   selected: string[];
   message: string;
-  recipient: Recipient;
+  recipient: Recipient | null;
   selected: string[];
+  users_selected?: Users[];
   scheduleDate: Date | string | null;
 };
 

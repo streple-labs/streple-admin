@@ -1,6 +1,6 @@
 import { anton } from "@/app/fonts";
 import api from "@/utils/axios";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import cn from "classnames";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -22,6 +22,12 @@ import {
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
 import { FiX } from "react-icons/fi";
+
+type Users = {
+  fullName: string;
+  email: string;
+  id: string;
+};
 
 export default function MailEditorComponent({
   close,
@@ -76,9 +82,31 @@ export default function MailEditorComponent({
   const [isSearchUserInputFocused, setSearchUserInputFocus] = useState(false);
   const [searchUser, setSearchUser] = useState("");
 
+  const {
+    data: users = {},
+    isError,
+    isPending,
+  } = useQuery({
+    queryKey: ["users", searchUser],
+    queryFn: async () => {
+      const res = await api.get("users/get-users", {
+        params: {
+          search: searchUser,
+        },
+      });
+
+      return res.data;
+    },
+    enabled: !!searchUser,
+  });
+
   const { mutate: handleSendEmail, isPending: isSendingEmail } = useMutation({
     mutationKey: ["upload-email"],
-    mutationFn: async () => api.post("/email", emailData),
+    mutationFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { users_selected, ...payload } = emailData;
+      return api.post("/email", payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["email-data"],
@@ -624,26 +652,27 @@ export default function MailEditorComponent({
                   />
                 ) : (
                   <>
-                    {!!emailData.selected.length && (
+                    {!!emailData?.users_selected?.length && (
                       <div className="flex items-center gap-2.5">
-                        {emailData.selected.map((user, i) => (
+                        {emailData.users_selected.map((user, i) => (
                           <p
+                            onClick={() => {
+                              setEmailData((prev) => ({
+                                ...prev,
+                                selected: prev.selected.filter(
+                                  (_, idx) => idx !== i
+                                ),
+                                users_selected: prev.users_selected?.filter(
+                                  (_, idx) => idx !== i
+                                ),
+                              }));
+                            }}
                             key={i}
-                            className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
+                            className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-1.5 text-white/60 cursor-pointer"
                           >
-                            {user}
-                            <span
-                              onClick={() => {
-                                setEmailData((prev) => ({
-                                  ...prev,
-                                  selected: prev.selected.filter(
-                                    (_, idx) => idx !== i
-                                  ),
-                                }));
-                              }}
-                            >
-                              <FiX width={12} color="#FFFFFF99" />
-                            </span>
+                            {user.fullName}
+
+                            <FiX width={12} color="#FFFFFF99" />
                           </p>
                         ))}
                       </div>
@@ -655,33 +684,56 @@ export default function MailEditorComponent({
                   className="ml-auto cursor-pointer"
                   onClick={() => {
                     setSearchUserInputFocus((prev) => !prev);
+                    setEmailData((prev) => ({ ...prev, recipient: null }));
                   }}
                 />
 
-                {/* <div className="absolute z-10 top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
-                  {users
-                    .filter((user) =>
-                      user.toLowerCase().includes(user.toLowerCase())
-                    )
-                    .map((user, i) => (
-                      <p
-                        key={i}
-                        onClick={() => {
-                          setEmailData((prev) => ({
-                            ...prev,
-                            selected: Array.from(
-                              new Set([...prev.selected, user])
-                            ),
-                          }));
-                          setSearchUser("");
-                          setSearchUserInputFocus(false);
-                        }}
-                        className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px]"
-                      >
-                        {user}
+                {searchUser && (
+                  <div className="absolute z-10 top-14 left-0 w-full max-w-[183px] rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
+                    {isPending && (
+                      <span className="p-8 flex items-center justify-center">
+                        <Loader />
+                      </span>
+                    )}
+
+                    {isError && (
+                      <p className="text-base text-red-400 font-semibold p-8 mx-auto">
+                        Error fetching users
                       </p>
-                    ))}
-                </div> */}
+                    )}
+
+                    {!!users?.data?.length &&
+                      users.data.map((user: Users, i: number) => (
+                        <div
+                          key={i}
+                          onClick={() => {
+                            setEmailData((prev) => ({
+                              ...prev,
+                              selected: Array.from(
+                                new Set([...prev.selected, user.id])
+                              ),
+                              users_selected: [
+                                ...(prev.users_selected || []),
+                                {
+                                  fullName: user.fullName.split(" ")[0],
+                                },
+                              ],
+                            }));
+                            setSearchUser("");
+                            setSearchUserInputFocus(false);
+                          }}
+                          className="cursor-pointer w-full overflow-ellipsis whitespace-nowrap overflow-x-hidden"
+                        >
+                          <p className="text-xs/tight font-semibold text-white/60">
+                            {user.fullName}
+                          </p>
+                          <span className="text-[9px]/tight text-white/30">
+                            {user.email}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -691,6 +743,8 @@ export default function MailEditorComponent({
                 setEmailData((prev) => ({
                   ...prev,
                   recipient: "All users",
+                  selected: [],
+                  users_selected: [],
                 }));
               }}
               className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"
@@ -709,6 +763,8 @@ export default function MailEditorComponent({
                 setEmailData((prev) => ({
                   ...prev,
                   recipient: "Copiers",
+                  selected: [],
+                  users_selected: [],
                 }));
               }}
               className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"
@@ -727,6 +783,8 @@ export default function MailEditorComponent({
                 setEmailData((prev) => ({
                   ...prev,
                   recipient: "Protraders",
+                  selected: [],
+                  users_selected: [],
                 }));
               }}
               className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"

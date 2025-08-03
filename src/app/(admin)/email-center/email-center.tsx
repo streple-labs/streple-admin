@@ -39,6 +39,7 @@ const initialState = {
   message: "",
   recipient: "All users" as Recipient,
   selected: [],
+  users_selected: [],
   scheduleDate: null,
 };
 
@@ -376,7 +377,9 @@ export default function EmailCenter() {
                             {email.message.replace(/<[^>]+>/g, "")}
                           </span>
                         </td>
-                        <td>{email.recipient}</td>
+                        <td className="max-w-[100px] whitespace-nowrap overflow-hidden text-ellipsis">
+                          {email.recipient || email.selected.join(", ")}
+                        </td>
                         <td>
                           {new Date(email.createdAt).toLocaleDateString(
                             "en-GB",

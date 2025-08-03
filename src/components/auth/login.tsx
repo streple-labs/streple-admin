@@ -2,9 +2,8 @@
 "use client";
 
 import { anton } from "@/app/fonts";
-import api from "@/utils/axios";
+import { login } from "@/utils/action";
 import { useMutation } from "@tanstack/react-query";
-import { setCookie } from "cookies-next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,27 +27,17 @@ export default function Login() {
 
   const { mutate: handleLogin, isPending: loading } = useMutation({
     mutationKey: ["login"],
-    mutationFn: async () => await api.post("/auth/login", formData),
+    mutationFn: async () => await login(formData),
     onSuccess: (res) => {
-      setCookie("streple_auth_token", res.data.streple_auth_token, {
-        secure: true,
-        sameSite: "lax",
-        expires: new Date(Date.now() + 60 * 60 * 1000),
-      });
-      router.push("/");
-      toast.success(res.data.message || "login successful.");
+      if (res.success) {
+        router.push("/");
+        toast.success(res.message);
+        // setUser(res.user_data);
+      } else toast.error(res.message);
     },
     onError: (error: any) => {
-      let errorMessage = "Signup failed. Please try again later.";
-
-      if (error?.response?.data?.message) {
-        if (Array.isArray(error.response.data.message))
-          errorMessage = error.response.data.message.join(", ");
-        else errorMessage = error.response.data.message;
-      } else if (error?.userMessage) errorMessage = error.userMessage;
-      else if (error?.message) errorMessage = error.message;
-
-      toast.error(errorMessage);
+      console.error(error);
+      toast.error("An unexpected error occurred. Please try again.");
     },
   });
 

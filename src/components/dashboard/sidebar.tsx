@@ -10,9 +10,9 @@ import OverviewIcon from "@/assets/overview-icon";
 import ProtradersIcon from "@/assets/protraders-icon";
 import TradingSimulatorIcon from "@/assets/trading-simulator-icon";
 import UsersIcon from "@/assets/users-icon";
-import { deleteCookie } from "cookies-next";
+import { clearToken } from "@/utils/queries";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const nav_items = [
   {
@@ -64,7 +64,6 @@ const nav_items = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   return (
     <aside className="hide-scrollbar flex shrink-0 py-8 px-6 w-full max-w-[249px] h-full overflow-y-auto rounded-[20px] bg-[#5A555C1A]">
@@ -95,9 +94,8 @@ export default function Sidebar() {
         <button
           className="flex rounded-[10px] h-[43px] p-3 gap-3 items-center"
           title="Logout"
-          onClick={() => {
-            deleteCookie("streple_auth_token");
-            router.push("/login");
+          onClick={async () => {
+            await clearToken();
           }}
         >
           <LogoutIcon />

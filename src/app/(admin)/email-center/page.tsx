@@ -4,7 +4,7 @@ import EmailCenter from "./email-center";
 export default function Page() {
   return (
     <Suspense>
-      <EmailCenter />
+      <EmailCenter key={Math.random()} />
     </Suspense>
   );
 }
