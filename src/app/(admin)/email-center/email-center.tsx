@@ -239,7 +239,7 @@ export default function EmailCenter() {
                         <div className="w-40 rounded-[20px] border border-white/5 px-3 py-4 flex flex-col gap-3 bg-[#252326]">
                           {filterOptions[filterOptionType].map((option) => (
                             <p
-                              key={Math.random()}
+                              key={`${option}-${Math.random()}`}
                               onClick={() => {
                                 selectFilterOption(option);
                               }}
@@ -286,7 +286,7 @@ export default function EmailCenter() {
                         ? "bg-[#A894E5] text-[#3A393F]"
                         : "text-white/70"
                     }`}
-                    key={option.label}
+                    key={`${Math.random()}-${option.label}`}
                     onClick={() => {
                       if (option.label === "Recipient" || showRecipients)
                         toggleShowRecipients();
@@ -331,7 +331,7 @@ export default function EmailCenter() {
                             ? "bg-[#A894E5] text-[#3A393F]"
                             : "text-white/70"
                         }`}
-                        key={Math.random()}
+                        key={`${Math.random()}-${option}`}
                       >
                         <p>{option}</p>
                       </div>
@@ -366,7 +366,7 @@ export default function EmailCenter() {
                   <tbody>
                     {emails?.data.map((email) => (
                       <tr
-                        key={Math.random()}
+                        key={email.id}
                         className="[&>td]:text-xs [&>td]:leading-3 [&>td]:tracking-0 [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:h-[72px] border-b border-b-white/5"
                       >
                         <td className="flex flex-col justify-center gap-2">
