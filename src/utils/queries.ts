@@ -2,17 +2,21 @@
 "use server";
 
 import { cookies } from "next/headers";
-import api from "./axios";
 import { redirect } from "next/navigation";
+import api from "./axios";
 
-export const getLoggedInUser = async () => {
+export const getSession = async (): Promise<{
+  success: boolean;
+  message: string;
+  user_data: User | null;
+}> => {
   try {
     const res = await api.get("/users/me");
 
     return {
       success: true,
       message: "",
-      user_data: res.data.data,
+      user_data: res.data,
     };
   } catch (error: any) {
     let errorMessage = "request failed. Please try again later.";

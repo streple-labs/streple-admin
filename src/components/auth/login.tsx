@@ -2,6 +2,7 @@
 "use client";
 
 import { anton } from "@/app/fonts";
+import { useAuth } from "@/context/auth-context";
 import { login } from "@/utils/action";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
@@ -13,6 +14,8 @@ import Loader from "../loader";
 
 export default function Login() {
   const router = useRouter();
+
+  const { setUser } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,7 +35,7 @@ export default function Login() {
       if (res.success) {
         router.push("/");
         toast.success(res.message);
-        // setUser(res.user_data);
+        setUser(res.user_data);
       } else toast.error(res.message);
     },
     onError: (error: any) => {

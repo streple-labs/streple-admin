@@ -425,7 +425,7 @@ const FillBlogDetailsModal = ({
       <div className="absolute inset-0 bg-black/70" onClick={toggleModal} />
 
       <form
-        className="bg-[#242324] w-full max-w-3xl overflow-y-auto max-h-[90vh] rounded-[20px] p-8  space-y-10 relative"
+        className="bg-[#242324] w-full max-w-3xl overflow-y-auto max-h-[90vh] rounded-[20px] p-8 space-y-10 relative"
         onSubmit={(e) => {
           e.preventDefault();
 

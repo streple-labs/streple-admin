@@ -3,48 +3,63 @@ import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 import { NextRequest, NextResponse } from "next/server";
 
-export type Tokens = string;
+type ROLE = "FOLLOWER" | "ADMIN" | "SUPER_ADMIN" | "PRO_TRADER" | "PUBLISHER";
 
-export type UserType = {
-  _id: string;
+type UserType = {
+  sub: string;
+  role: ROLE;
   exp: number;
   iat: number;
 };
 
-const loginUrls = ["/login", "/signup", "/forgot-password"];
-const protectedRoutes = [
-  "/",
-  "/users",
-  "/learning-hub",
-  "/blog-manager",
-  "/protraders",
-  "/trading-simulator",
-  "/email-center",
-  "/analytics",
-];
+const loginUrls = ["/login"];
+const routes = {
+  SUPER_ADMIN: [
+    "/",
+    "/users",
+    "/learning-hub",
+    "/blog-manager",
+    "/protraders",
+    "/trading-simulator",
+    "/email-center",
+    "/feeback",
+    "/analytics",
+  ],
+  PRO_TRADERS: ["/", "/protraders"],
+  PUBLISHER: ["/", "blog-manager", "/learning-hub"],
+  ADMIN: [
+    "/",
+    "/users",
+    "/learning-hub",
+    "/blog-manager",
+    "/protraders",
+    "/trading-simulator",
+    "/email-center",
+    "/feeback",
+    "/analytics",
+  ],
+};
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   let isAuthenticated = false;
   const BASE_FRONTEND_URL = request.nextUrl.origin;
   const CURRENT_URL_PATHNAME = request.nextUrl.pathname;
+  let data: UserType | null = null;
 
   const strepleAuthToken = request.cookies.get("streple_auth_token");
-  if (strepleAuthToken) {
+  if (strepleAuthToken)
     try {
       const authTokens = strepleAuthToken.value;
-      const data = jwtDecode(authTokens) as UserType;
+      data = jwtDecode(authTokens) as UserType;
+
       const isExpired = dayjs.unix(data.exp).diff(dayjs()) < 1;
 
-      if (!isExpired) {
-        isAuthenticated = true;
-      } else {
-        deleteCookie("streple_auth_token", { req: request, res: response });
-      }
+      if (!isExpired) isAuthenticated = true;
+      else deleteCookie("streple_auth_token", { req: request, res: response });
     } catch (error) {
       console.error("Failed to decode JWT:", error);
     }
-  }
 
   const hasRoute = (routes: Array<string>, currentPath: string) => {
     return routes.some((route) => {
@@ -55,28 +70,27 @@ export function middleware(request: NextRequest) {
 
       return false;
     });
-
-    // let isValid = false;
-
-    // routes.forEach((route) => {
-    //   const routeRegex = new RegExp(`^${route}(.*)$`);
-    //   isValid = isValid || routeRegex.test(currentPath);
-    // });
-
-    // return isValid;
   };
 
   const buildUrl = (route: string) =>
     new URL(route, BASE_FRONTEND_URL).toString();
 
-  if (
-    !isAuthenticated &&
-    hasRoute(protectedRoutes, CURRENT_URL_PATHNAME) &&
-    CURRENT_URL_PATHNAME !== "/login"
-  )
+  if (!isAuthenticated && !loginUrls.includes(CURRENT_URL_PATHNAME))
     return NextResponse.redirect(buildUrl("/login"));
 
-  if (isAuthenticated && hasRoute(loginUrls, CURRENT_URL_PATHNAME))
+  if (isAuthenticated && loginUrls.includes(CURRENT_URL_PATHNAME))
+    return NextResponse.redirect(buildUrl("/"));
+
+  if (isAuthenticated && data && !Object.keys(routes).includes(data.role)) {
+    deleteCookie("streple_auth_token", { req: request, res: response });
+    return NextResponse.redirect("https://app.streple.com");
+  }
+
+  if (
+    isAuthenticated &&
+    data &&
+    !hasRoute(routes[data.role], CURRENT_URL_PATHNAME)
+  )
     return NextResponse.redirect(buildUrl("/"));
 
   return response;
