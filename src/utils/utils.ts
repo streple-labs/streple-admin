@@ -1,3 +1,103 @@
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
+
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  metadata?: {
+    startTime: Date;
+  };
+}
+
+export function createNetworkError(
+  error: AxiosError,
+  config: CustomAxiosRequestConfig,
+  duration: number
+) {
+  const baseError = {
+    type: "NETWORK_ERROR",
+    timestamp: new Date().toISOString(),
+    url: config?.url,
+    method: config?.method?.toUpperCase(),
+    duration: `${duration}ms`,
+  };
+
+  // Determine specific network error type
+  if (error.code === "ECONNABORTED") {
+    return {
+      ...baseError,
+      subType: "TIMEOUT",
+      message:
+        "The request timed out. Please check your internet connection and try again.",
+      userMessage: "Request timed out. Please try again.",
+      code: "TIMEOUT_ERROR",
+    };
+  }
+
+  if (error.code === "ENOTFOUND" || error.code === "EAI_AGAIN") {
+    return {
+      ...baseError,
+      subType: "DNS_ERROR",
+      message:
+        "Unable to resolve the server address. Please check your internet connection.",
+      userMessage:
+        "Cannot connect to server. Please check your internet connection.",
+      code: "DNS_RESOLUTION_ERROR",
+    };
+  }
+
+  if (error.code === "ECONNREFUSED") {
+    return {
+      ...baseError,
+      subType: "CONNECTION_REFUSED",
+      message:
+        "The server refused the connection. The service might be temporarily unavailable.",
+      userMessage: "Service temporarily unavailable. Please try again later.",
+      code: "CONNECTION_REFUSED_ERROR",
+    };
+  }
+
+  if (error.code === "ECONNRESET") {
+    return {
+      ...baseError,
+      subType: "CONNECTION_RESET",
+      message:
+        "The connection was reset by the server. This might be a temporary issue.",
+      userMessage: "Connection interrupted. Please try again.",
+      code: "CONNECTION_RESET_ERROR",
+    };
+  }
+
+  if (error.code === "EHOSTUNREACH") {
+    return {
+      ...baseError,
+      subType: "HOST_UNREACHABLE",
+      message:
+        "The server is unreachable. Please check your network connection.",
+      userMessage: "Cannot reach server. Please check your connection.",
+      code: "HOST_UNREACHABLE_ERROR",
+    };
+  }
+
+  if (error.code === "ENETUNREACH") {
+    return {
+      ...baseError,
+      subType: "NETWORK_UNREACHABLE",
+      message: "Network is unreachable. Please check your internet connection.",
+      userMessage: "No internet connection. Please check your network.",
+      code: "NETWORK_UNREACHABLE_ERROR",
+    };
+  }
+
+  // Generic network error for unknown cases
+  return {
+    ...baseError,
+    subType: "UNKNOWN_NETWORK_ERROR",
+    message:
+      "A network error occurred. Please check your internet connection and try again.",
+    userMessage: "Connection failed. Please try again.",
+    code: "UNKNOWN_NETWORK_ERROR",
+    originalError: error.message,
+  };
+}
+
 export const passwordValidation = (password: string) => {
   const checks = {
     length: password.length >= 8,

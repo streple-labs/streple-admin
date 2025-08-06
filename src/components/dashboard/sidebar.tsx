@@ -42,6 +42,11 @@ const routes: Record<
       href: "/users",
     },
     {
+      name: "Manage Roles",
+      icon: UsersIcon,
+      href: "/manage-roles",
+    },
+    {
       name: "Learning hub",
       icon: LearningHubIcon,
       href: "/learning-hub",

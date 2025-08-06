@@ -3,7 +3,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import api from "./axios";
+import api from "./server-axios";
 
 export const getSession = async (): Promise<{
   success: boolean;

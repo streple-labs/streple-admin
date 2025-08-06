@@ -3,7 +3,8 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import { deleteCookie, getCookie } from "cookies-next";
+import { deleteCookie } from "cookies-next";
+import { cookies } from "next/headers";
 import { base_url } from "./constants";
 import { createNetworkError } from "./utils";
 
@@ -19,8 +20,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-  (config: CustomAxiosRequestConfig) => {
-    const token = getCookie("streple_auth_token");
+  async (config: CustomAxiosRequestConfig) => {
+    const token = (await cookies()).get("streple_auth_token")?.value;
+
     if (token && config.headers)
       config.headers["Authorization"] = `Bearer ${token}`;
 

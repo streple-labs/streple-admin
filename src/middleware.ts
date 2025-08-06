@@ -17,6 +17,7 @@ const routes = {
   SUPER_ADMIN: [
     "/",
     "/users",
+    "/manage-roles",
     "/learning-hub",
     "/blog-manager",
     "/protraders",
