@@ -28,6 +28,7 @@ const routes = {
   ],
   PRO_TRADERS: ["/", "/protraders"],
   PUBLISHER: ["/", "/blog-manager", "/learning-hub"],
+  MARKETER: ["/", "/blog-manager", "/learning-hub", '/email-center'],
   ADMIN: [
     "/",
     "/users",

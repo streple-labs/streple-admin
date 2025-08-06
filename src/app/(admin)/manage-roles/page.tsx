@@ -2,13 +2,31 @@
 
 import Loader from "@/components/loader";
 import api from "@/utils/axios";
-import { useMutation } from "@tanstack/react-query";
+import { getAllUsers } from "@/utils/queries";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
+import { MdDeleteOutline } from "react-icons/md";
+import { PiPencilSimpleLineBold } from "react-icons/pi";
 import { toast } from "sonner";
 
 export default function Page() {
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
+
+  const {
+    data: users,
+    error,
+    isPending,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const res = await getAllUsers();
+
+      return res.users;
+    },
+  });
+
+  console.log(users);
 
   return (
     <div className="relative w-full">
@@ -18,7 +36,7 @@ export default function Page() {
           setIsCreateUserModalOpen(false);
         }}
       />
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <p>Users</p>
 
         <button
@@ -30,6 +48,68 @@ export default function Page() {
           Create User
         </button>
       </div>
+
+      {error && (
+        <div className="flex items-center justify-center w-full h-full">
+          <p className="text-white/50 text-sm font-normal text-red-600">
+            Error fetching users {error.message}
+          </p>
+        </div>
+      )}
+
+      {isPending ? (
+        <div className="flex items-center justify-center w-full h-full">
+          <Loader />
+        </div>
+      ) : users?.data.length === 0 ? (
+        <div className="flex items-center justify-center w-full h-full">
+          <p className="text-white/50 text-sm font-normal">
+            No users found. Create a user!
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto hide-scrollbar h-full">
+          <table className="min-w-full text-left text-xs font-normal text-white">
+            <thead>
+              <tr className="[&>th]:text-xs [&>th]:font-normal [&>th]:py-3 [&>th]:px-4 [&>th]:text-nowrap">
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Quick actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users?.data.map((users, idx) => (
+                <tr
+                  key={idx}
+                  className={`${
+                    idx % 2 ? "" : "bg-white/[2%]"
+                  } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:text-nowrap`}
+                >
+                  <td className=" max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
+                    {users.fullName}
+                  </td>
+                  <td className=" max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
+                    {users.email}
+                  </td>
+                  <td>{users.role}</td>
+
+                  <td>
+                    <div className="flex gap-4 items-center">
+                      <button onClick={() => {}}>
+                        <PiPencilSimpleLineBold size={15} />
+                      </button>
+                      <button onClick={() => {}}>
+                        <MdDeleteOutline size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -150,19 +230,24 @@ function CreateUserForm({
           </label>
           {openRoles && (
             <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-2 bg-[#242324]">
-              {["ADMIN", "PRO_TRADER", "PUBLISHER"].map((role, i) => (
+              {[
+                { label: "ADMIN", id: "ADMIN" },
+                { label: "PRO TRADER", id: "PRO_TRADER" },
+                { label: "PUBLISHER", id: "PUBLISHER" },
+                { label: "MARKETER", id: "MARKETER" },
+              ].map((role, i) => (
                 <p
                   key={i}
                   onClick={() => {
                     setFormData((prev) => ({
                       ...prev,
-                      role,
+                      role: role.id,
                     }));
                     setOpenRoles(false);
                   }}
                   className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px] hover:bg-white/10 rounded-full py-2 px-4"
                 >
-                  {role}
+                  {role.label}
                 </p>
               ))}
             </div>

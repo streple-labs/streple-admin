@@ -32,6 +32,33 @@ export const getSession = async (): Promise<{
   }
 };
 
+export const getAllUsers = async (): Promise<{
+  success: boolean;
+  message: string;
+  users: { data: User[]; totalCount: number; totalPages: number } | null;
+}> => {
+  try {
+    const res = await api.get("/users/get-users");
+
+    return {
+      success: true,
+      message: "",
+      users: res.data,
+    };
+  } catch (error: any) {
+    let errorMessage = "request failed. Please try again later.";
+
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+
+    return { success: false, message: errorMessage, users: null };
+  }
+};
+
 export const clearToken = async () => {
   (await cookies()).delete("streple_auth_token");
   redirect("/login");
