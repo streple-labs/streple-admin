@@ -12,8 +12,10 @@ export default function Navbar() {
           <Image
             src="/streple-logo.png"
             alt="streple logo"
+            priority
             width={112}
             height={33}
+            className="w-auto h-auto"
           />
         </Link>
 
@@ -42,7 +44,7 @@ export default function Navbar() {
               alt="test image"
               width={40}
               height={40}
-              className="rounded-full object-cover object-center"
+              className="rounded-full object-cover object-center size-10"
             />
             <FaChevronDown color="#FFFFFF99" width={12} />
           </div>
