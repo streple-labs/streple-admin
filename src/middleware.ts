@@ -27,7 +27,7 @@ const routes = {
     "/analytics",
   ],
   PRO_TRADERS: ["/", "/protraders"],
-  PUBLISHER: ["/", "blog-manager", "/learning-hub"],
+  PUBLISHER: ["/", "/blog-manager", "/learning-hub"],
   ADMIN: [
     "/",
     "/users",
