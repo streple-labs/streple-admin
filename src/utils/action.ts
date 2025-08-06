@@ -6,7 +6,7 @@ import api from "./axios";
 
 export const login = async (formData: { email: string; password: string }) => {
   try {
-    const res = await api.post("/auth/login", formData);
+    const res = await api.post("/auth/login/admin", formData);
 
     (await cookies()).set("streple_auth_token", res.data.streple_auth_token, {
       // httpOnly: true,
