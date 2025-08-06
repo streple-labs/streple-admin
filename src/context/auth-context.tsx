@@ -2,6 +2,7 @@
 
 import { clearToken, getSession } from "@/utils/queries";
 import { useQuery } from "@tanstack/react-query";
+import { getCookie } from "cookies-next";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface AuthState {
@@ -51,6 +52,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     queryKey: ["fetch-user"],
     queryFn: async () => {
       try {
+        if (!getCookie("streple_auth_token")) return null;
+
         const res = await getSession();
 
         if (res.success) {
