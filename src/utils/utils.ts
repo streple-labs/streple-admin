@@ -19,7 +19,6 @@ export function createNetworkError(
     duration: `${duration}ms`,
   };
 
-  // Determine specific network error type
   if (error.code === "ECONNABORTED") {
     return {
       ...baseError,
@@ -86,7 +85,6 @@ export function createNetworkError(
     };
   }
 
-  // Generic network error for unknown cases
   return {
     ...baseError,
     subType: "UNKNOWN_NETWORK_ERROR",

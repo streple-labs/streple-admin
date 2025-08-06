@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/loader";
 import api from "@/utils/axios";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -47,7 +48,7 @@ function CreateUserForm({
 }) {
   const [formData, setFormData] = useState(initialState);
 
-  const { mutate: createUser } = useMutation({
+  const { mutate: createUser, isPending: loading } = useMutation({
     mutationKey: ["create-user"],
     mutationFn: async () => await api.post("/users/create-admins", formData),
     onSuccess: (res) => {
@@ -69,6 +70,8 @@ function CreateUserForm({
       toast.error(errorMessage);
     },
   });
+
+  const [openRoles, setOpenRoles] = useState(false);
 
   if (!isOpen) return null;
 
@@ -129,18 +132,24 @@ function CreateUserForm({
           />
         </div>
 
-        <div className="w-full space-y-3">
+        <div className="w-full space-y-3 relative">
           <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
             Select role
           </p>
-          <label className="relative cursor-pointer group flex items-center justify-between h-[55px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] outline-0 ring-0 caret-[#B39FF0] bg-white/5">
+          <label
+            onClick={() => {
+              setOpenRoles((prev) => !prev);
+            }}
+            className="relative cursor-pointer flex items-center justify-between h-[55px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] outline-0 ring-0 caret-[#B39FF0] bg-white/5"
+          >
             <p className={!formData.role ? "text-white/50" : ""}>
               {formData.role || "Select user role"}
             </p>
 
             <FaChevronDown size={18} fill="#fff" />
-
-            <div className="absolute z-10 top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 hidden group-hover:flex flex-col gap-2 bg-[#242324]">
+          </label>
+          {openRoles && (
+            <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-2 bg-[#242324]">
               {["ADMIN", "PRO_TRADER", "PUBLISHER"].map((role, i) => (
                 <p
                   key={i}
@@ -149,6 +158,7 @@ function CreateUserForm({
                       ...prev,
                       role,
                     }));
+                    setOpenRoles(false);
                   }}
                   className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px] hover:bg-white/10 rounded-full py-2 px-4"
                 >
@@ -156,15 +166,16 @@ function CreateUserForm({
                 </p>
               ))}
             </div>
-          </label>
+          )}
         </div>
 
         <div className="w-full flex justify-end mt-4">
           <button
+            disabled={loading}
             type="submit"
             className="flex items-center justify-center gap-2.5 bg-[#A082F9] rounded-[10px] p-3 h-[40px] font-normal text-xs leading-3 text-[#2b2b37]"
           >
-            Create
+            {loading ? <Loader /> : "Create"}
           </button>
         </div>
       </form>
