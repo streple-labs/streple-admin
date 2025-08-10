@@ -697,7 +697,7 @@ export default function MailEditorComponent({
                     )}
 
                     {isError && (
-                      <p className="text-base text-red-400 font-semibold p-8 mx-auto">
+                      <p className="text-xs text-center text-red-400 font-semibold mx-auto">
                         Error fetching users
                       </p>
                     )}
