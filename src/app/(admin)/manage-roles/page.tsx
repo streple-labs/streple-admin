@@ -6,8 +6,8 @@ import { getAllUsers } from "@/utils/queries";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
-import { MdDeleteOutline } from "react-icons/md";
-import { PiPencilSimpleLineBold } from "react-icons/pi";
+// import { MdDeleteOutline } from "react-icons/md";
+// import { PiPencilSimpleLineBold } from "react-icons/pi";
 import { toast } from "sonner";
 
 export default function Page() {
@@ -22,11 +22,11 @@ export default function Page() {
     queryFn: async () => {
       const res = await getAllUsers();
 
+      console.log(res);
+
       return res.users;
     },
   });
-
-  console.log(users);
 
   return (
     <div className="relative w-full">
@@ -75,7 +75,7 @@ export default function Page() {
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Role</th>
-                <th>Quick actions</th>
+                {/* <th>Quick actions</th> */}
               </tr>
             </thead>
             <tbody>
@@ -94,7 +94,7 @@ export default function Page() {
                   </td>
                   <td>{users.role}</td>
 
-                  <td>
+                  {/* <td>
                     <div className="flex gap-4 items-center">
                       <button onClick={() => {}}>
                         <PiPencilSimpleLineBold size={15} />
@@ -103,7 +103,7 @@ export default function Page() {
                         <MdDeleteOutline size={15} />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

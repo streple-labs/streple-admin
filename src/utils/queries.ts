@@ -38,7 +38,7 @@ export const getAllUsers = async (): Promise<{
   users: { data: User[]; totalCount: number; totalPages: number } | null;
 }> => {
   try {
-    const res = await api.get("/users/get-users");
+    const res = await api.get("/users/manage-user");
 
     return {
       success: true,
