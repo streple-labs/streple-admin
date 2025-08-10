@@ -51,7 +51,7 @@ export default function Page() {
 
       {error && (
         <div className="flex items-center justify-center w-full h-full">
-          <p className="text-white/50 text-sm font-normal text-red-600">
+          <p className="text-sm font-normal text-red-600">
             Error fetching users {error.message}
           </p>
         </div>

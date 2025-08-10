@@ -82,6 +82,8 @@ export default function MailEditorComponent({
   const [isSearchUserInputFocused, setSearchUserInputFocus] = useState(false);
   const [searchUser, setSearchUser] = useState("");
 
+  const [noOfUsers, setAllNoOfUsers] = useState(0);
+
   const {
     data: users = {},
     isError,
@@ -107,7 +109,8 @@ export default function MailEditorComponent({
       const { users_selected, ...payload } = emailData;
       return api.post("/email", payload);
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
+      setAllNoOfUsers(res.data.sendTo);
       queryClient.invalidateQueries({
         queryKey: ["email-data"],
       });
@@ -125,6 +128,16 @@ export default function MailEditorComponent({
           close();
         }, 5000);
       }
+      setEmailData({
+        schedule: false,
+        draft: false,
+        subject: "",
+        message: "",
+        recipient: "All users" as Recipient,
+        selected: [],
+        users_selected: [],
+        scheduleDate: null,
+      });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -298,7 +311,7 @@ export default function MailEditorComponent({
                         )
                       : ""
                   }`
-                : "Email sent successfully to 1,204 users."}
+                : `Email sent successfully to ${noOfUsers} users.`}
             </p>
 
             <button
