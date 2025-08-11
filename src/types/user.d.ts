@@ -16,4 +16,10 @@ interface User {
   demoFundingBalance: string;
 }
 
-type ROLE = "FOLLOWER" | "ADMIN" | "SUPER_ADMIN" | "PRO_TRADER" | "PUBLISHER";
+type ROLE =
+  | "FOLLOWER"
+  | "ADMIN"
+  | "SUPER_ADMIN"
+  | "PRO_TRADER"
+  | "PUBLISHER"
+  | "MARKETER";

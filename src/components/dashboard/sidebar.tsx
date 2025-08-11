@@ -23,19 +23,8 @@ const routes: Record<
     href: string;
   }[]
 > = {
-  FOLLOWER: [
-    {
-      name: "Overview",
-      icon: OverviewIcon,
-      href: "/",
-    },
-  ],
+  FOLLOWER: [],
   SUPER_ADMIN: [
-    {
-      name: "Overview",
-      icon: OverviewIcon,
-      href: "/",
-    },
     {
       name: "Users",
       icon: UsersIcon,
@@ -84,22 +73,12 @@ const routes: Record<
   ],
   PRO_TRADER: [
     {
-      name: "Overview",
-      icon: OverviewIcon,
-      href: "/",
-    },
-    {
       name: "Protraders",
       icon: ProtradersIcon,
       href: "/protraders",
     },
   ],
   PUBLISHER: [
-    {
-      name: "Overview",
-      icon: OverviewIcon,
-      href: "/",
-    },
     {
       name: "Learning hub",
       icon: LearningHubIcon,
@@ -112,11 +91,6 @@ const routes: Record<
     },
   ],
   ADMIN: [
-    {
-      name: "Overview",
-      icon: OverviewIcon,
-      href: "/",
-    },
     {
       name: "Users",
       icon: UsersIcon,
@@ -158,6 +132,23 @@ const routes: Record<
       href: "/analytics",
     },
   ],
+  MARKETER: [
+    {
+      name: "Learning hub",
+      icon: LearningHubIcon,
+      href: "/learning-hub",
+    },
+    {
+      name: "Blog manager",
+      icon: BlogManagerIcon,
+      href: "/blog-manager",
+    },
+    {
+      name: "Email Center",
+      icon: EmailIcon,
+      href: "/email-center",
+    },
+  ],
 };
 
 export default function Sidebar() {
@@ -168,6 +159,26 @@ export default function Sidebar() {
   return (
     <aside className="hide-scrollbar flex shrink-0 py-8 px-6 w-full max-w-[249px] h-full overflow-y-auto rounded-[20px] bg-[#5A555C1A]">
       <nav className="flex flex-col gap-4 w-full">
+        <Link
+          href={"/"}
+          title={"Overview"}
+          aria-label={"Overview"}
+          className={`flex rounded-[10px] h-[43px] p-3 gap-3 items-center ${
+            pathname === "/"
+              ? "text-[#2b2b37] bg-[#A082F9]"
+              : "text-[#F8F5FF80]"
+          }`}
+        >
+          <OverviewIcon
+            className={`${
+              pathname === "/" ? "fill-[#2B2B37]" : "fill-[#F8F5FF80]"
+            }`}
+          />
+          <span className="text-sm font-normal leading-[100%] tracking-normal">
+            Overview
+          </span>
+        </Link>
+
         {user &&
           routes[user.role].map((item) => (
             <Link
