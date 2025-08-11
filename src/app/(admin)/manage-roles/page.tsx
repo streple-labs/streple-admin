@@ -80,9 +80,8 @@ export default function Page() {
               {users?.data.map((users, idx) => (
                 <tr
                   key={idx}
-                  className={`${
-                    idx % 2 ? "" : "bg-white/[2%]"
-                  } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:text-nowrap`}
+                  className={`${idx % 2 ? "" : "bg-white/[2%]"
+                    } [&>td]:text-xs [&>td]:font-normal [&>td]:py-3 [&>td]:px-4 [&>td]:text-nowrap`}
                 >
                   <td className=" max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
                     {users.fullName}
@@ -116,6 +115,8 @@ const initialState = {
   fullName: "",
   email: "",
   role: "",
+  roleLevel: "",
+  type: "",
 };
 function CreateUserForm({
   isOpen,
@@ -229,10 +230,10 @@ function CreateUserForm({
           {openRoles && (
             <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-2 bg-[#242324]">
               {[
-                { label: "ADMIN", id: "ADMIN" },
-                { label: "PRO TRADER", id: "PRO_TRADER" },
-                { label: "PUBLISHER", id: "PUBLISHER" },
-                { label: "MARKETER", id: "MARKETER" },
+                { label: "ADMIN", id: "ADMIN", type: "Internal", roleLevel: "3" },
+                { label: "PRO TRADER", id: "PRO_TRADER", type: "External", roleLevel: "1" },
+                { label: "PUBLISHER", id: "PUBLISHER", type: "Internal", roleLevel: "2" },
+                { label: "MARKETER", id: "MARKETER", type: "External", roleLevel: "2" },
               ].map((role, i) => (
                 <p
                   key={i}
@@ -240,6 +241,8 @@ function CreateUserForm({
                     setFormData((prev) => ({
                       ...prev,
                       role: role.id,
+                      roleLevel: role.roleLevel,
+                      type: role.type
                     }));
                     setOpenRoles(false);
                   }}
