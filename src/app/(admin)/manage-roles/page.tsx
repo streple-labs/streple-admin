@@ -22,8 +22,6 @@ export default function Page() {
     queryFn: async () => {
       const res = await getAllUsers();
 
-      console.log(res);
-
       return res.users;
     },
   });
