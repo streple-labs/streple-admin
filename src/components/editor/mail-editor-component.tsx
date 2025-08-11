@@ -5,6 +5,7 @@ import cn from "classnames";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { FaArrowLeft, FaChevronDown, FaPlus } from "react-icons/fa6";
+import { FiX } from "react-icons/fi";
 import { GoCheckCircle, GoLink } from "react-icons/go";
 import { IoImageOutline } from "react-icons/io5";
 import { MdOutlineTouchApp } from "react-icons/md";
@@ -21,7 +22,6 @@ import {
 } from "./config";
 import { useEditorApi } from "./context";
 import TextEditor from "./text-editor";
-import { FiX } from "react-icons/fi";
 
 type Users = {
   fullName: string;
@@ -810,6 +810,27 @@ export default function MailEditorComponent({
                 }`}
               />
               Protraders
+            </p>
+
+            <p
+              onClick={() => {
+                setEmailData((prev) => ({
+                  ...prev,
+                  recipient: "Waitlist",
+                  selected: [],
+                  users_selected: [],
+                }));
+              }}
+              className="flex gap-2.5 items-center text-[11px] leading-4 tracking-[1px] cursor-pointer"
+            >
+              <span
+                className={`size-4 rounded-full ${
+                  emailData.recipient === "Waitlist"
+                    ? "bg-[#B39FF0]"
+                    : "border border-white/50"
+                }`}
+              />
+              Waitlist
             </p>
           </div>
         </div>

@@ -19,7 +19,7 @@ export default function AuthLayout({
               priority
               width={112}
               height={33}
-              className="w-auto h-auto"
+              className="size-auto"
             />
           </Link>
 
