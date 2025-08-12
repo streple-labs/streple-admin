@@ -18,7 +18,6 @@ export default function AuthLayout({
               alt="streple logo"
               width={112}
               height={33}
-              className="size-auto"
             />
           </Link>
 

@@ -14,7 +14,6 @@ export default function Navbar() {
             alt="streple logo"
             width={112}
             height={33}
-            className="size-auto"
           />
         </Link>
 

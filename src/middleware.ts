@@ -28,7 +28,7 @@ const routes = {
   ],
   PRO_TRADERS: ["/", "/protraders"],
   PUBLISHER: ["/", "/blog-manager", "/learning-hub"],
-  MARKETER: ["/", "/blog-manager", "/learning-hub", '/email-center'],
+  MARKETER: ["/", "/blog-manager", "/learning-hub", "/email-center"],
   ADMIN: [
     "/",
     "/users",
@@ -99,5 +99,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|images|favicon.ico).*)"],
 };
