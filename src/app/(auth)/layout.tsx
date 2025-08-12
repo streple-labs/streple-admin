@@ -16,7 +16,6 @@ export default function AuthLayout({
             <Image
               src="/streple-logo.png"
               alt="streple logo"
-              priority
               width={112}
               height={33}
               className="size-auto"

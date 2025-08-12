@@ -116,8 +116,12 @@ const ToolPanel = ({
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  const imageUrl = URL.createObjectURL(file);
-                  addImg(imageUrl);
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const base64 = reader.result as string;
+                    addImg(base64);
+                  };
+                  reader.readAsDataURL(file);
                   e.target.value = "";
                 }
               }}
