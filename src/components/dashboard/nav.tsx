@@ -3,18 +3,15 @@ import Link from "next/link";
 import { GoBell } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 import { FaChevronDown } from "react-icons/fa6";
+import logo from "../../../public/streple-logo.png";
+import pfp from "../../../public/test-png.jpg";
 
 export default function Navbar() {
   return (
     <header className="py-4 w-full h-[85px] flex items-center justify-center">
       <div className="flex items-center justify-between max-w-[1440px] w-full">
         <Link href="">
-          <Image
-            src="/streple-logo.png"
-            alt="streple logo"
-            width={112}
-            height={33}
-          />
+          <Image src={logo} alt="streple logo" width={112} height={33} />
         </Link>
 
         <div className="flex w-full max-w-[593px]">
@@ -38,7 +35,7 @@ export default function Navbar() {
 
           <div className="flex gap-2 items-center cursor-pointer">
             <Image
-              src={"/test-png.jpg"}
+              src={pfp}
               alt="test image"
               width={40}
               height={40}

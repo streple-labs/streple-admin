@@ -1,6 +1,7 @@
 import { anton } from "@/app/fonts";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "../../../public/streple-logo.png";
 
 export default function AuthLayout({
   children,
@@ -13,12 +14,7 @@ export default function AuthLayout({
         <div className="bg-[url('../../public/bg-eclipse.png')] absolute top-0 -left-0 bg-center bg-cover bg-no-repeat size-[796px]" />
         <div className="flex justify-between flex-col relative size-full">
           <Link href="">
-            <Image
-              src="/streple-logo.png"
-              alt="streple logo"
-              width={112}
-              height={33}
-            />
+            <Image src={logo} alt="streple logo" width={112} height={33} />
           </Link>
 
           <div className="space-y-4">
