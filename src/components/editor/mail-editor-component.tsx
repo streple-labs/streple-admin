@@ -820,7 +820,7 @@ export default function MailEditorComponent({
               onClick={() => {
                 setEmailData((prev) => ({
                   ...prev,
-                  recipient: "Waitlist",
+                  recipient: "WaitList",
                   selected: [],
                   users_selected: [],
                 }));
@@ -829,7 +829,7 @@ export default function MailEditorComponent({
             >
               <span
                 className={`size-4 rounded-full ${
-                  emailData.recipient === "Waitlist"
+                  emailData.recipient === "WaitList"
                     ? "bg-[#B39FF0]"
                     : "border border-white/50"
                 }`}

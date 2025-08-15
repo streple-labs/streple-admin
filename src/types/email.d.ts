@@ -1,4 +1,4 @@
-type Recipient = "All users" | "Copiers" | "Protraders" | "Waitlist";
+type Recipient = "All users" | "Copiers" | "Protraders" | "WaitList";
 
 type Users = {
   fullName: string;
