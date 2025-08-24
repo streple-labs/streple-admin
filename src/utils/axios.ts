@@ -81,8 +81,10 @@ api.interceptors.response.use(
 
       console.error("🔥 Response Error:", errorInfo);
 
-      if (response.status === 401 && typeof window !== "undefined")
+      if (response.status === 401 && typeof window !== "undefined") {
         deleteCookie("streple_auth_token");
+        window.location.href = "/login";
+      }
     } else if (request) {
       console.error("🌐 Network Error:", {
         message: "No response received",

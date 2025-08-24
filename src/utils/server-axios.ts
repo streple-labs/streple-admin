@@ -3,8 +3,8 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import { deleteCookie } from "cookies-next";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { base_url } from "./constants";
 import { createNetworkError } from "./utils";
 
@@ -64,7 +64,7 @@ api.interceptors.response.use(
 
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     const { response, request } = error;
 
     const config = error.config as CustomAxiosRequestConfig;
@@ -83,8 +83,10 @@ api.interceptors.response.use(
 
       console.error("🔥 Response Error:", errorInfo);
 
-      if (response.status === 401 && typeof window !== "undefined")
-        deleteCookie("streple_auth_token");
+      if (response.status === 401) {
+        (await cookies()).delete("streple_auth_token");
+        redirect("/login");
+      }
     } else if (request) {
       console.error("🌐 Network Error:", {
         message: "No response received",
