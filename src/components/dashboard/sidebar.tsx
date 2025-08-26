@@ -33,7 +33,7 @@ const routes: Record<
     {
       name: "Users",
       icon: UsersIcon,
-      href: "/users",
+      href: "",
     },
     {
       name: "Manage Roles",
@@ -63,7 +63,7 @@ const routes: Record<
     {
       name: "Trading simulator",
       icon: TradingSimulatorIcon,
-      href: "/trading-simulator",
+      href: "",
     },
     {
       name: "Email Center",
@@ -73,12 +73,12 @@ const routes: Record<
     {
       name: "Feedback page",
       icon: FeedbackIcon,
-      href: "/feedback-page",
+      href: "",
     },
     {
       name: "Analytics",
       icon: AnalyticsIcon,
-      href: "/analytics",
+      href: "",
     },
   ],
   PRO_TRADER: [
@@ -109,7 +109,7 @@ const routes: Record<
     {
       name: "Users",
       icon: UsersIcon,
-      href: "/users",
+      href: "",
     },
     {
       name: "Learning hub",
@@ -134,7 +134,7 @@ const routes: Record<
     {
       name: "Trading simulator",
       icon: TradingSimulatorIcon,
-      href: "/trading-simulator",
+      href: "",
     },
     {
       name: "Email Center",
@@ -144,12 +144,12 @@ const routes: Record<
     {
       name: "Feedback page",
       icon: FeedbackIcon,
-      href: "/feedback-page",
+      href: "",
     },
     {
       name: "Analytics",
       icon: AnalyticsIcon,
-      href: "/analytics",
+      href: "",
     },
   ],
   MARKETER: [

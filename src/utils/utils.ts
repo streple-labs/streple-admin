@@ -6,6 +6,19 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   };
 }
 
+export function formatCurrency(value: number, showCurrency: boolean = true) {
+  const sign = value > 0 ? "+" : value < 0 ? "-" : "";
+  if (!showCurrency)
+    return `${sign}${Math.abs(value).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  return `${sign}$${Math.abs(value).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
 export function createNetworkError(
   error: AxiosError,
   config: CustomAxiosRequestConfig,
