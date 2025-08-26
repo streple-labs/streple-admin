@@ -14,6 +14,7 @@ import { useAuth } from "@/context/auth-context";
 import { clearToken } from "@/utils/queries";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FaChevronDown } from "react-icons/fa6";
 
 const routes: Record<
   ROLE,
@@ -21,6 +22,10 @@ const routes: Record<
     name: string;
     icon: React.FC<React.SVGProps<SVGSVGElement>>;
     href: string;
+    sub_routes?: {
+      name: string;
+      href: string;
+    }[];
   }[]
 > = {
   FOLLOWER: [],
@@ -49,6 +54,11 @@ const routes: Record<
       name: "Protraders",
       icon: ProtradersIcon,
       href: "/protraders",
+      sub_routes: [
+        { name: "Overview", href: "/protraders" },
+        { name: "Trader management", href: "/protraders/trader-management" },
+        { name: "Profile", href: "/protraders/profile" },
+      ],
     },
     {
       name: "Trading simulator",
@@ -76,6 +86,11 @@ const routes: Record<
       name: "Protraders",
       icon: ProtradersIcon,
       href: "/protraders",
+      sub_routes: [
+        { name: "Overview", href: "/protraders" },
+        { name: "Trader management", href: "/protraders/trader-management" },
+        { name: "Profile", href: "/protraders/profile" },
+      ],
     },
   ],
   PUBLISHER: [
@@ -110,6 +125,11 @@ const routes: Record<
       name: "Protraders",
       icon: ProtradersIcon,
       href: "/protraders",
+      sub_routes: [
+        { name: "Overview", href: "/protraders" },
+        { name: "Trader management", href: "/protraders/trader-management" },
+        { name: "Profile", href: "/protraders/profile" },
+      ],
     },
     {
       name: "Trading simulator",
@@ -163,7 +183,7 @@ export default function Sidebar() {
           href={"/"}
           title={"Overview"}
           aria-label={"Overview"}
-          className={`flex rounded-[10px] h-[43px] p-3 gap-3 items-center ${
+          className={`flex rounded-[10px] h-[43px] p-3 gap-2.5 items-center ${
             pathname === "/"
               ? "text-[#2b2b37] bg-[#A082F9]"
               : "text-[#F8F5FF80]"
@@ -174,37 +194,74 @@ export default function Sidebar() {
               pathname === "/" ? "fill-[#2B2B37]" : "fill-[#F8F5FF80]"
             }`}
           />
-          <span className="text-sm font-normal leading-[100%] tracking-normal">
+          <span className="text-sm/[19px] font-normal leading-[100%] tracking-normal">
             Overview
           </span>
         </Link>
 
         {user &&
           routes[user.role].map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              title={item.name}
-              aria-label={item.name}
-              className={`flex rounded-[10px] h-[43px] p-3 gap-3 items-center ${
-                pathname === item.href
-                  ? "text-[#2b2b37] bg-[#A082F9]"
-                  : "text-[#F8F5FF80]"
-              }`}
-            >
-              <item.icon
-                className={`${
-                  pathname === item.href ? "fill-[#2B2B37]" : "fill-[#F8F5FF80]"
+            <>
+              <Link
+                key={item.name}
+                href={item.href}
+                title={item.name}
+                aria-label={item.name}
+                className={`flex items-center cursor-pointer justify-between p-3 h-[43px] gap-4 rounded-[10px] ${
+                  pathname === item.href && item.name !== "Protraders"
+                    ? "bg-[#A082F9] text-[#2b2b37]"
+                    : "text-[#F8F5FF80]"
                 }`}
-              />
-              <span className="text-sm font-normal leading-[100%] tracking-normal">
-                {item.name}
-              </span>
-            </Link>
+              >
+                <div className="flex gap-2.5 items-center">
+                  <item.icon
+                    className={`${
+                      pathname === item.href && item.name !== "Protraders"
+                        ? "fill-[#2B2B37]"
+                        : "fill-[#F8F5FF80]"
+                    }`}
+                  />
+                  <span className="text-sm/[19px] font-normal leading-[100%] tracking-normal">
+                    {item.name}
+                  </span>
+                </div>
+
+                {item.sub_routes && (
+                  <FaChevronDown
+                    className={`${
+                      pathname.startsWith("/protraders") && "rotate-180"
+                    } fill-[#F8F5FF80] cursor-pointer`}
+                    width={11}
+                  />
+                )}
+              </Link>
+
+              {pathname === item.href && item.sub_routes && (
+                <div className="flex flex-col gap-4 w-full">
+                  {item.sub_routes.map((sub_item) => (
+                    <Link
+                      key={sub_item.name}
+                      href={sub_item.href}
+                      title={sub_item.name}
+                      aria-label={sub_item.name}
+                      className={`flex items-center pl-[30px] ${
+                        pathname === sub_item.href
+                          ? "text-[#2b2b37] bg-[#A082F9] rounded-[10px] h-[36px]"
+                          : "text-[#F8F5FF80]"
+                      }`}
+                    >
+                      <span className="text-sm/[19px] font-normal leading-[100%] tracking-normal">
+                        {sub_item.name}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
           ))}
 
         <button
-          className="flex rounded-[10px] h-[43px] p-3 gap-3 items-center"
+          className="flex rounded-[10px] h-[43px] p-3 gap-2.5 items-center"
           title="Logout"
           onClick={async () => {
             await clearToken();
@@ -212,7 +269,7 @@ export default function Sidebar() {
         >
           <LogoutIcon />
 
-          <span className="text-sm font-normal leading-[100%] tracking-normal text-[#F8F5FF80]">
+          <span className="text-sm/[19px] font-normal leading-[100%] tracking-normal text-[#F8F5FF80]">
             Logout
           </span>
         </button>
