@@ -64,6 +64,8 @@ export default function Protraders() {
     reason: "",
   });
 
+  const [isPublishTradeOpen, setIsPublishTradeOpen] = useState(false);
+
   return (
     <>
       <div className="rounded-[20px] bg-[#211F22] py-8 px-6 w-full flex flex-col gap-6 overflow-y-auto hide-scrollbar">
@@ -75,7 +77,9 @@ export default function Protraders() {
               Overview
             </h4>
             <button
-              onClick={() => {}}
+              onClick={() => {
+                setIsPublishTradeOpen(true);
+              }}
               className="flex items-center justify-center gap-2.5 bg-[#A082F9] rounded-[10px] p-3 h-[40px] font-normal text-xs leading-3 text-[#2b2b37]"
             >
               Publish trade
@@ -114,9 +118,14 @@ export default function Protraders() {
               </p>
             </div>
             <div className="py-6 px-4 rounded-[15px] flex flex-col gap-6 bg-white/5">
-              <p className="text-sm text-white/50 font-normal">Risk level</p>
+              <div className="flex items-center justify-between w-full">
+                <p className="text-sm text-white/50 font-normal">Profit</p>
+                <p className="border border-white/5 bg-white/5 py-1 px-2 rounded-[5px] text-xs font-normal text-[#3BFD5F99]">
+                  +$30 last 30 days
+                </p>
+              </div>
               <p className={`${anton.className} text-2xl text-white/80`}>
-                +$1,240.50
+                +$16,240.50
               </p>
             </div>
             <div className="py-6 px-4 rounded-[15px] flex flex-col gap-6 bg-white/5">
@@ -202,8 +211,10 @@ export default function Protraders() {
       </div>
 
       <PublishTradeForm
-        isOpen={false}
-        close={() => {}}
+        isOpen={isPublishTradeOpen}
+        close={() => {
+          setIsPublishTradeOpen(false);
+        }}
         formData={formData}
         setFormData={setFormData}
         isLoading={false}
