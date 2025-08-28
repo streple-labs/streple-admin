@@ -61,5 +61,7 @@ export const getAllUsers = async (): Promise<{
 
 export const clearToken = async () => {
   (await cookies()).delete("streple_auth_token");
+  (await cookies()).delete("streple_refresh_token");
+
   redirect("/login");
 };

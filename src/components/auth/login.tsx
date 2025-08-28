@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { toast } from "sonner";
-import Loader from "../loader";
+import Loader from "../ui/loader";
 
 export default function Login() {
   const router = useRouter();

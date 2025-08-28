@@ -3,8 +3,8 @@
 import { anton, dmSans } from "@/app/fonts";
 import { TextEditorProvider } from "@/components/editor/context";
 import MailEditorComponent from "@/components/editor/mail-editor-component";
-import Loader from "@/components/loader";
-import Search from "@/components/search";
+import Loader from "@/components/ui/loader";
+import Search from "@/components/ui/search";
 import api from "@/utils/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";

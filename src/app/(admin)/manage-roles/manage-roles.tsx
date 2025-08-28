@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/loader";
+import Loader from "@/components/ui/loader";
 import CreateUserForm from "@/components/modals/create-user";
 import { getAllUsers } from "@/utils/queries";
 import { useQuery } from "@tanstack/react-query";

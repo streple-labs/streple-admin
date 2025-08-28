@@ -12,7 +12,7 @@ type UserType = {
   iat: number;
 };
 
-const loginUrls = ["/login"];
+const loginUrls = ["/login", "/forgot-password"];
 const routes = {
   SUPER_ADMIN: [
     "/",

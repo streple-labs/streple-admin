@@ -1,5 +1,5 @@
 import { anton } from "@/app/fonts";
-import Loader from "@/components/loader";
+import Loader from "@/components/ui/loader";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";

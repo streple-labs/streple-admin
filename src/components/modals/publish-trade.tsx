@@ -1,9 +1,9 @@
 import { anton } from "@/app/fonts";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { FaChevronDown } from "react-icons/fa6";
-import Loader from "../loader";
+import { Dispatch, SetStateAction, useState } from "react";
 import DatePicker from "react-datepicker";
+import { FaChevronDown } from "react-icons/fa6";
 import { toast } from "sonner";
+import Loader from "../ui/loader";
 
 export default function PublishTradeForm({
   isOpen,
@@ -11,15 +11,19 @@ export default function PublishTradeForm({
   formData,
   setFormData,
   isLoading,
+  handlePublishTrade,
 }: {
   isOpen: boolean;
   close: () => void;
   formData: CopyTradeFormData;
   setFormData: Dispatch<SetStateAction<CopyTradeFormData>>;
   isLoading: boolean;
+  handlePublishTrade: () => void;
 }) {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [showTradeTypeDropdown, setShowTradeTypeDropdown] = useState(false);
+  const [showTradeDirectionDropdown, setShowTradeDirectionDropdown] =
+    useState(false);
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
   const [showTradeDurationDropdown, setShowTradeDurationDropdown] =
     useState(false);
@@ -42,8 +46,7 @@ export default function PublishTradeForm({
           e.preventDefault();
           if (isLoading) return;
 
-          console.log(formData);
-          close();
+          handlePublishTrade();
         }}
         className="bg-[#242324] w-full max-w-3xl overflow-y-auto h-[90vh] rounded-[20px] px-8 py-14 space-y-[60px] relative hide-scrollbar"
       >
@@ -67,9 +70,7 @@ export default function PublishTradeForm({
                   setShowAssetDropdown(true);
                 }}
               >
-                <p>
-                  {formData.assetPair ? formData.assetPair : "Select asset"}
-                </p>
+                <p>{formData.asset ? formData.asset : "Select asset"}</p>
                 <FaChevronDown className="w-3 stroke-white/50" />
               </div>
               {showAssetDropdown && (
@@ -85,12 +86,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          assetPair: "BTC/USDT",
+                          asset: "BTC/USDT",
                         }));
                         setShowAssetDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.assetPair === "BTC/USDT" && "bg-white/5"
+                        formData.asset === "BTC/USDT" && "bg-white/5"
                       }`}
                     >
                       BTC/USDT
@@ -99,12 +100,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          assetPair: "ETH/USDT",
+                          asset: "ETH/USDT",
                         }));
                         setShowAssetDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.assetPair === "ETH/USDT" && "bg-white/5"
+                        formData.asset === "ETH/USDT" && "bg-white/5"
                       }`}
                     >
                       ETH/USDT
@@ -113,12 +114,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          assetPair: "SOL/USDT",
+                          asset: "SOL/USDT",
                         }));
                         setShowAssetDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.assetPair === "SOL/USDT" && "bg-white/5"
+                        formData.asset === "SOL/USDT" && "bg-white/5"
                       }`}
                     >
                       SOL/USDT
@@ -127,12 +128,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          assetPair: "XRP/USDT",
+                          asset: "XRP/USDT",
                         }));
                         setShowAssetDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.assetPair === "XRP/USDT" && "bg-white/5"
+                        formData.asset === "XRP/USDT" && "bg-white/5"
                       }`}
                     >
                       XRP/USDT
@@ -141,12 +142,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          assetPair: "BNB/USDT",
+                          asset: "BNB/USDT",
                         }));
                         setShowAssetDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.assetPair === "BNB/USDT" && "bg-white/5"
+                        formData.asset === "BNB/USDT" && "bg-white/5"
                       }`}
                     >
                       BNB/USDT
@@ -161,17 +162,13 @@ export default function PublishTradeForm({
               </p>
               <div
                 title="Trade type"
-                className={`h-[55px] cursor-pointer w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
+                className={`h-[55px] cursor-pointer capitalize w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
                 onClick={() => {
                   if (isLoading) return;
                   setShowTradeTypeDropdown(true);
                 }}
               >
-                <p>
-                  {formData.tradeType
-                    ? formData.tradeType
-                    : "Select trade type"}
-                </p>
+                <p>{formData.action ? formData.action : "Select trade type"}</p>
                 <FaChevronDown className="w-3 stroke-white/50" />
               </div>
               {showTradeTypeDropdown && (
@@ -187,12 +184,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          tradeType: "Buy",
+                          action: "buy",
                         }));
                         setShowTradeTypeDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.tradeType === "Buy" && "bg-white/5"
+                        formData.action === "buy" && "bg-white/5"
                       }`}
                     >
                       Buy
@@ -201,15 +198,75 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          tradeType: "Sell",
+                          action: "sell",
                         }));
                         setShowTradeTypeDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.tradeType === "Sell" && "bg-white/5"
+                        formData.action === "sell" && "bg-white/5"
                       }`}
                     >
                       Sell
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="space-y-3 relative">
+              <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
+                Trade direction
+              </p>
+              <div
+                title="Trade direction"
+                className={`h-[55px] cursor-pointer capitalize w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
+                onClick={() => {
+                  if (isLoading) return;
+                  setShowTradeDirectionDropdown(true);
+                }}
+              >
+                <p>
+                  {formData.direction
+                    ? formData.direction
+                    : "Select trade direction"}
+                </p>
+                <FaChevronDown className="w-3 stroke-white/50" />
+              </div>
+              {showTradeDirectionDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 bg-transparent cursor-pointer"
+                    onClick={() => {
+                      setShowTradeDirectionDropdown(false);
+                    }}
+                  />
+                  <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 p-3 flex flex-col bg-[#2F2E2F]">
+                    <p
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          direction: "long",
+                        }));
+                        setShowTradeTypeDropdown(false);
+                      }}
+                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
+                        formData.direction === "long" && "bg-white/5"
+                      }`}
+                    >
+                      Long
+                    </p>
+                    <p
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          direction: "short",
+                        }));
+                        setShowTradeTypeDropdown(false);
+                      }}
+                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
+                        formData.direction === "short" && "bg-white/5"
+                      }`}
+                    >
+                      Short
                     </p>
                   </div>
                 </>
@@ -294,7 +351,7 @@ export default function PublishTradeForm({
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    leverage: Number(e.target.value.replace(/[^0-9.]/g, "")),
+                    leverage: e.target.value.replace(/[^0-9.]/g, ""),
                   }))
                 }
                 title="Add leverage"
@@ -316,13 +373,11 @@ export default function PublishTradeForm({
                   name="positionSizeValue"
                   readOnly={isLoading}
                   required
-                  value={formData.positionSizeValue}
+                  value={formData.stakeAmout}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      positionSizeValue: Number(
-                        e.target.value.replace(/[^0-9.]/g, "")
-                      ),
+                      stakeAmout: e.target.value.replace(/[^0-9.]/g, ""),
                     }))
                   }
                   title="Add position size"
@@ -337,7 +392,7 @@ export default function PublishTradeForm({
                     setShowPositionDropdown((prev) => !prev);
                   }}
                 >
-                  <span>{formData.positionSizeCurrency}</span>
+                  <span>{formData.positionSize}</span>
                   <FaChevronDown className="w-3 stroke-white/50" />
                 </span>
               </div>
@@ -354,12 +409,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          positionSizeCurrency: "BTC",
+                          positionSize: "BTC",
                         }));
                         setShowPositionDropdown(false);
                       }}
                       className={`p-2 h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.positionSizeCurrency === "BTC" && "bg-white/5"
+                        formData.positionSize === "BTC" && "bg-white/5"
                       }`}
                     >
                       BTC
@@ -368,12 +423,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          positionSizeCurrency: "USDT",
+                          positionSize: "USDT",
                         }));
                         setShowPositionDropdown(false);
                       }}
                       className={`p-2 h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.positionSizeCurrency === "USDT" && "bg-white/5"
+                        formData.positionSize === "USDT" && "bg-white/5"
                       }`}
                     >
                       USDT
@@ -395,16 +450,16 @@ export default function PublishTradeForm({
                 }}
               >
                 <p>
-                  {formData.tradeDuration
-                    ? typeof formData.tradeDuration === "string"
-                      ? formData.tradeDuration
-                      : typeof formData.tradeDuration === "object" &&
-                        formData.tradeDuration !== null &&
-                        formData.tradeDuration.start &&
-                        formData.tradeDuration.end
+                  {formData.duration
+                    ? typeof formData.duration === "string"
+                      ? formData.duration
+                      : typeof formData.duration === "object" &&
+                        formData.duration !== null &&
+                        formData.duration.startDate &&
+                        formData.duration.endDate
                       ? (() => {
-                          const start = new Date(formData.tradeDuration.start);
-                          const end = new Date(formData.tradeDuration.end);
+                          const start = new Date(formData.duration.startDate);
+                          const end = new Date(formData.duration.endDate);
                           const diffMs = end.getTime() - start.getTime();
                           const diffDays = Math.floor(
                             diffMs / (1000 * 60 * 60 * 24)
@@ -440,12 +495,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          tradeDuration: "Scalp",
+                          duration: "Scalp",
                         }));
                         setShowTradeDurationDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.tradeDuration === "Scalp" && "bg-white/5"
+                        formData.duration === "Scalp" && "bg-white/5"
                       }`}
                     >
                       Scalp
@@ -454,12 +509,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          tradeDuration: "Intraday",
+                          duration: "Intraday",
                         }));
                         setShowTradeDurationDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.tradeDuration === "Intraday" && "bg-white/5"
+                        formData.duration === "Intraday" && "bg-white/5"
                       }`}
                     >
                       Intraday
@@ -468,12 +523,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          tradeDuration: "Swing",
+                          duration: "Swing",
                         }));
                         setShowTradeDurationDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.tradeDuration === "Swing" && "bg-white/5"
+                        formData.duration === "Swing" && "bg-white/5"
                       }`}
                     >
                       Swing
@@ -482,12 +537,12 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          tradeDuration: "Position",
+                          duration: "Position",
                         }));
                         setShowTradeDurationDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.tradeDuration === "Position" && "bg-white/5"
+                        formData.duration === "Position" && "bg-white/5"
                       }`}
                     >
                       Position
@@ -499,7 +554,7 @@ export default function PublishTradeForm({
                           setShowCustomDatePicker((prev) => !prev);
                           setFormData((prev) => ({
                             ...prev,
-                            tradeDuration: undefined,
+                            duration: undefined,
                           }));
                         }}
                       >
@@ -647,8 +702,8 @@ export default function PublishTradeForm({
                                   setFormData((prev) => ({
                                     ...prev,
                                     tradeDuration: {
-                                      start: startDateCombined,
-                                      end: endDateCombined,
+                                      startDate: startDateCombined,
+                                      endDate: endDateCombined,
                                     },
                                   }));
 
@@ -754,11 +809,11 @@ export default function PublishTradeForm({
                 id="reason"
                 name="reason"
                 readOnly={isLoading}
-                value={formData.reason}
+                value={formData.comment}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    reason: e.target.value,
+                    comment: e.target.value,
                   }))
                 }
                 required

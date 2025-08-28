@@ -1,5 +1,5 @@
 import { anton, dmSans } from "@/app/fonts";
-import Loader from "@/components/loader";
+import Loader from "@/components/ui/loader";
 import { formatFileSize } from "@/utils/utils";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useState } from "react";

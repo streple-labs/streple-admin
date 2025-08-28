@@ -11,7 +11,7 @@ import { IoImageOutline } from "react-icons/io5";
 import { MdOutlineTouchApp } from "react-icons/md";
 import { RxTextAlignCenter } from "react-icons/rx";
 import { toast } from "sonner";
-import Loader from "../loader";
+import Loader from "../ui/loader";
 import ColorPicker from "./color-picker";
 import {
   BLOCK_LABELS,

@@ -1,4 +1,4 @@
-import Loader from "@/components/loader";
+import Loader from "@/components/ui/loader";
 import api from "@/utils/axios";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

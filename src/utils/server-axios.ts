@@ -12,12 +12,16 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   metadata?: {
     startTime: Date;
   };
+  _retry?: boolean;
 }
 
 const api = axios.create({
   baseURL: base_url,
   timeout: 20000,
 });
+
+let isRefreshing = false;
+let failedRequestsQueue: ((token: string) => void)[] = [];
 
 api.interceptors.request.use(
   async (config: CustomAxiosRequestConfig) => {
@@ -28,14 +32,13 @@ api.interceptors.request.use(
 
     config.metadata = { startTime: new Date() };
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development")
       console.log("🚀 Request:", {
         method: config.method?.toUpperCase(),
         url: config.url,
         data: config.data,
         headers: config.headers,
       });
-    }
 
     return config;
   },
@@ -65,11 +68,11 @@ api.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const { response, request } = error;
+    const { response, request, config } = error;
 
-    const config = error.config as CustomAxiosRequestConfig;
-    const duration = config?.metadata
-      ? new Date().getTime() - config.metadata.startTime.getTime()
+    const originalRequest = config as CustomAxiosRequestConfig;
+    const duration = originalRequest.metadata
+      ? new Date().getTime() - originalRequest.metadata.startTime.getTime()
       : 0;
 
     if (response) {
@@ -83,9 +86,76 @@ api.interceptors.response.use(
 
       console.error("🔥 Response Error:", errorInfo);
 
-      if (response.status === 401) {
-        (await cookies()).delete("streple_auth_token");
-        redirect("/login");
+      if (response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        if (!isRefreshing) {
+          isRefreshing = true;
+          if (process.env.NODE_ENV === "development")
+            console.log("Attempting to refresh access token...");
+          try {
+            const refreshToken = (await cookies()).get(
+              "streple_refresh_token"
+            )?.value;
+
+            if (!refreshToken) {
+              (await cookies()).delete("streple_auth_token");
+              (await cookies()).delete("streple_refresh_token");
+              return redirect("/login");
+            }
+
+            const refreshResponse = await axios.post(
+              `${base_url}/auth/refresh`,
+              {
+                token: refreshToken,
+              }
+            );
+
+            const { streple_auth_token: newAccessToken } = refreshResponse.data;
+
+            (await cookies()).set("streple_auth_token", newAccessToken, {
+              // httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "lax",
+              expires: new Date(Date.now() + 60 * 60 * 1000),
+              path: "/",
+            });
+
+            axios.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+
+            // Re-run all the requests that were queued up
+            failedRequestsQueue.forEach((callback) => callback(newAccessToken));
+            failedRequestsQueue = []; // Clear the queue
+
+            isRefreshing = false;
+
+            // Re-try the original failed request with the new token
+            originalRequest.headers[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+            return api(originalRequest);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (refreshError: any) {
+            console.error("❌ Token refresh failed:", refreshError);
+
+            failedRequestsQueue = [];
+            isRefreshing = false;
+
+            (await cookies()).delete("streple_auth_token");
+            (await cookies()).delete("streple_refresh_token");
+            return redirect("/login");
+          }
+        }
+
+        // If a refresh is already in progress, add the failed request to a queue
+        return new Promise((resolve) => {
+          failedRequestsQueue.push((token) => {
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
       }
     } else if (request) {
       console.error("🌐 Network Error:", {
@@ -93,7 +163,7 @@ api.interceptors.response.use(
         url: config?.url,
         duration: `${duration}ms`,
       });
-      const networkError = createNetworkError(error, config, duration);
+      const networkError = createNetworkError(error, originalRequest, duration);
       return Promise.reject(networkError);
     } else console.error("⚙️ Request Setup Error:", error.message);
 

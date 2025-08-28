@@ -10,28 +10,28 @@ type CopyTrade = {
 };
 
 type CopyTradeFormData = {
-  assetPair:
+  asset:
     | "BTC/USDT"
     | "ETH/USDT"
     | "SOL/USDT"
     | "XRP/USDT"
     | "BNB/USDT"
     | undefined;
-  tradeType: "Buy" | "Sell" | undefined;
-  entryPrice: number | undefined;
-  stopLoss: number | undefined;
-  takeProfit: number | undefined;
-  leverage: number | undefined;
-  positionSizeValue: number | undefined;
-  positionSizeCurrency: "BTC" | "USDT" | undefined;
-  tradeDuration:
+  leverage: string | undefined;
+  positionSize: "BTC" | "USDT" | undefined;
+  duration:
     | "Scalp"
     | "Intraday"
     | "Swing"
     | "Position"
-    | { start: Date; end: Date }
+    | { startDate: Date; endDate: Date }
     | undefined;
-  position: "Long" | "Short" | undefined;
+  comment: string;
+  entryPrice: number | undefined;
+  direction: "long" | "short" | undefined;
+  stopLoss: number | undefined;
+  takeProfit: number | undefined;
+  stakeAmout: string | undefined;
+  action: "buy" | "sell" | undefined;
   riskLevel: "Low" | "Medium" | "High" | undefined;
-  reason: string;
 };
