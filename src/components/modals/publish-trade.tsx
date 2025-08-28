@@ -246,7 +246,7 @@ export default function PublishTradeForm({
                           ...prev,
                           direction: "long",
                         }));
-                        setShowTradeTypeDropdown(false);
+                        setShowTradeDirectionDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
                         formData.direction === "long" && "bg-white/5"
@@ -260,7 +260,7 @@ export default function PublishTradeForm({
                           ...prev,
                           direction: "short",
                         }));
-                        setShowTradeTypeDropdown(false);
+                        setShowTradeDirectionDropdown(false);
                       }}
                       className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
                         formData.direction === "short" && "bg-white/5"

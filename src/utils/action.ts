@@ -156,10 +156,7 @@ export const resendOtp = async (formData: {
 
 export const publishTrade = async (formData: CopyTradeFormData) => {
   try {
-    const res = await api.post("/trade", {
-      ...formData,
-      stakeAmout: parseFloat(formData.stakeAmout || "0"),
-    });
+    const res = await api.post("/trade", formData);
 
     return {
       success: true,
