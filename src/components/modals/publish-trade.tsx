@@ -29,6 +29,7 @@ export default function PublishTradeForm({
     useState(false);
   const [showRiskLevelDropdown, setShowRiskLevelDropdown] = useState(false);
   const [showCustomDatePicker, setShowCustomDatePicker] = useState(false);
+  const [showOrderTypeDropdown, setShowOrderTypeDropdown] = useState(false);
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -373,11 +374,14 @@ export default function PublishTradeForm({
                   name="positionSizeValue"
                   readOnly={isLoading}
                   required
-                  value={formData.stakeAmout}
+                  value={formData.positionSize.amount}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      stakeAmout: e.target.value.replace(/[^0-9.]/g, ""),
+                      positionSize: {
+                        ...prev.positionSize,
+                        amount: e.target.value.replace(/[^0-9.]/g, ""),
+                      },
                     }))
                   }
                   title="Add position size"
@@ -392,7 +396,7 @@ export default function PublishTradeForm({
                     setShowPositionDropdown((prev) => !prev);
                   }}
                 >
-                  <span>{formData.positionSize}</span>
+                  <span>{formData.positionSize.currency}</span>
                   <FaChevronDown className="w-3 stroke-white/50" />
                 </span>
               </div>
@@ -409,12 +413,15 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          positionSize: "BTC",
+                          positionSize: {
+                            ...prev.positionSize,
+                            currency: "BTC",
+                          },
                         }));
                         setShowPositionDropdown(false);
                       }}
                       className={`p-2 h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.positionSize === "BTC" && "bg-white/5"
+                        formData.positionSize.currency === "BTC" && "bg-white/5"
                       }`}
                     >
                       BTC
@@ -423,12 +430,16 @@ export default function PublishTradeForm({
                       onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          positionSize: "USDT",
+                          positionSize: {
+                            ...prev.positionSize,
+                            currency: "USDT",
+                          },
                         }));
                         setShowPositionDropdown(false);
                       }}
                       className={`p-2 h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.positionSize === "USDT" && "bg-white/5"
+                        formData.positionSize.currency === "USDT" &&
+                        "bg-white/5"
                       }`}
                     >
                       USDT
@@ -801,6 +812,66 @@ export default function PublishTradeForm({
                 </>
               )}
             </div>
+            <div className="space-y-3 relative">
+              <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
+                Order type
+              </p>
+              <div
+                title="Order type"
+                className={`h-[55px] cursor-pointer w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
+                onClick={() => {
+                  if (isLoading) return;
+                  setShowOrderTypeDropdown(true);
+                }}
+              >
+                <p>
+                  {formData.orderType
+                    ? formData.orderType
+                    : "Select order type"}
+                </p>
+                <FaChevronDown className="w-3 stroke-white/50" />
+              </div>
+              {showOrderTypeDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 bg-transparent cursor-pointer"
+                    onClick={() => {
+                      setShowOrderTypeDropdown(false);
+                    }}
+                  />
+                  <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 p-3 flex flex-col bg-[#2F2E2F]">
+                    <p
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          orderType: "Market Order",
+                        }));
+                        setShowOrderTypeDropdown(false);
+                      }}
+                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
+                        formData.orderType === "Market Order" && "bg-white/5"
+                      }`}
+                    >
+                      Market Order
+                    </p>
+                    <p
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          orderType: "Limit Order",
+                        }));
+                        setShowOrderTypeDropdown(false);
+                      }}
+                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
+                        formData.orderType === "Limit Order" && "bg-white/5"
+                      }`}
+                    >
+                      Limit Order
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
             <label htmlFor="reason" className="space-y-3">
               <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
                 Reason for trade
@@ -822,6 +893,44 @@ export default function PublishTradeForm({
                 className={`h-[160px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] bg-white/5`}
               />
             </label>
+            <label className="flex items-center gap-6 text-white/80">
+              <p
+                onClick={() => {
+                  if (isLoading) return;
+                  setFormData((prev) => ({
+                    ...prev,
+                    isDraft: false,
+                  }));
+                }}
+                className="flex gap-3 items-center text-base leading-6 tracking-[1px] cursor-pointer"
+              >
+                <span
+                  className={`size-4 rounded-full ${
+                    !formData.isDraft
+                      ? "bg-[#B39FF0]"
+                      : "border border-white/50"
+                  }`}
+                />
+                Publish now
+              </p>
+              <p
+                onClick={() => {
+                  if (isLoading) return;
+                  setFormData((prev) => ({
+                    ...prev,
+                    isDraft: true,
+                  }));
+                }}
+                className="flex gap-3 items-center text-base leading-6 tracking-[1px] cursor-pointer"
+              >
+                <span
+                  className={`size-4 rounded-full ${
+                    formData.isDraft ? "bg-[#B39FF0]" : "border border-white/50"
+                  }`}
+                />
+                Save as draft
+              </p>
+            </label>
           </div>
         </div>
 
@@ -831,7 +940,7 @@ export default function PublishTradeForm({
           title="upload trade"
           className="flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 mx-auto h-[50px] w-[188px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
         >
-          {isLoading ? <Loader /> : "Publish"}
+          {isLoading ? <Loader /> : "Done"}
         </button>
       </form>
     </div>

@@ -18,7 +18,10 @@ type CopyTradeFormData = {
     | "BNB/USDT"
     | undefined;
   leverage: string | undefined;
-  positionSize: "BTC" | "USDT" | undefined;
+  positionSize: {
+    amount: string;
+    currency: "BTC" | "USDT";
+  };
   duration:
     | "Scalp"
     | "Intraday"
@@ -31,7 +34,8 @@ type CopyTradeFormData = {
   direction: "long" | "short" | undefined;
   stopLoss: number | undefined;
   takeProfit: number | undefined;
-  stakeAmout: string | undefined;
   action: "buy" | "sell" | undefined;
   riskLevel: "Low" | "Medium" | "High" | undefined;
+  isDraft: boolean;
+  orderType: "Market Order" | "Limit Order" | undefined;
 };

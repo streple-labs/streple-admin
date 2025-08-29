@@ -56,7 +56,10 @@ const mockTrades: CopyTrade[] = [
 const initialState: CopyTradeFormData = {
   asset: undefined,
   leverage: undefined,
-  positionSize: undefined,
+  positionSize: {
+    amount: "",
+    currency: "USDT",
+  },
   duration: undefined,
   comment: "",
   action: undefined,
@@ -64,8 +67,9 @@ const initialState: CopyTradeFormData = {
   direction: undefined,
   takeProfit: undefined,
   stopLoss: undefined,
-  stakeAmout: undefined,
   riskLevel: undefined,
+  isDraft: false,
+  orderType: undefined,
 };
 
 export default function Protraders() {
