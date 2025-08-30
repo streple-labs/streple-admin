@@ -206,7 +206,9 @@ export default function BlogManager() {
               Blogs manager
             </h4>
             <div className="flex w-full items-center justify-between gap-8">
-              <Search title="search for blogs" placeholder="search for blogs" />
+              <div className="w-full max-w-[400px]">
+                <Search placeholder="search for blogs" />
+              </div>
 
               <div className="flex w-full items-center justify-end">
                 <button

@@ -5,7 +5,10 @@ import { openSans } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Streple | Copy Top Traders and Earn Smarter",
+  title: {
+    default: "Streple | Copy Top Traders and Earn Smarter",
+    template: "Streple | %s",
+  },
   description:
     "Mirror top traders in real time with Streple. Start trading like a pro in 3 simple steps — no experience needed. Copy verified experts, automate your trades, and earn smarter.",
   keywords: [

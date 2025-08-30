@@ -215,10 +215,9 @@ export default function LearningHub() {
             </h4>
             <div className="flex w-full items-center justify-between gap-8">
               <div className="flex items-center gap-6 w-full">
-                <Search
-                  title="search for courses"
-                  placeholder="search for courses"
-                />
+                <div className="w-full max-w-[400px]">
+                  <Search placeholder="search for courses" />
+                </div>
 
                 <div className="relative">
                   {level ? (

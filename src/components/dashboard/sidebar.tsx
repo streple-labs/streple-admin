@@ -56,7 +56,7 @@ const routes: Record<
       href: "/protraders",
       sub_routes: [
         { name: "Overview", href: "/protraders" },
-        { name: "Trader management", href: "/protraders/trader-management" },
+        { name: "Trade management", href: "/protraders/trade-management" },
         { name: "Profile", href: "/protraders/profile" },
       ],
     },
@@ -88,7 +88,7 @@ const routes: Record<
       href: "/protraders",
       sub_routes: [
         { name: "Overview", href: "/protraders" },
-        { name: "Trader management", href: "/protraders/trader-management" },
+        { name: "Trade management", href: "/protraders/trade-management" },
         { name: "Profile", href: "/protraders/profile" },
       ],
     },
@@ -127,7 +127,7 @@ const routes: Record<
       href: "/protraders",
       sub_routes: [
         { name: "Overview", href: "/protraders" },
-        { name: "Trader management", href: "/protraders/trader-management" },
+        { name: "Trade management", href: "/protraders/trade-management" },
         { name: "Profile", href: "/protraders/profile" },
       ],
     },
@@ -229,14 +229,14 @@ export default function Sidebar() {
                 {item.sub_routes && (
                   <FaChevronDown
                     className={`${
-                      pathname.startsWith("/protraders") && "rotate-180"
+                      pathname.startsWith(item.href) && "rotate-180"
                     } fill-[#F8F5FF80] cursor-pointer`}
                     width={11}
                   />
                 )}
               </Link>
 
-              {pathname === item.href && item.sub_routes && (
+              {pathname.startsWith(item.href) && item.sub_routes && (
                 <div className="flex flex-col gap-4 w-full">
                   {item.sub_routes.map((sub_item) => (
                     <Link

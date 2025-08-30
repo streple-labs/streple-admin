@@ -177,7 +177,9 @@ export default function EmailCenter() {
 
           <div className="flex w-full items-center justify-between gap-8">
             <div className="flex items-center gap-6 w-full">
-              <Search title="search for email" placeholder="search for email" />
+              <div className="w-full max-w-[400px]">
+                <Search placeholder="search for email" />
+              </div>
 
               <div className="relative">
                 {filterOption ? (

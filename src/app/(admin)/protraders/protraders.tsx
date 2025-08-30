@@ -5,6 +5,7 @@ import PublishTradeForm from "@/components/modals/publish-trade";
 import { publishTrade } from "@/utils/action";
 import { formatCurrency } from "@/utils/utils";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -185,11 +186,17 @@ export default function Protraders() {
           </div>
         </div>
         <div className="flex flex-col gap-6 w-full">
-          <h4
-            className={`${anton.className} text-sm font-normal leading-4 tracking-normal`}
-          >
-            Recent published trades
-          </h4>
+          <div className="flex items-center justify-between">
+            <h4
+              className={`${anton.className} text-sm font-normal leading-4 tracking-normal`}
+            >
+              Recent published trades
+            </h4>
+
+            <Link href="/protraders/trade-management">
+              <p className="text-xs text-[#F4E90ECC] font-normal">Show all</p>
+            </Link>
+          </div>
           <div className="overflow-x-auto size-full hide-scrollbar bg-[#242324] rounded-[15px]">
             <table className="min-w-full text-left text-xs font-normal">
               <thead>
@@ -282,7 +289,7 @@ export default function Protraders() {
             </h4>
             <p className="text-base font-normal leading-6 tracking-[1px] -mt-3">
               Your trade has been published successfully. You can view the trade
-              in the Trade management tab
+              in the <b>Trade management tab</b>
             </p>
 
             <button
