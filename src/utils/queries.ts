@@ -59,6 +59,56 @@ export const getAllUsers = async (): Promise<{
   }
 };
 
+export const getUserCopyTrades = async (params: {
+  limit?: number;
+  page?: number;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  status?: string;
+  outcome?: string;
+  search?: string;
+}): Promise<{ trades: GetCopyTradesResponse | null; error: string | null }> => {
+  try {
+    const res = await api.get("/trades", { params });
+
+    return { trades: res.data, error: null };
+  } catch (error: any) {
+    let errorMessage = "request failed. Please try again later.";
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+    return {
+      error: errorMessage,
+      trades: null,
+    };
+  }
+};
+export const getUserCopyTradeStats = async (): Promise<{
+  stats: GetCopyTradeStatsResponse | null;
+  error: string | null;
+}> => {
+  try {
+    const res = await api.get("/trading-stats");
+
+    return { stats: res.data, error: null };
+  } catch (error: any) {
+    let errorMessage = "request failed. Please try again later.";
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+    return {
+      error: errorMessage,
+      stats: null,
+    };
+  }
+};
+
 export const clearToken = async () => {
   (await cookies()).delete("streple_auth_token");
   (await cookies()).delete("streple_refresh_token");

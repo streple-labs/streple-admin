@@ -2,14 +2,46 @@ import { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   metadata?: {
     startTime: Date;
   };
+}
+
+export const formatDate = (dateString: string | Date) => {
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+export const formatFigure = (num: number) => {
+  if (num === null || num === undefined || isNaN(num)) return "0.00";
+  const absNum = Math.abs(num);
+  const sign = num < 0 ? "-" : "";
+
+  if (absNum < 1_000_000)
+    return (
+      sign +
+      absNum.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
+  else
+    return (
+      sign +
+      (absNum / 1_000_000).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }) +
+      "M"
+    );
+};
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
 
 export function formatCurrency(value: number, showCurrency: boolean = true) {
@@ -146,6 +178,7 @@ export const focusToNextInput = (target: HTMLElement) => {
 
   if (nextElementSibling) nextElementSibling.focus();
 };
+
 export const focusToPrevInput = (target: HTMLElement) => {
   const previousElementSibling =
     target.previousElementSibling as HTMLInputElement;
