@@ -66,13 +66,13 @@ export default function Filters() {
             <button
               className="w-full border border-white/10 rounded-[15px] h-8 py-2 px-4 flex items-center justify-between gap-2.5 text-white/70 text-xs/3 font-normal"
               onClick={() => {
-                if (searchParams.get("status")) removeParam("status");
+                if (searchParams.get("draft")) removeParam("draft");
                 else setShowStatusFilterOptions((prev) => !prev);
               }}
             >
-              {searchParams.get("status") ? (
+              {searchParams.get("draft") ? (
                 <>
-                  {searchParams.get("status")}
+                  {searchParams.get("draft") ? "Draft" : "Published"}
 
                   <GoXCircle color="#F8F5FF80" width={12} />
                 </>
@@ -94,7 +94,7 @@ export default function Filters() {
                 <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
                   <p
                     onClick={() => {
-                      setParams("status", "published");
+                      setParams("draft", "true");
                       setShowStatusFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -103,7 +103,7 @@ export default function Filters() {
                   </p>
                   <p
                     onClick={() => {
-                      setParams("status", "draft");
+                      setParams("draft", "false");
                       setShowStatusFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -119,13 +119,13 @@ export default function Filters() {
             <button
               className="w-full border border-white/10 rounded-[15px] h-8 py-2 px-4 flex items-center justify-between gap-2.5 text-white/70 text-xs/3 font-normal"
               onClick={() => {
-                if (searchParams.get("position")) removeParam("position");
+                if (searchParams.get("action")) removeParam("action");
                 else setShowPositionFilterOptions((prev) => !prev);
               }}
             >
-              {searchParams.get("position") ? (
+              {searchParams.get("action") ? (
                 <>
-                  {searchParams.get("position")}
+                  {searchParams.get("action") ? "Long" : "Short"}
 
                   <GoXCircle color="#F8F5FF80" width={12} />
                 </>
@@ -147,7 +147,7 @@ export default function Filters() {
                 <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
                   <p
                     onClick={() => {
-                      setParams("position", "long");
+                      setParams("action", "buy");
                       setShowPositionFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -156,7 +156,7 @@ export default function Filters() {
                   </p>
                   <p
                     onClick={() => {
-                      setParams("position", "short");
+                      setParams("action", "sell");
                       setShowPositionFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -172,13 +172,13 @@ export default function Filters() {
             <button
               className="w-full border border-white/10 rounded-[15px] h-8 py-2 px-4 flex items-center justify-between gap-2.5 text-white/70 text-xs/3 font-normal"
               onClick={() => {
-                if (searchParams.get("pair")) removeParam("pair");
+                if (searchParams.get("asset")) removeParam("asset");
                 else setShowPairFilterOptions((prev) => !prev);
               }}
             >
-              {searchParams.get("pair") ? (
+              {searchParams.get("asset") ? (
                 <>
-                  {searchParams.get("pair")}
+                  {searchParams.get("asset")}
 
                   <GoXCircle color="#F8F5FF80" width={12} />
                 </>
@@ -201,7 +201,7 @@ export default function Filters() {
                 <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
                   <p
                     onClick={() => {
-                      setParams("pair", "BTC/USDT");
+                      setParams("asset", "BTC/USDT");
                       setShowPairFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -210,7 +210,7 @@ export default function Filters() {
                   </p>
                   <p
                     onClick={() => {
-                      setParams("pair", "ETH/USDT");
+                      setParams("asset", "ETH/USDT");
                       setShowPairFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -219,7 +219,7 @@ export default function Filters() {
                   </p>
                   <p
                     onClick={() => {
-                      setParams("pair", "BIN/USDT");
+                      setParams("asset", "BIN/USDT");
                       setShowPairFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -228,7 +228,7 @@ export default function Filters() {
                   </p>
                   <p
                     onClick={() => {
-                      setParams("pair", "SOL/USDT");
+                      setParams("asset", "SOL/USDT");
                       setShowPairFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -247,10 +247,9 @@ export default function Filters() {
                 setShowDateFilterOptions((prev) => !prev);
               }}
             >
-              {searchParams.get("startDate") ? (
+              {searchParams.get("fromDate") ? (
                 <>
-                  {searchParams.get("startDate")} -{" "}
-                  {searchParams.get("endDate")}
+                  {searchParams.get("fromDate")} - {searchParams.get("toDate")}
                   <GoXCircle color="#F8F5FF80" width={12} />
                 </>
               ) : (
@@ -272,17 +271,14 @@ export default function Filters() {
                   <DatePicker
                     placeholderText="Start date"
                     selected={
-                      searchParams.get("startDate")
-                        ? new Date(searchParams.get("startDate")!)
+                      searchParams.get("fromDate")
+                        ? new Date(searchParams.get("fromDate")!)
                         : null
                     }
                     onChange={(date) => {
                       if (date)
-                        setParams(
-                          "startDate",
-                          date.toISOString().split("T")[0]
-                        );
-                      else removeParam("startDate");
+                        setParams("fromDate", date.toISOString().split("T")[0]);
+                      else removeParam("fromDate");
                     }}
                     required
                     dateFormat="P"
@@ -293,18 +289,18 @@ export default function Filters() {
                   <DatePicker
                     placeholderText="End date"
                     selected={
-                      searchParams.get("endDate")
-                        ? new Date(searchParams.get("endDate")!)
+                      searchParams.get("toDate")
+                        ? new Date(searchParams.get("toDate")!)
                         : null
                     }
                     onChange={(date) => {
-                      if (!searchParams.get("startDate")) {
+                      if (!searchParams.get("fromDate")) {
                         toast.error("Please select a start date first");
                         return;
                       }
                       if (date)
-                        setParams("endDate", date.toISOString().split("T")[0]);
-                      else removeParam("endDate");
+                        setParams("toDate", date.toISOString().split("T")[0]);
+                      else removeParam("toDate");
 
                       setShowDateFilterOptions(false);
                     }}
@@ -322,13 +318,13 @@ export default function Filters() {
             <button
               className="w-full border border-white/10 rounded-[15px] h-8 py-2 px-4 flex items-center justify-between gap-2.5 text-white/70 text-xs/3 font-normal"
               onClick={() => {
-                if (searchParams.get("performance")) removeParam("performance");
+                if (searchParams.get("outcome")) removeParam("outcome");
                 else setShowPerformanceFilterOptions((prev) => !prev);
               }}
             >
-              {searchParams.get("performance") ? (
+              {searchParams.get("outcome") ? (
                 <>
-                  {searchParams.get("performance")}
+                  {searchParams.get("outcome") ? "Win" : "Loss"}
 
                   <GoXCircle color="#F8F5FF80" width={12} />
                 </>
@@ -351,7 +347,7 @@ export default function Filters() {
                 <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
                   <p
                     onClick={() => {
-                      setParams("performance", "profitable");
+                      setParams("outcome", "Win");
                       setShowPerformanceFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
@@ -360,7 +356,7 @@ export default function Filters() {
                   </p>
                   <p
                     onClick={() => {
-                      setParams("performance", "loss making");
+                      setParams("outcome", "Loss");
                       setShowPerformanceFilterOptions(false);
                     }}
                     className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"

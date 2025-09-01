@@ -67,6 +67,12 @@ export const getUserCopyTrades = async (params: {
   status?: string;
   outcome?: string;
   search?: string;
+  draft?: boolean;
+  action?: string;
+  asset?: string;
+  fromDate?: string;
+  toDate?: string;
+  copiers?: string;
 }): Promise<{ trades: GetCopyTradesResponse | null; error: string | null }> => {
   try {
     const res = await api.get("/trades", { params });

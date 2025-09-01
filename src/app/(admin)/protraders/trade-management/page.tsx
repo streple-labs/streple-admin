@@ -6,8 +6,16 @@ import Filters from "./_component/filters";
 
 export const revalidate = 0;
 
-export default async function page() {
-  const { trades, error } = await getUserCopyTrades({});
+export default async function page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+  const { trades, error } = await getUserCopyTrades({
+    ...params,
+    ...(params.draft ? { draft: params.draft === "true" } : {}),
+  });
 
   return (
     <div className="rounded-[20px] bg-[#211F22] py-8 px-6 w-full flex flex-col gap-6 overflow-y-auto hide-scrollbar">
