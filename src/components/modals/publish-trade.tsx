@@ -276,28 +276,94 @@ export default function PublishTradeForm({
                 </>
               )}
             </div>
-            <label htmlFor="entryPrice" className="space-y-3">
+            <div className="space-y-3 relative">
               <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
-                Entry Price
+                Order type
               </p>
-              <input
-                id="entryPrice"
-                name="entryPrice"
-                readOnly={isLoading}
-                required
-                value={formData.entryPrice}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    entryPrice: Number(e.target.value.replace(/[^0-9.]/g, "")),
-                  }))
-                }
-                title="Input entry price"
-                type="text"
-                placeholder="Input entry price"
-                className={`h-[55px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] bg-white/5`}
-              />
-            </label>
+              <div
+                title="Order type"
+                className={`h-[55px] cursor-pointer w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
+                onClick={() => {
+                  if (isLoading) return;
+                  setShowOrderTypeDropdown(true);
+                }}
+              >
+                <p>
+                  {formData.orderType
+                    ? formData.orderType
+                    : "Select order type"}
+                </p>
+                <FaChevronDown className="w-3 stroke-white/50" />
+              </div>
+              {showOrderTypeDropdown && (
+                <>
+                  <div
+                    className="fixed inset-0 bg-transparent cursor-pointer"
+                    onClick={() => {
+                      setShowOrderTypeDropdown(false);
+                    }}
+                  />
+                  <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 p-3 flex flex-col bg-[#2F2E2F]">
+                    <p
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          orderType: "Market Order",
+                          entryPrice: undefined,
+                        }));
+                        setShowOrderTypeDropdown(false);
+                      }}
+                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
+                        formData.orderType === "Market Order" && "bg-white/5"
+                      }`}
+                    >
+                      Market Order
+                    </p>
+                    <p
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          orderType: "Limit Order",
+                          entryPrice: undefined,
+                        }));
+                        setShowOrderTypeDropdown(false);
+                      }}
+                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
+                        formData.orderType === "Limit Order" && "bg-white/5"
+                      }`}
+                    >
+                      Limit Order
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+            {formData.orderType === "Limit Order" && (
+              <label htmlFor="entryPrice" className="space-y-3">
+                <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
+                  Entry Price
+                </p>
+                <input
+                  id="entryPrice"
+                  name="entryPrice"
+                  readOnly={isLoading}
+                  required
+                  value={formData.entryPrice}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      entryPrice: Number(
+                        e.target.value.replace(/[^0-9.]/g, "")
+                      ),
+                    }))
+                  }
+                  title="Input entry price"
+                  type="text"
+                  placeholder="Input entry price"
+                  className={`h-[55px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] placeholder:text-white/50 outline-0 ring-0 caret-[#B39FF0] bg-white/5`}
+                />
+              </label>
+            )}
             <label htmlFor="stopLoss" className="space-y-3">
               <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
                 Stop loss
@@ -810,66 +876,6 @@ export default function PublishTradeForm({
                       }`}
                     >
                       High
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="space-y-3 relative">
-              <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
-                Order type
-              </p>
-              <div
-                title="Order type"
-                className={`h-[55px] cursor-pointer w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
-                onClick={() => {
-                  if (isLoading) return;
-                  setShowOrderTypeDropdown(true);
-                }}
-              >
-                <p>
-                  {formData.orderType
-                    ? formData.orderType
-                    : "Select order type"}
-                </p>
-                <FaChevronDown className="w-3 stroke-white/50" />
-              </div>
-              {showOrderTypeDropdown && (
-                <>
-                  <div
-                    className="fixed inset-0 bg-transparent cursor-pointer"
-                    onClick={() => {
-                      setShowOrderTypeDropdown(false);
-                    }}
-                  />
-                  <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 p-3 flex flex-col bg-[#2F2E2F]">
-                    <p
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          orderType: "Market Order",
-                        }));
-                        setShowOrderTypeDropdown(false);
-                      }}
-                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.orderType === "Market Order" && "bg-white/5"
-                      }`}
-                    >
-                      Market Order
-                    </p>
-                    <p
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          orderType: "Limit Order",
-                        }));
-                        setShowOrderTypeDropdown(false);
-                      }}
-                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.orderType === "Limit Order" && "bg-white/5"
-                      }`}
-                    >
-                      Limit Order
                     </p>
                   </div>
                 </>

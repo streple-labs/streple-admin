@@ -48,7 +48,7 @@ export default function PublishTradeBtn() {
         setShowSuccessModal(true);
         setTimeout(() => {
           setShowSuccessModal(false);
-          router.push("/protraders/trade-management");
+          router.refresh();
         }, 5000);
       } else toast.error(res.message);
     },
@@ -105,13 +105,21 @@ export default function PublishTradeBtn() {
             </h4>
             <p className="text-base font-normal leading-6 tracking-[1px] -mt-3">
               Your trade has been published successfully. You can view the trade
-              in the <b>Trade management tab</b>
+              in the{" "}
+              <b
+                onClick={() => {
+                  router.push("/protraders/trade-management");
+                }}
+              >
+                Trade management tab
+              </b>
             </p>
 
             <button
               onClick={() => {
                 setIsPublishTradeOpen(false);
                 setShowSuccessModal(false);
+                router.refresh();
               }}
               className="w-full flex items-center justify-center gap-2.5 bg-[#B39FF0] rounded-[20px] p-3 h-[50px] text-sm leading-[150%] tracking-[2px] font-bold text-[#2C2C26]"
             >
