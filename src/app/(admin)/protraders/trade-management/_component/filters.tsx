@@ -28,7 +28,7 @@ export default function Filters() {
     replace(`${pathname}?${params.toString()}`);
   };
 
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [showFilterOptions, setShowFilterOptions] = useState(true);
   const toggleFilterOptions = () => {
     setShowFilterOptions(!showFilterOptions);
   };
@@ -84,26 +84,34 @@ export default function Filters() {
               )}
             </button>
             {showStatusFilterOptions && (
-              <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
-                <p
+              <>
+                <div
+                  className="fixed size-full inset-0"
                   onClick={() => {
-                    setParams("status", "published");
                     setShowStatusFilterOptions(false);
                   }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Published
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("status", "draft");
-                    setShowStatusFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Draft
-                </p>
-              </div>
+                />
+                <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
+                  <p
+                    onClick={() => {
+                      setParams("status", "published");
+                      setShowStatusFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Published
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("status", "draft");
+                      setShowStatusFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Draft
+                  </p>
+                </div>
+              </>
             )}
           </div>
 
@@ -129,26 +137,34 @@ export default function Filters() {
               )}
             </button>
             {showPostionFilterOptions && (
-              <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
-                <p
+              <>
+                <div
+                  className="fixed size-full inset-0"
                   onClick={() => {
-                    setParams("position", "long");
                     setShowPositionFilterOptions(false);
                   }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Long
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("position", "short");
-                    setShowPositionFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Short
-                </p>
-              </div>
+                />
+                <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
+                  <p
+                    onClick={() => {
+                      setParams("position", "long");
+                      setShowPositionFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Long
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("position", "short");
+                      setShowPositionFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Short
+                  </p>
+                </div>
+              </>
             )}
           </div>
 
@@ -174,44 +190,53 @@ export default function Filters() {
               )}
             </button>
             {showPairFilterOptions && (
-              <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
-                <p
+              <>
+                <div
+                  className="fixed size-full inset-0"
                   onClick={() => {
-                    setParams("pair", "BTC/USDT");
                     setShowPairFilterOptions(false);
                   }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  BTC/USDT
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("pair", "ETH/USDT");
-                    setShowPairFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  ETH/USDT
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("pair", "BIN/USDT");
-                    setShowPairFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  BIN/USDT
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("pair", "SOL/USDT");
-                    setShowPairFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  SOL/USDT
-                </p>
-              </div>
+                />
+
+                <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
+                  <p
+                    onClick={() => {
+                      setParams("pair", "BTC/USDT");
+                      setShowPairFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    BTC/USDT
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("pair", "ETH/USDT");
+                      setShowPairFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    ETH/USDT
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("pair", "BIN/USDT");
+                      setShowPairFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    BIN/USDT
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("pair", "SOL/USDT");
+                      setShowPairFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    SOL/USDT
+                  </p>
+                </div>
+              </>
             )}
           </div>
 
@@ -236,49 +261,60 @@ export default function Filters() {
               )}
             </button>
             {showDateFilterOptions && (
-              <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
-                <DatePicker
-                  placeholderText="Start date"
-                  selected={
-                    searchParams.get("startDate")
-                      ? new Date(searchParams.get("startDate")!)
-                      : null
-                  }
-                  onChange={(date) => {
-                    if (date)
-                      setParams("startDate", date.toISOString().split("T")[0]);
-                    else removeParam("startDate");
-                  }}
-                  required
-                  dateFormat="P"
-                  locale="en-GB"
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs outline-0 ring-0  cursor-pointer hover:opacity-100"
-                />
-
-                <DatePicker
-                  placeholderText="End date"
-                  selected={
-                    searchParams.get("endDate")
-                      ? new Date(searchParams.get("endDate")!)
-                      : null
-                  }
-                  onChange={(date) => {
-                    if (!searchParams.get("startDate")) {
-                      toast.error("Please select a start date first");
-                      return;
-                    }
-                    if (date)
-                      setParams("endDate", date.toISOString().split("T")[0]);
-                    else removeParam("endDate");
-
+              <>
+                <div
+                  className="fixed size-full inset-0"
+                  onClick={() => {
                     setShowDateFilterOptions(false);
                   }}
-                  required
-                  dateFormat="P"
-                  locale="en-GB"
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs outline-0 ring-0  cursor-pointer hover:opacity-100"
                 />
-              </div>
+                <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
+                  <DatePicker
+                    placeholderText="Start date"
+                    selected={
+                      searchParams.get("startDate")
+                        ? new Date(searchParams.get("startDate")!)
+                        : null
+                    }
+                    onChange={(date) => {
+                      if (date)
+                        setParams(
+                          "startDate",
+                          date.toISOString().split("T")[0]
+                        );
+                      else removeParam("startDate");
+                    }}
+                    required
+                    dateFormat="P"
+                    locale="en-GB"
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs outline-0 ring-0  cursor-pointer hover:opacity-100"
+                  />
+
+                  <DatePicker
+                    placeholderText="End date"
+                    selected={
+                      searchParams.get("endDate")
+                        ? new Date(searchParams.get("endDate")!)
+                        : null
+                    }
+                    onChange={(date) => {
+                      if (!searchParams.get("startDate")) {
+                        toast.error("Please select a start date first");
+                        return;
+                      }
+                      if (date)
+                        setParams("endDate", date.toISOString().split("T")[0]);
+                      else removeParam("endDate");
+
+                      setShowDateFilterOptions(false);
+                    }}
+                    required
+                    dateFormat="P"
+                    locale="en-GB"
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs outline-0 ring-0  cursor-pointer hover:opacity-100"
+                  />
+                </div>
+              </>
             )}
           </div>
 
@@ -304,26 +340,35 @@ export default function Filters() {
               )}
             </button>
             {showPerformanceFilterOptions && (
-              <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
-                <p
+              <>
+                <div
+                  className="fixed size-full inset-0"
                   onClick={() => {
-                    setParams("performance", "profitable");
                     setShowPerformanceFilterOptions(false);
                   }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Profitable
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("performance", "loss making");
-                    setShowPerformanceFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Loss making
-                </p>
-              </div>
+                />
+
+                <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
+                  <p
+                    onClick={() => {
+                      setParams("performance", "profitable");
+                      setShowPerformanceFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Profitable
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("performance", "loss making");
+                      setShowPerformanceFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Loss making
+                  </p>
+                </div>
+              </>
             )}
           </div>
 
@@ -349,26 +394,34 @@ export default function Filters() {
               )}
             </button>
             {showCopierFilterOptions && (
-              <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
-                <p
+              <>
+                <div
+                  className="fixed size-full inset-0"
                   onClick={() => {
-                    setParams("copiers", "most copied");
                     setShowCopierFilterOptions(false);
                   }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Most Copied
-                </p>
-                <p
-                  onClick={() => {
-                    setParams("copiers", "least copied");
-                    setShowCopierFilterOptions(false);
-                  }}
-                  className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
-                >
-                  Least Copied
-                </p>
-              </div>
+                />
+                <div className="absolute top-10 left-0 min-w-[150px] py-1 px-2.5 rounded-[10px] border border-white/10 bg-[#211F22] flex flex-col items-start [&>p]:w-full">
+                  <p
+                    onClick={() => {
+                      setParams("copiers", "most copied");
+                      setShowCopierFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Most Copied
+                  </p>
+                  <p
+                    onClick={() => {
+                      setParams("copiers", "least copied");
+                      setShowCopierFilterOptions(false);
+                    }}
+                    className="py-2 px-1 opacity-80 text-white/60 text-xs cursor-pointer hover:opacity-100"
+                  >
+                    Least Copied
+                  </p>
+                </div>
+              </>
             )}
           </div>
         </div>
