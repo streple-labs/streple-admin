@@ -75,7 +75,7 @@ export const getUserCopyTrades = async (params: {
   copiers?: string;
 }): Promise<{ trades: GetCopyTradesResponse | null; error: string | null }> => {
   try {
-    const res = await api.get("/trades", { params });
+    const res = await api.get("/user-trades", { params });
 
     return { trades: res.data, error: null };
   } catch (error: any) {
@@ -92,6 +92,7 @@ export const getUserCopyTrades = async (params: {
     };
   }
 };
+
 export const getUserCopyTradeStats = async (): Promise<{
   stats: GetCopyTradeStatsResponse | null;
   error: string | null;
