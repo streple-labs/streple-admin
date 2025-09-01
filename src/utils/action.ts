@@ -182,3 +182,55 @@ export const publishTrade = async (formData: CopyTradeFormData) => {
     return { success: false, message: errorMessage, trade: null };
   }
 };
+
+export const updateTrade = async (
+  formData: CopyTradeFormData & { id: string }
+) => {
+  try {
+    await api.patch("/trade/" + formData.id, {
+      ...formData,
+      positionSize: {
+        amount: Number(formData.positionSize.amount),
+        currency: formData.positionSize.currency,
+      },
+    });
+
+    return {
+      success: true,
+      message: "Trade published successfully.",
+    };
+  } catch (error: any) {
+    let errorMessage = "Publish draft trade failed. Please try again later.";
+
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+
+    return { success: false, message: errorMessage };
+  }
+};
+
+export const closeTrade = async (tradeId: string) => {
+  try {
+    await api.get("/cancel-trade/" + tradeId);
+
+    return {
+      success: true,
+      message: "Trade closed successfully.",
+    };
+  } catch (error: any) {
+    let errorMessage = "Close trade failed. Please try again later.";
+
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+
+    return { success: false, message: errorMessage };
+  }
+};

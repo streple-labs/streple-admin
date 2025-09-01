@@ -20,7 +20,6 @@ const initialState: CopyTradeFormData = {
   comment: "",
   action: undefined,
   entryPrice: undefined,
-  direction: undefined,
   takeProfit: undefined,
   stopLoss: undefined,
   riskLevel: undefined,
@@ -107,6 +106,7 @@ export default function PublishTradeBtn() {
               Your trade has been published successfully. You can view the trade
               in the{" "}
               <b
+                className="cursor-pointer"
                 onClick={() => {
                   router.push("/protraders/trade-management");
                 }}

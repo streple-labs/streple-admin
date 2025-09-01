@@ -22,8 +22,6 @@ export default function PublishTradeForm({
 }) {
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
   const [showTradeTypeDropdown, setShowTradeTypeDropdown] = useState(false);
-  const [showTradeDirectionDropdown, setShowTradeDirectionDropdown] =
-    useState(false);
   const [showPositionDropdown, setShowPositionDropdown] = useState(false);
   const [showTradeDurationDropdown, setShowTradeDurationDropdown] =
     useState(false);
@@ -216,66 +214,7 @@ export default function PublishTradeForm({
                 </>
               )}
             </div>
-            <div className="space-y-3 relative">
-              <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
-                Trade direction
-              </p>
-              <div
-                title="Trade direction"
-                className={`h-[55px] cursor-pointer capitalize w-full text-base text-white/50 font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] bg-white/5 flex items-center justify-between relative`}
-                onClick={() => {
-                  if (isLoading) return;
-                  setShowTradeDirectionDropdown(true);
-                }}
-              >
-                <p>
-                  {formData.direction
-                    ? formData.direction
-                    : "Select trade direction"}
-                </p>
-                <FaChevronDown className="w-3 stroke-white/50" />
-              </div>
-              {showTradeDirectionDropdown && (
-                <>
-                  <div
-                    className="fixed inset-0 bg-transparent cursor-pointer"
-                    onClick={() => {
-                      setShowTradeDirectionDropdown(false);
-                    }}
-                  />
-                  <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 p-3 flex flex-col bg-[#2F2E2F]">
-                    <p
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          direction: "long",
-                        }));
-                        setShowTradeDirectionDropdown(false);
-                      }}
-                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.direction === "long" && "bg-white/5"
-                      }`}
-                    >
-                      Long
-                    </p>
-                    <p
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          direction: "short",
-                        }));
-                        setShowTradeDirectionDropdown(false);
-                      }}
-                      className={`px-2 py-3 rounded-[10px] h-12 w-full flex items-center text-sm font-normal hover:bg-white/5 text-white/60 cursor-pointer ${
-                        formData.direction === "short" && "bg-white/5"
-                      }`}
-                    >
-                      Short
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
+
             <div className="space-y-3 relative">
               <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
                 Order type

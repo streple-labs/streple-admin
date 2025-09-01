@@ -20,7 +20,6 @@ type CopyTradeFormData = {
     | undefined;
   comment: string;
   entryPrice: number | undefined;
-  direction: "long" | "short" | undefined;
   stopLoss: number | undefined;
   takeProfit: number | undefined;
   action: "buy" | "sell" | undefined;
@@ -83,7 +82,6 @@ type CopyTrade = {
     | "Swing"
     | "Position"
     | { startDate: Date; endDate: Date };
-  direction: "long" | "short";
   startDate: Date;
   expiresAt: Date;
   riskLevel: "Low" | "Medium" | "High";

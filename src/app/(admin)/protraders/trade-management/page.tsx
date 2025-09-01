@@ -3,6 +3,7 @@ import { getUserCopyTrades } from "@/utils/queries";
 import { formatCurrency, formatDate } from "@/utils/utils";
 import { Suspense } from "react";
 import Filters from "./_component/filters";
+import QuickActionBtns from "./_component/quick-action-btns";
 
 export const revalidate = 0;
 
@@ -91,10 +92,15 @@ export default async function page({
                   </td>
                   <td>{trade.noOfCopiers}</td>
                   <td>{formatCurrency(trade.copiersProfit)}</td>
-                  <td>{formatDate(trade.createdAt)}</td>
+                  <td>
+                    {trade.isDraft ? (
+                      <span className="text-[#F3EB52CC]">Draft</span>
+                    ) : (
+                      formatDate(trade.createdAt)
+                    )}
+                  </td>
                   <td className="flex items-center gap-4">
-                    <button>Update</button>
-                    <button className="text-[#F28787]">Close</button>
+                    <QuickActionBtns trade={trade} />
                   </td>
                 </tr>
               ))}

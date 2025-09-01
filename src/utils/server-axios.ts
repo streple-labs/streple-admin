@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { base_url } from "./constants";
 import { createNetworkError } from "./utils";
+import { setCookie } from "cookies-next";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   metadata?: {
@@ -113,7 +114,7 @@ api.interceptors.response.use(
 
             const { streple_auth_token: newAccessToken } = refreshResponse.data;
 
-            (await cookies()).set("streple_auth_token", newAccessToken, {
+            setCookie("streple_auth_token", newAccessToken, {
               // httpOnly: true,
               secure: process.env.NODE_ENV === "production",
               sameSite: "lax",
