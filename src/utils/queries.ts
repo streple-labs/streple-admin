@@ -116,6 +116,31 @@ export const getUserCopyTradeStats = async (): Promise<{
   }
 };
 
+export const getTrade = async (
+  trade_id: string
+): Promise<{
+  trade: CopyTrade | null;
+  error: string | null;
+}> => {
+  try {
+    const res = await api.get(`/trade?id=${trade_id}`);
+
+    return { trade: res.data.data, error: null };
+  } catch (error: any) {
+    let errorMessage = "request failed. Please try again later.";
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+    return {
+      error: errorMessage,
+      trade: null,
+    };
+  }
+};
+
 export const clearToken = async () => {
   (await cookies()).delete("streple_auth_token");
   (await cookies()).delete("streple_refresh_token");

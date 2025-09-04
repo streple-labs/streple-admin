@@ -172,7 +172,7 @@ export default async function page() {
                             : "bg-[#C76969] text-[#2F1818]"
                         }`}
                       >
-                        {trade.action ? "Long" : "Short"}
+                        {trade.action === "buy" ? "Long" : "Short"}
                       </span>
                     </td>
                     <td>{trade.entryPrice.toLocaleString()} USDT</td>
