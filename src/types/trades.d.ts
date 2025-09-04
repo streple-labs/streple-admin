@@ -11,13 +11,9 @@ type CopyTradeFormData = {
     amount: string;
     currency: "BTC" | "USDT";
   };
-  duration:
-    | "Scalp"
-    | "Intraday"
-    | "Swing"
-    | "Position"
-    | { startDate: Date; endDate: Date }
-    | undefined;
+  duration: "Scalp" | "Intraday" | "Swing" | "Position" | undefined;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
   comment: string;
   entryPrice: number | undefined;
   stopLoss: number | undefined;
@@ -76,12 +72,9 @@ type CopyTrade = {
   noOfCopiers: 0;
   scheduleStartId: 0;
   scheduleEndId: 1;
-  duration:
-    | "Scalp"
-    | "Intraday"
-    | "Swing"
-    | "Position"
-    | { startDate: Date; endDate: Date };
+  duration: "Scalp" | "Intraday" | "Swing" | "Position" | undefined;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
   startDate: Date;
   expiresAt: Date;
   riskLevel: "Low" | "Medium" | "High";

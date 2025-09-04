@@ -28,7 +28,7 @@ export default function Filters() {
     replace(`${pathname}?${params.toString()}`);
   };
 
-  const [showFilterOptions, setShowFilterOptions] = useState(true);
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
   const toggleFilterOptions = () => {
     setShowFilterOptions(!showFilterOptions);
   };
@@ -125,7 +125,7 @@ export default function Filters() {
             >
               {searchParams.get("action") ? (
                 <>
-                  {searchParams.get("action") ? "Long" : "Short"}
+                  {searchParams.get("action") === "buy" ? "Long" : "Short"}
 
                   <GoXCircle color="#F8F5FF80" width={12} />
                 </>
@@ -244,7 +244,10 @@ export default function Filters() {
             <button
               className="w-full border border-white/10 rounded-[15px] h-8 py-2 px-4 flex items-center justify-between gap-2.5 text-white/70 text-xs/3 font-normal overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => {
-                setShowDateFilterOptions((prev) => !prev);
+                if (searchParams.get("fromDate")) {
+                  removeParam("toDate");
+                  removeParam("fromDate");
+                } else setShowDateFilterOptions((prev) => !prev);
               }}
             >
               {searchParams.get("fromDate") ? (

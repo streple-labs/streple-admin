@@ -17,6 +17,8 @@ const initialState: CopyTradeFormData = {
     currency: "USDT",
   },
   duration: undefined,
+  startDate: undefined,
+  endDate: undefined,
   comment: "",
   action: undefined,
   entryPrice: undefined,

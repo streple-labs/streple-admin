@@ -15,7 +15,6 @@ export default async function page({
   const params = await searchParams;
   const { trades, error } = await getUserCopyTrades({
     ...params,
-    ...(params.draft ? { draft: Boolean(params.draft === "true") } : {}),
   });
 
   return (

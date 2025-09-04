@@ -472,13 +472,10 @@ export default function PublishTradeForm({
                   {formData.duration
                     ? typeof formData.duration === "string"
                       ? formData.duration
-                      : typeof formData.duration === "object" &&
-                        formData.duration !== null &&
-                        formData.duration.startDate &&
-                        formData.duration.endDate
+                      : formData.startDate && formData.endDate
                       ? (() => {
-                          const start = new Date(formData.duration.startDate);
-                          const end = new Date(formData.duration.endDate);
+                          const start = new Date(formData.startDate);
+                          const end = new Date(formData.endDate);
                           const diffMs = end.getTime() - start.getTime();
                           const diffDays = Math.floor(
                             diffMs / (1000 * 60 * 60 * 24)
@@ -495,7 +492,7 @@ export default function PublishTradeForm({
                           if (diffMinutes > 0) result += `${diffMinutes}m`;
                           return result.trim() || "0m";
                         })()
-                      : ""
+                      : formData.startDate?.toDateString()
                     : "Select trade duration"}
                 </p>
                 <FaChevronDown className="w-3 stroke-white/50" />
@@ -637,6 +634,11 @@ export default function PublishTradeForm({
                                   }
 
                                   setStartTime(date);
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    startDate: combined,
+                                    duration: undefined,
+                                  }));
                                 }}
                                 required
                                 showTimeSelect
@@ -659,7 +661,7 @@ export default function PublishTradeForm({
                                 placeholderText="Select date"
                                 selected={endDate}
                                 onChange={(date) => {
-                                  if (!startDate || !startTime) {
+                                  if (!formData.startDate) {
                                     toast.error("Select start date first");
                                     return;
                                   }
@@ -679,7 +681,7 @@ export default function PublishTradeForm({
                                 placeholderText="Select time"
                                 selected={endTime}
                                 onChange={(date) => {
-                                  if (!startDate || !startTime) {
+                                  if (!formData.startDate) {
                                     toast.error("Select start date first");
                                     return;
                                   }
@@ -692,14 +694,6 @@ export default function PublishTradeForm({
                                     return;
                                   }
 
-                                  const startDateCombined = new Date(
-                                    startDate.getFullYear(),
-                                    startDate.getMonth(),
-                                    startDate.getDate(),
-                                    startTime.getHours(),
-                                    startTime.getMinutes()
-                                  );
-
                                   const endDateCombined = new Date(
                                     endDate.getFullYear(),
                                     endDate.getMonth(),
@@ -710,7 +704,7 @@ export default function PublishTradeForm({
 
                                   if (
                                     endDateCombined.getTime() <=
-                                    startDateCombined.getTime()
+                                    formData.startDate.getTime()
                                   ) {
                                     toast.error(
                                       "End date and time must be after start date and time."
@@ -720,10 +714,8 @@ export default function PublishTradeForm({
 
                                   setFormData((prev) => ({
                                     ...prev,
-                                    tradeDuration: {
-                                      startDate: startDateCombined,
-                                      endDate: endDateCombined,
-                                    },
+                                    endDate: endDateCombined,
+                                    duration: undefined,
                                   }));
 
                                   setEndTime(date);

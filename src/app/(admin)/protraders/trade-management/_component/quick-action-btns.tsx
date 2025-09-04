@@ -19,6 +19,8 @@ export default function QuickActionBtns({ trade }: { trade: CopyTrade }) {
       currency: trade.positionSize.currency,
     },
     duration: trade.duration,
+    startDate: trade.startDate,
+    endDate: trade.endDate,
     comment: trade.comment,
     action: trade.action,
     entryPrice: trade.entryPrice,
