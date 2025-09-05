@@ -9,9 +9,10 @@ const initialState = {
   fullName: "",
   email: "",
   role: "",
-  roleLevel: "",
+  roleLevel: undefined,
   type: "",
 };
+
 export default function CreateUserForm({
   isOpen,
   close,
@@ -19,7 +20,13 @@ export default function CreateUserForm({
   isOpen: boolean;
   close: () => void;
 }) {
-  const [formData, setFormData] = useState(initialState);
+  const [formData, setFormData] = useState<{
+    fullName: string;
+    email: string;
+    role: string;
+    roleLevel: number | undefined;
+    type: string;
+  }>(initialState);
 
   const { mutate: createUser, isPending: loading } = useMutation({
     mutationKey: ["create-user"],
@@ -45,6 +52,7 @@ export default function CreateUserForm({
   });
 
   const [openRoles, setOpenRoles] = useState(false);
+  const [openRoleLevel, setOpenRoleLevel] = useState(false);
 
   if (!isOpen) return null;
 
@@ -128,25 +136,21 @@ export default function CreateUserForm({
                   label: "ADMIN",
                   id: "ADMIN",
                   type: "Internal",
-                  roleLevel: "3",
                 },
                 {
                   label: "PRO TRADER",
                   id: "PRO_TRADER",
-                  type: "External",
-                  roleLevel: "1",
+                  type: "Internal",
                 },
                 {
                   label: "PUBLISHER",
                   id: "PUBLISHER",
                   type: "Internal",
-                  roleLevel: "2",
                 },
                 {
                   label: "MARKETER",
                   id: "MARKETER",
-                  type: "External",
-                  roleLevel: "2",
+                  type: "Internal",
                 },
               ].map((role, i) => (
                 <p
@@ -155,7 +159,6 @@ export default function CreateUserForm({
                     setFormData((prev) => ({
                       ...prev,
                       role: role.id,
-                      roleLevel: role.roleLevel,
                       type: role.type,
                     }));
                     setOpenRoles(false);
@@ -163,6 +166,50 @@ export default function CreateUserForm({
                   className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px] hover:bg-white/10 rounded-full py-2 px-4"
                 >
                   {role.label}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="w-full space-y-3 relative">
+          <p className="font-normal text-base leading-6 tracking-[1px] text-white/80">
+            Select role level
+          </p>
+          <label
+            onClick={() => {
+              setOpenRoleLevel((prev) => !prev);
+            }}
+            className="relative cursor-pointer flex items-center justify-between h-[55px] w-full text-base font-normal py-5 px-4 rounded-[10px] gap-4 leading-6 tracking-[1px] outline-0 ring-0 caret-[#B39FF0] bg-white/5"
+          >
+            <p className={!formData.roleLevel ? "text-white/50" : ""}>
+              {formData.roleLevel || "Select user role level"}
+            </p>
+
+            <FaChevronDown size={18} fill="#fff" />
+          </label>
+          {openRoleLevel && (
+            <div className="absolute z-10 top-24 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-2 bg-[#242324]">
+              {[
+                {
+                  roleLevel: 2,
+                },
+                {
+                  roleLevel: 3,
+                },
+              ].map((role, i) => (
+                <p
+                  key={i}
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      roleLevel: role.roleLevel,
+                    }));
+                    setOpenRoleLevel(false);
+                  }}
+                  className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px] hover:bg-white/10 rounded-full py-2 px-4"
+                >
+                  {role.roleLevel}
                 </p>
               ))}
             </div>
