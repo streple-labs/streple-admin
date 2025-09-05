@@ -86,7 +86,7 @@ export default async function page({
             <div className="py-6 px-4 rounded-[15px] flex flex-col gap-6 bg-white/5">
               <p className="text-sm text-white/50 font-normal">Copiers</p>
               <p className={`${anton.className} text-2xl text-white/80`}>
-                +${formatFigure(trade?.noOfCopiers as number)}
+                {trade?.noOfCopiers as number}
               </p>
             </div>
             <div className="py-6 px-4 rounded-[15px] flex flex-col gap-6 bg-white/5">
