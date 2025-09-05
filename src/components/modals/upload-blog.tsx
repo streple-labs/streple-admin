@@ -7,7 +7,25 @@ import { FiX } from "react-icons/fi";
 import { IoImageOutline } from "react-icons/io5";
 import { toast } from "sonner";
 
-const tag_options = ["Crypto Basics"];
+const tag_options = [
+  "Crypto Basics",
+  "Crypto",
+  "Bitcoin",
+  "Ethereum",
+  "Crypto trading",
+  "Learn crypto",
+  "Investing in crypto",
+  "Beginner trading",
+  "How to trade crypto",
+  "Blockchain",
+  "DeFi",
+  "NFTs",
+  "Global payments",
+  "Crypto news",
+  "Ethereum price",
+  "Bitcoin price",
+  "Crypto for beginners",
+];
 
 export default function FillBlogDetailsModal({
   isOpen,
@@ -107,10 +125,25 @@ export default function FillBlogDetailsModal({
                   className="p-0 bg-transparent text-sm font-semibold leading-[150%] tracking-[2px] text-white border-0 ring-0 outline-0 w-full placeholder:text-white/50"
                   type="text"
                   placeholder="Add tags (e.g. Crypto Basics)"
-                  onChange={(e) => setSearchTag(e.target.value.trim())}
+                  onChange={(e) => setSearchTag(e.target.value)}
                 />
 
                 <div className="absolute z-10 top-14 left-0 w-full rounded-[20px] border border-white/10 px-3 py-4 flex flex-col gap-3 bg-[#242324] pb-5">
+                  {searchTag && (
+                    <p
+                      onClick={() => {
+                        setBlogData((prev) => ({
+                          ...prev,
+                          tags: Array.from(new Set([...prev.tags, searchTag])),
+                        }));
+                        setSearchTag("");
+                        setTagInputFocus(false);
+                      }}
+                      className="cursor-pointer text-sm font-normal leading-[150%] tracking-[2px]"
+                    >
+                      {searchTag}
+                    </p>
+                  )}
                   {tag_options
                     .filter((tag) =>
                       tag.toLowerCase().includes(searchTag.toLowerCase())
@@ -143,20 +176,18 @@ export default function FillBlogDetailsModal({
                   <div className="flex items-center gap-2.5">
                     {blogData.tags.map((tag, i) => (
                       <p
+                        onClick={() => {
+                          setBlogData((prev) => ({
+                            ...prev,
+                            tags: prev.tags.filter((_, idx) => idx !== i),
+                          }));
+                        }}
                         key={i}
                         className="bg-white/5 py-1 px-2 rounded-[5px] flex items-center gap-2.5 text-white/60"
                       >
                         {tag}
-                        <span
-                          onClick={() => {
-                            setBlogData((prev) => ({
-                              ...prev,
-                              tags: prev.tags.filter((_, idx) => idx !== i),
-                            }));
-                          }}
-                        >
-                          <FiX width={12} color="#FFFFFF99" />
-                        </span>
+
+                        <FiX width={12} color="#FFFFFF99" />
                       </p>
                     ))}
                   </div>
