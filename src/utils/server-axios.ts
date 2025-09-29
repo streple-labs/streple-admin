@@ -28,7 +28,7 @@ api.interceptors.request.use(
   async (config: CustomAxiosRequestConfig) => {
     const token = (await cookies()).get("streple_auth_token")?.value;
 
-    if (token && config.headers)
+    if (token && config.headers && !config.headers["Authorization"])
       config.headers["Authorization"] = `Bearer ${token}`;
 
     config.metadata = { startTime: new Date() };

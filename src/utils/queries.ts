@@ -147,3 +147,36 @@ export const clearToken = async () => {
 
   redirect("/login");
 };
+
+export const initiate2fa = async (
+  token: string
+): Promise<{
+  success: boolean;
+  error: string | null;
+  data: { dataUrl: string; secret: string } | null;
+}> => {
+  try {
+    const res = await api.get("/user/initiate-tfa-enabling", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return {
+      success: true,
+      error: null,
+      data: res.data,
+    };
+  } catch (error: any) {
+    let errorMessage = "Close trade failed. Please try again later.";
+
+    if (error?.response?.data?.message) {
+      if (Array.isArray(error.response.data.message))
+        errorMessage = error.response.data.message.join(", ");
+      else errorMessage = error.response.data.message;
+    } else if (error?.userMessage) errorMessage = error.userMessage;
+    else if (error?.message) errorMessage = error.message;
+
+    return { success: false, error: errorMessage, data: null };
+  }
+};

@@ -30,14 +30,9 @@ export default function AuthLayout({
           </div>
         </div>
       </div>
-      <div className="w-full lg:w-1/2 h-screen flex items-center justify-center flex-col gap-10 px-[5%] md:px-[5.76%] py-8 bg-[#1B191C] relative">
+      <div className="w-full lg:w-1/2 min-h-screen flex items-center justify-center flex-col gap-10 px-[5%] md:px-[5.76%] py-8 bg-[#1B191C] relative">
         <div className="w-full flex items-start lg:hidden">
-          <Image
-            src="/streple-logo.png"
-            alt="streple logo"
-            width={112}
-            height={33}
-          />
+          <Image src={logo} alt="streple logo" width={112} height={33} />
         </div>
         {children}
       </div>

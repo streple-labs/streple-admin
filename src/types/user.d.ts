@@ -14,6 +14,7 @@ interface User {
   performanceHistory: Record<string, unknown> | null;
   followerCount: number;
   demoFundingBalance: string;
+  isTfaEnabled: boolean;
 }
 
 type ROLE =

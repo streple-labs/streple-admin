@@ -36,7 +36,7 @@ export default function Success({
                 title="success"
                 // type="submit"
               >
-                Login
+                Continue
               </button>
             </Link>
           </div>

@@ -25,7 +25,7 @@ let failedRequestsQueue: ((token: string) => void)[] = [];
 api.interceptors.request.use(
   (config: CustomAxiosRequestConfig) => {
     const token = getCookie("streple_auth_token");
-    if (token && config.headers)
+    if (token && config.headers && !config.headers["Authorization"])
       config.headers["Authorization"] = `Bearer ${token}`;
 
     config.metadata = { startTime: new Date() };
