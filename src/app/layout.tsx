@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import "react-datepicker/dist/react-datepicker.css";
 import { openSans } from "./fonts";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
@@ -63,6 +64,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Analytics />
+
       <Providers>
         <body className={`${openSans.className} antialiased`}>{children}</body>
       </Providers>
