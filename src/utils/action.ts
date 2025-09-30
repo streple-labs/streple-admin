@@ -20,6 +20,7 @@ export const login = async (formData: { email: string; password: string }) => {
       streple_auth_token,
       streple_refresh_token,
       user_data,
+      status: res.status,
     };
   } catch (error: any) {
     let errorMessage = "login failed. Please try again later.";
@@ -36,6 +37,8 @@ export const login = async (formData: { email: string; password: string }) => {
       message: errorMessage,
       user_data: null,
       streple_auth_token: null,
+      streple_refresh_token: null,
+      status: error.status || 500,
     };
   }
 };
