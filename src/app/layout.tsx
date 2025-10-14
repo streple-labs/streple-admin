@@ -7,35 +7,38 @@ import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Streple | Copy Top Traders and Earn Smarter",
+    default: "Streple | Borderless Payments & Social Trading App",
     template: "Streple | %s",
+    absolute: "Streple | Borderless Payments & Social Trading App",
   },
   description:
-    "Mirror top traders in real time with Streple. Start trading like a pro in 3 simple steps — no experience needed. Copy verified experts, automate your trades, and earn smarter.",
+    "Streple is a borderless FinTech app that lets you send money worldwide, manage digital assets, and copy verified traders in a secure, EU VASP-certified platform.",
   keywords: [
-    "copy trading",
-    "automated trading",
-    "top traders",
-    "crypto trading",
-    "Streple",
-    "mirror trades",
-    "trading app",
-    "earn with trading",
-    "passive income",
-    "crypto investing",
+    "borderless payment app",
+    "global money transfer",
+    "send money across borders",
+    "copy trading app",
+    "social trading platform",
+    "copy verified traders",
+    "EU VASP-certified fintech",
+    "digital assets",
+    "cross-border finance app",
+    "one account for global payments",
+    "tokenized asset platform",
+    "pro trader network",
   ],
   openGraph: {
-    title: "Streple | Copy Top Traders and Earn Smarter",
+    title: "Streple | Send Money Worldwide & Copy Verified Traders",
     description:
-      "With Streple, you copy the exact trades of top-performing experts. Start earning with no experience — automate trades, manage risk, and grow smarter.",
-    url: "https://streple.com",
+      "Send money globally, manage digital assets, and copy verified traders securely with Streple, an EU VASP-certified, borderless finance app.",
+    url: "https://solace.streple.com",
     siteName: "Streple",
     images: [
       {
-        url: "https://streple.com/opengraph-image.png",
+        url: "https://solace.streple.com/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Streple - Copy Top Traders",
+        alt: "Streple - Borderless Finance & Social Trading App",
       },
     ],
     locale: "en_US",
@@ -43,13 +46,29 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Streple | Copy Top Traders and Earn Smarter",
+    title: "Streple | Borderless Payments & Social Trading",
     description:
-      "Start trading like a pro with Streple. No experience needed — copy top-performing experts and automate your trading journey.",
-    images: ["https://streple.com/opengraph-image.png"],
+      "Streple lets beginners and pros send money internationally, own crypto & tokenized assets, and copy top traders — all in one secure platform.",
+    images: ["https://solace.streple.com/opengraph-image.png"],
     creator: "@StrepleNetwork",
   },
-  metadataBase: new URL("https://streple.com"),
+  metadataBase: new URL("https://solace.streple.com"),
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // Add your verification codes when available
+    // google: 'your-google-verification-code',
+    // yandex: 'your-yandex-verification-code',
+  },
 };
 
 export const viewport: Viewport = {
@@ -65,9 +84,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Analytics />
-      <Providers>
-        <body className={`${openSans.className} antialiased`}>{children}</body>
-      </Providers>
+      <body className={`${openSans.className} antialiased`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

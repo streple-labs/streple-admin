@@ -25,6 +25,7 @@ type Blog = {
   scheduleDate?: string;
   createdAt: string;
   updatedAt: string;
+  creator: { fullName: string };
   creatorId: string | null;
   view: number;
 };

@@ -51,7 +51,9 @@ export default function BlogManager() {
     queryFn: async () =>
       (
         await api.get("/blogs", {
-          params: params.get("query") ? { search: params.get("query") } : {},
+          params: params.get("query")
+            ? { search: params.get("query"), include: "creator" }
+            : { include: "creator" },
         })
       ).data,
   });
@@ -273,7 +275,7 @@ export default function BlogManager() {
                             }
                           )}
                         </td>
-                        <td>{blog.creatorId}</td>
+                        <td>{blog.creator.fullName}</td>
                         <td>{blog.view}</td>
                         <td className="relative">
                           <span
