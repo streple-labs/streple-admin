@@ -204,3 +204,154 @@ export function fileToBase64(file: File): Promise<string> {
     reader.onerror = (error) => reject(error);
   });
 }
+
+/**
+ * Compresses and optionally resizes an image file until its size is less than
+ * or equal to the target size in Kilobytes (KB).
+ *
+ * @param {File} imageFile - The image file (e.g., from an <input type="file">).
+ * @param {number} targetSizeInKB - The maximum desired size of the compressed image in Kilobytes (KB).
+ * @param {number} [initialQuality=0.9] - The starting JPEG compression quality (0.0 to 1.0).
+ * @param {number} [qualityStep=0.05] - How much to decrease quality in each compression attempt.
+ * @param {number} [minQuality=0.1] - The minimum quality to stop at before attempting resizing.
+ * @returns {Promise<File>} A Promise that resolves with the compressed image as a new File object.
+ */
+export function compressImageToTargetSize(
+  imageFile: File,
+  targetSizeInKB: number,
+  initialQuality: number = 0.9,
+  qualityStep: number = 0.05,
+  minQuality: number = 0.1
+): Promise<File> {
+  const targetSizeInBytes: number = targetSizeInKB * 1024;
+
+  if (imageFile.size <= targetSizeInBytes) {
+    console.log(`Image is already below ${targetSizeInKB} KB.`);
+    return Promise.resolve(imageFile);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+      const img = new Image();
+
+      img.onload = () => {
+        let currentQuality: number = initialQuality;
+        let currentWidth: number = img.width;
+        let currentHeight: number = img.height;
+
+        const mimeType: string =
+          imageFile.type === "image/jpeg" || imageFile.type === "image/png"
+            ? "image/jpeg"
+            : imageFile.type;
+
+        let bestEffortBlob: Blob | null = null;
+
+        const attemptCompression = (isResizing: boolean = false): void => {
+          const canvas: HTMLCanvasElement = document.createElement("canvas");
+          canvas.width = currentWidth;
+          canvas.height = currentHeight;
+          const ctx: CanvasRenderingContext2D | null = canvas.getContext("2d");
+
+          if (!ctx) {
+            return reject(new Error("Failed to get 2D canvas context."));
+          }
+
+          ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                return reject(
+                  new Error("Failed to create Blob during compression.")
+                );
+              }
+
+              bestEffortBlob = blob;
+
+              if (blob.size <= targetSizeInBytes) {
+                const compressedFile: File = new File([blob], imageFile.name, {
+                  type: mimeType,
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+                return;
+              }
+
+              currentQuality -= qualityStep;
+
+              if (currentQuality < minQuality) {
+                if (isResizing) {
+                  console.error(
+                    "Failed to meet target size even after resizing and max compression."
+                  );
+                  const finalFile: File = new File(
+                    [bestEffortBlob],
+                    imageFile.name,
+                    { type: mimeType }
+                  );
+                  resolve(finalFile);
+                  return;
+                }
+
+                console.warn(
+                  `Stopped at minimum quality (${minQuality}). Attempting resize...`
+                );
+
+                currentWidth = Math.floor(currentWidth * 0.9);
+                currentHeight = Math.floor(currentHeight * 0.9);
+                currentQuality = initialQuality;
+
+                if (currentWidth < 100 || currentHeight < 100) {
+                  console.error(
+                    "Image dimensions are too small to reduce further."
+                  );
+                  const finalFile: File = new File(
+                    [bestEffortBlob],
+                    imageFile.name,
+                    { type: mimeType }
+                  );
+                  resolve(finalFile);
+                  return;
+                }
+
+                attemptCompression(true);
+                return;
+              }
+
+              const sizeKB = (blob.size / 1024).toFixed(2);
+              const qualityStr = currentQuality.toFixed(2);
+              if (!isResizing) {
+                console.log(
+                  `Current size: ${sizeKB} KB. Quality: ${qualityStr}. Decreasing quality...`
+                );
+              } else {
+                console.log(
+                  `Resizing: Size: ${sizeKB} KB. Dimensions: ${currentWidth}x${currentHeight}. Quality: ${qualityStr}.`
+                );
+              }
+
+              attemptCompression(isResizing);
+            },
+            mimeType,
+            currentQuality
+          );
+        };
+
+        attemptCompression(false);
+      };
+
+      img.onerror = () =>
+        reject(new Error("Failed to load image for processing."));
+
+      if (typeof event.target?.result === "string")
+        img.src = event.target.result;
+      else reject(new Error("Failed to read file as Data URL."));
+    };
+
+    reader.onerror = () => reject(new Error("Failed to read the file."));
+
+    reader.readAsDataURL(imageFile);
+  });
+}

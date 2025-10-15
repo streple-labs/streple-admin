@@ -1,6 +1,6 @@
 import { anton, dmSans } from "@/app/fonts";
 import Loader from "@/components/ui/loader";
-import { formatFileSize } from "@/utils/utils";
+import { compressImageToTargetSize, formatFileSize } from "@/utils/utils";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaRegFileAlt } from "react-icons/fa";
@@ -241,12 +241,17 @@ export default function UploadCourseModal({
                 id="thumbnail"
                 accept="image/*"
                 readOnly={isLoading}
-                onChange={(e) => {
+                onChange={async (e) => {
                   const file = e.target.files?.[0] || null;
                   if (file) {
+                    const thumbnail = await compressImageToTargetSize(
+                      file,
+                      295
+                    );
+
                     setCourseDetails((prev) => ({
                       ...prev,
-                      thumbnail: file,
+                      thumbnail,
                     }));
                     toast.success(`selected cover image: ${file.name}`);
                   } else toast.error("No cover image selected");

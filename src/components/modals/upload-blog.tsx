@@ -1,5 +1,6 @@
 import { anton } from "@/app/fonts";
 import Loader from "@/components/ui/loader";
+import { compressImageToTargetSize } from "@/utils/utils";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
@@ -229,7 +230,7 @@ export default function FillBlogDetailsModal({
               id="cover_img"
               accept="image/*"
               readOnly={isLoading}
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0] || null;
 
                 if (file && file.size > 5 * 1024 * 1024) {
@@ -238,10 +239,13 @@ export default function FillBlogDetailsModal({
                 }
 
                 if (file) {
+                  const thumbnail = await compressImageToTargetSize(file, 300);
+
                   setBlogData((prev) => ({
                     ...prev,
-                    thumbnail: file,
+                    thumbnail,
                   }));
+                  toast.success(`selected cover image: ${thumbnail.name}`);
                 } else toast.error("No cover image selected");
               }}
               className="hidden"
