@@ -283,9 +283,6 @@ export function compressImageToTargetSize(
 
               if (currentQuality < minQuality) {
                 if (isResizing) {
-                  console.error(
-                    "Failed to meet target size even after resizing and max compression."
-                  );
                   const finalFile: File = new File(
                     [bestEffortBlob],
                     imageFile.name,
@@ -295,18 +292,11 @@ export function compressImageToTargetSize(
                   return;
                 }
 
-                // console.warn(
-                //   `Stopped at minimum quality (${minQuality}). Attempting resize...`
-                // );
-
                 currentWidth = Math.floor(currentWidth * 0.9);
                 currentHeight = Math.floor(currentHeight * 0.9);
                 currentQuality = initialQuality;
 
                 if (currentWidth < 100 || currentHeight < 100) {
-                  // console.error(
-                  //   "Image dimensions are too small to reduce further."
-                  // );
                   const finalFile: File = new File(
                     [bestEffortBlob],
                     imageFile.name,
@@ -319,18 +309,6 @@ export function compressImageToTargetSize(
                 attemptCompression(true);
                 return;
               }
-
-              const sizeKB = (blob.size / 1024).toFixed(2);
-              const qualityStr = currentQuality.toFixed(2);
-              // if (!isResizing) {
-              //   console.log(
-              //     `Current size: ${sizeKB} KB. Quality: ${qualityStr}. Decreasing quality...`
-              //   );
-              // } else {
-              //   console.log(
-              //     `Resizing: Size: ${sizeKB} KB. Dimensions: ${currentWidth}x${currentHeight}. Quality: ${qualityStr}.`
-              //   );
-              // }
 
               attemptCompression(isResizing);
             },
