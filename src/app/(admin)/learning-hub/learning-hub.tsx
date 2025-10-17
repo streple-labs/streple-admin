@@ -71,8 +71,15 @@ export default function LearningHub() {
   const [editCourse, setEditCourse] = useState(false);
   const { mutate: handleEditCourse, isPending: isEditingCourse } = useMutation({
     mutationKey: ["edit-course"],
-    mutationFn: async (courseid: string) =>
-      await api.patch(`/learning/${courseid}`, courseDetails),
+    mutationFn: async (courseid: string) => {
+      const formData = new FormData();
+      for (const key in courseDetails) {
+        const value = courseDetails[key as keyof typeof courseDetails];
+        if (value !== null && value !== undefined) formData.append(key, value);
+      }
+
+      return await api.patch(`/learning/${courseid}`, formData);
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries({
         queryKey: ["courses-data", params.get("query"), level],

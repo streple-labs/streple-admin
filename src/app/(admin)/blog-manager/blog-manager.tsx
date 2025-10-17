@@ -61,11 +61,26 @@ export default function BlogManager() {
   const [editBlog, setEditBlog] = useState(false);
   const { mutate: handleEditBlog, isPending: isEditingBlog } = useMutation({
     mutationKey: ["edit-blog"],
-    mutationFn: async (blogId: string) =>
-      await api.patch(`/blog/${blogId}`, {
-        ...blogData,
-        draft: Boolean(blogData.status === "Draft"),
-      }),
+    mutationFn: async (blogId: string) => {
+      const formData = new FormData();
+      for (const key in blogData) {
+        const value = blogData[key as keyof typeof blogData];
+        if (typeof value === "boolean") {
+          formData.append(key, value ? "true" : "false");
+          continue;
+        } else if (value !== null && value !== undefined) {
+          if (value instanceof Date) formData.append(key, value.toISOString());
+          else if (Array.isArray(value))
+            value.forEach((item) => {
+              formData.append(`${key}[]`, item);
+            });
+          else if (value instanceof File) formData.append(key, value);
+          else formData.append(key, String(value));
+        }
+      }
+
+      return await api.patch(`/blog/${blogId}`, formData);
+    },
     onSuccess: (res) => {
       queryClient.invalidateQueries({
         queryKey: ["blog-data", params.get("query")],
