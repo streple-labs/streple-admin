@@ -174,7 +174,7 @@ export default function LearningHub() {
   return (
     <>
       <div className="px-6 py-8 rounded-[20px] flex flex-col gap-6 w-full bg-[#211F22] overflow-y-auto hide-scrollbar">
-        {courseDetails.type === "article" && !editCourse && !isEditingCourse ? (
+        {courseDetails.type === "article" ? (
           <TextEditorProvider>
             <ToolPanel
               title={courseDetails.title}
@@ -431,7 +431,6 @@ export default function LearningHub() {
                                 });
                                 setFillCourseDetails(true);
                                 setEditCourse(true);
-                                toggleUploadModal();
                               }}
                             >
                               <PiPencilSimpleLineBold size={15} />

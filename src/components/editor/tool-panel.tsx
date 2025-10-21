@@ -59,25 +59,25 @@ const ToolPanel = ({
   return (
     <div className="flex flex-col gap-6 w-full">
       <div className="flex gap-8 justify-between pb-4 border-b border-b-white/5">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 w-full">
           <span className="cursor-pointer" onClick={close}>
             <FaArrowLeft className="w-5 stroke-white/80" />
           </span>
           <form
             onSubmit={(e) => e.preventDefault()}
-            className="flex items-center"
+            className="flex items-center w-full"
           >
             <input
               value={title}
               type="text"
-              className="text-xl text-white/80 font-semibold bg-transparent border-none outline-none"
+              className="text-xl text-white/80 font-semibold bg-transparent border-none outline-none w-full text-ellipsis whitespace-nowrap overflow-hidden"
               placeholder="Untitled document"
               onChange={(e) => setTitle(e.target.value)}
               aria-label="Document title"
             />
           </form>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 shrink-0">
           <button
             onClick={() => {
               saveAsDraft(toHtml());
